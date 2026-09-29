@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/banner-gerenciador-salas.png" alt="Banner do Gerenciador de Salas e Recursos" width="100%">
+</p>
+
 # Gerenciador de Salas de Aula
 
 Sistema acadêmico em **Java 21 e Spring Boot 3.x** para alocar salas, professores, materiais e equipamentos sem conflitos de horário, com autorização, auditoria, concorrência segura e evidências reproduzíveis de qualidade.
