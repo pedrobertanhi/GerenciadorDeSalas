@@ -1,6 +1,6 @@
 # ADR-004: Arquitetura em camadas
 
-- **Status:** Proposta
+- **Status:** Aceita
 - **Data:** 26/08/2026
 - **Issue relacionada:** #1
 

@@ -1,6 +1,6 @@
 # ADR-006: Controle concorrente de reservas
 
-- **Status:** Proposta
+- **Status:** Aceita
 - **Data:** 26/08/2026
 - **Issue relacionada:** #1
 

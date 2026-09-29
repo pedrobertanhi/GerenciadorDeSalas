@@ -1,6 +1,6 @@
 # ADR-005: Autenticação e autorização
 
-- **Status:** Proposta
+- **Status:** Aceita
 - **Data:** 26/08/2026
 - **Issue relacionada:** #1
 

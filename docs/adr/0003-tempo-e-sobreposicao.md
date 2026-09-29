@@ -1,6 +1,6 @@
 # ADR-003: Fuso horário e sobreposição de intervalos
 
-- **Status:** Proposta
+- **Status:** Aceita
 - **Data:** 26/08/2026
 - **Issue relacionada:** #1
 

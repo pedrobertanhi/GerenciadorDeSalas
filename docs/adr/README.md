@@ -30,13 +30,13 @@ Um ADR não poderá ser considerado completo se alguma seção obrigatória esti
 
 | ADR | Decisão | Status |
 |---|---|---|
-| [ADR-001](0001-stack-tecnologica.md) | Stack tecnológica base | Proposta |
-| [ADR-002](0002-interface-web-e-openapi.md) | Interface web e documentação OpenAPI | Proposta |
-| [ADR-003](0003-tempo-e-sobreposicao.md) | Fuso horário e sobreposição de intervalos | Proposta |
-| [ADR-004](0004-arquitetura-em-camadas.md) | Arquitetura em camadas | Proposta |
-| [ADR-005](0005-autenticacao-e-autorizacao.md) | Autenticação e autorização | Proposta |
-| [ADR-006](0006-controle-concorrente-de-reservas.md) | Controle concorrente de reservas | Proposta |
-| [ADR-007](0007-estrategia-de-notificacoes.md) | Estratégia de notificações | Proposta |
+| [ADR-001](0001-stack-tecnologica.md) | Stack tecnológica base | Aceita |
+| [ADR-002](0002-interface-web-e-openapi.md) | Interface web e documentação OpenAPI | Aceita |
+| [ADR-003](0003-tempo-e-sobreposicao.md) | Fuso horário e sobreposição de intervalos | Aceita |
+| [ADR-004](0004-arquitetura-em-camadas.md) | Arquitetura em camadas | Aceita |
+| [ADR-005](0005-autenticacao-e-autorizacao.md) | Autenticação e autorização | Aceita |
+| [ADR-006](0006-controle-concorrente-de-reservas.md) | Controle concorrente de reservas | Aceita |
+| [ADR-007](0007-estrategia-de-notificacoes.md) | Estratégia de notificações | Aceita |
 
 ## Validação de escopo do GOV-01
 
