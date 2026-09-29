@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: gerenciador-de-salas
+  profiles:
+    active: dev
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
