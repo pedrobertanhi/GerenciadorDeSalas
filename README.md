@@ -5,7 +5,7 @@ Sistema acadêmico em **Java 21 e Spring Boot 3.x** para alocar salas, professor
 > Projeto semestral da disciplina **Qualidade de Software — 2026.2**. Entrega principal na semana 46.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/pedrobertanhi/gerenciadordesalas/main/docs/assets/banner-gerenciador-salas.png" alt="Banner do Gerenciador de Salas e Recursos" width="100%">
+  <img src="https://raw.githubusercontent.com/pedrobertanhi/gerenciadordesalas/4f77d1f3c1e9d24277cf21c534e1ec31ed7efe95/docs/assets/banner-gerenciador-salas.png" alt="Banner do Gerenciador de Salas e Recursos" width="100%">
 </p>
 
 ## Estado atual
