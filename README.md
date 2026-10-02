@@ -65,15 +65,27 @@ A release é reprovada se a aplicação não executar, o pipeline estiver ausent
 
 ## Como executar
 
-Os comandos tornam-se válidos quando a Issue #5 criar a aplicação:
+Pré-requisitos: **Java 21**, **Docker** e **Docker Compose v2**.
+
+No Linux/macOS:
 
 ```bash
+docker compose up -d --wait postgres
 ./mvnw -B verify
-docker compose up -d
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-Até lá, não há build executável a declarar. Quando a estrutura for criada, este trecho deverá registrar pré-requisitos, variáveis de exemplo, migrations, perfis, dados de demonstração, testes e diagnóstico.
+No Windows:
+
+```powershell
+docker compose up -d --wait postgres
+.\mvnw.cmd -B verify
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+Consulte o [guia do PostgreSQL com Docker Compose](docs/POSTGRESQL_DOCKER.md) para verificar o healthcheck, testar a conexão, consultar logs e recriar o banco.
+
+> A criação do esquema e das migrations será implementada na BASE-04 (#8).
 
 ## Antes de desenvolver
 
