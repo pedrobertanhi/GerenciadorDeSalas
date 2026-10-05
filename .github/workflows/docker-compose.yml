@@ -1,0 +1,57 @@
+name: PostgreSQL com Docker Compose
+
+on:
+  pull_request:
+    paths:
+      - "docker-compose.yml"
+      - ".env.example"
+      - "src/main/resources/application-dev.yml"
+      - ".github/workflows/docker-compose.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docker-compose.yml"
+      - ".env.example"
+      - "src/main/resources/application-dev.yml"
+      - ".github/workflows/docker-compose.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-compose-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validar-postgres:
+    name: Validar PostgreSQL
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Validar configuração do Compose
+        run: docker compose config
+
+      - name: Iniciar PostgreSQL e aguardar healthcheck
+        run: docker compose up -d --wait postgres
+
+      - name: Validar conexão e consulta
+        run: |
+          docker compose exec -T postgres pg_isready -U postgres -d gerenciador_salas_dev
+          docker compose exec -T postgres psql -U postgres -d gerenciador_salas_dev -c "SELECT 1;"
+
+      - name: Exibir estado do serviço
+        if: always()
+        run: docker compose ps
+
+      - name: Exibir logs em caso de falha
+        if: failure()
+        run: docker compose logs postgres
+
+      - name: Remover ambiente de teste
+        if: always()
+        run: docker compose down -v
