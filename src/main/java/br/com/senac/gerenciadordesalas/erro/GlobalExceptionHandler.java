@@ -81,4 +81,18 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErroResposta> tratarErroInterno(Exception ex) {
+        String correlationId = novoCorrelationId();
+
+        log.error("Erro interno nao tratado. correlationId={}", correlationId, ex);
+
+        ErroResposta erro = new ErroResposta(
+                "ERRO_INTERNO",
+                "Ocorreu um erro inesperado. Tente novamente mais tarde ou contate o suporte informando o codigo de referencia.",
+                correlationId
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erro);
+    }
 }
