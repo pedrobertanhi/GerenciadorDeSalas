@@ -67,4 +67,18 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(erro);
     }
+
+    @ExceptionHandler(ConflitoDeEstadoException.class)
+    public ResponseEntity<ErroResposta> tratarConflito(ConflitoDeEstadoException ex) {
+        String correlationId = novoCorrelationId();
+
+        log.warn("Conflito de estado. correlationId={}", correlationId);
+
+        ErroResposta erro = new ErroResposta(
+                "CONFLITO_DE_ESTADO",
+                "A operacao nao pode ser concluida devido a um conflito de estado atual do recurso.",
+                correlationId
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    }
 }
