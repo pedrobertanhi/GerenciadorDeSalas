@@ -66,3 +66,14 @@ Exemplo de formato, sem inventar resultado:
 `CI run URL · commit abc123 · ./mvnw -B verify · Java 21/PostgreSQL container · artifact nome · resultado`.
 
 Captura isolada não fecha a linha. O link deve continuar navegável e corresponder ao escopo entregue.
+
+## BASE-05 — Tratamento seguro de erros
+
+| ID | Requisito | Teste | Status |
+|---|---|---|---|
+| ERR-01 | Validação de campo retorna 400 com fieldErrors | Erro400ValidacaoTest | Implementado |
+| ERR-02 | Recurso inexistente retorna 404 | Erro404NaoEncontradoTest | Implementado |
+| ERR-03 | Acesso negado retorna 403 sem vazar detalhe | Erro403NegadoTest | Implementado |
+| ERR-04 | Conflito de estado retorna 409 | Erro409ConflitoTest | Implementado |
+| ERR-05 | Erro interno retorna 500 sem stack trace | Erro500InternoTest | Implementado |
+| ERR-06 | Toda resposta de erro carrega correlationId | CorrelationIdFilter + todos os testes acima | Implementado |
