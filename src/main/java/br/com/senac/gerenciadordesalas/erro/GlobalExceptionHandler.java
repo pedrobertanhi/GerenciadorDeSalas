@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.erro;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,13 +19,14 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    private String novoCorrelationId() {
-        return UUID.randomUUID().toString();
+    private String correlationIdDaRequisicao(HttpServletRequest request) {
+        Object existente = request.getAttribute(CorrelationIdFilter.HEADER_CORRELATION_ID);
+        return existente != null ? existente.toString() : UUID.randomUUID().toString();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErroResposta> tratarValidacao(MethodArgumentNotValidException ex) {
-        String correlationId = novoCorrelationId();
+    public ResponseEntity<ErroResposta> tratarValidacao(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        String correlationId = correlationIdDaRequisicao(request);
         List<ErroResposta.CampoErro> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> new ErroResposta.CampoErro(fe.getField(), fe.getDefaultMessage()))
                 .collect(Collectors.toList());
@@ -41,8 +43,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public ResponseEntity<ErroResposta> tratarRecursoNaoEncontrado(RecursoNaoEncontradoException ex) {
-        String correlationId = novoCorrelationId();
+    public ResponseEntity<ErroResposta> tratarRecursoNaoEncontrado(RecursoNaoEncontradoException ex, HttpServletRequest request) {
+        String correlationId = correlationIdDaRequisicao(request);
 
         log.warn("Recurso nao encontrado. correlationId={}", correlationId);
 
@@ -55,8 +57,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErroResposta> tratarAcessoNegado(AccessDeniedException ex) {
-        String correlationId = novoCorrelationId();
+    public ResponseEntity<ErroResposta> tratarAcessoNegado(AccessDeniedException ex, HttpServletRequest request) {
+        String correlationId = correlationIdDaRequisicao(request);
 
         log.warn("Acesso negado. correlationId={}", correlationId);
 
@@ -69,8 +71,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConflitoDeEstadoException.class)
-    public ResponseEntity<ErroResposta> tratarConflito(ConflitoDeEstadoException ex) {
-        String correlationId = novoCorrelationId();
+    public ResponseEntity<ErroResposta> tratarConflito(ConflitoDeEstadoException ex, HttpServletRequest request) {
+        String correlationId = correlationIdDaRequisicao(request);
 
         log.warn("Conflito de estado. correlationId={}", correlationId);
 
@@ -83,8 +85,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErroResposta> tratarErroInterno(Exception ex) {
-        String correlationId = novoCorrelationId();
+    public ResponseEntity<ErroResposta> tratarErroInterno(Exception ex, HttpServletRequest request) {
+        String correlationId = correlationIdDaRequisicao(request);
 
         log.error("Erro interno nao tratado. correlationId={}", correlationId, ex);
 
