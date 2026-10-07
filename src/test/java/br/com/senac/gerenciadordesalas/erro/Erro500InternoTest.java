@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.erro;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -7,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,14 +18,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TestErrorController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, CorrelationIdFilter.class})
 class Erro500InternoTest {
 
     @Autowired
+    WebApplicationContext context;
+
+    @Autowired
+    CorrelationIdFilter correlationIdFilter;
+
     MockMvc mockMvc;
 
+    @BeforeEach
+    void montarMockMvcComFiltroDeCorrelationId() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .addFilter(correlationIdFilter)
+                .build();
+    }
+
     @Test
-    void erroInesperado_retorna500SemStackTrace() throws Exception {
+    void erroInesperado_retorna500SemStackTraceComCorrelationIdConsistente() throws Exception {
         MvcResult result = mockMvc.perform(get("/test-erros/erro-interno"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.codigo").value("ERRO_INTERNO"))
@@ -34,6 +49,13 @@ class Erro500InternoTest {
                 .doesNotContain("at br.com.senac")
                 .doesNotContain("at java.")
                 .doesNotContain("Exception in thread")
-                .doesNotContain("Caused by");
+                .doesNotContain("Caused by")
+                .doesNotContain("Falha interna de teste");
+
+        String correlationIdNoCorpo = com.jayway.jsonpath.JsonPath.read(corpo, "$.correlationId");
+        String correlationIdNoHeader = result.getResponse().getHeader(CorrelationIdFilter.HEADER_CORRELATION_ID);
+
+        assertThat(correlationIdNoHeader).isNotBlank();
+        assertThat(correlationIdNoCorpo).isEqualTo(correlationIdNoHeader);
     }
 }
