@@ -38,4 +38,18 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
+
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
+    public ResponseEntity<ErroResposta> tratarRecursoNaoEncontrado(RecursoNaoEncontradoException ex) {
+        String correlationId = novoCorrelationId();
+
+        log.warn("Recurso nao encontrado. correlationId={}", correlationId);
+
+        ErroResposta erro = new ErroResposta(
+                "RECURSO_NAO_ENCONTRADO",
+                "O recurso solicitado nao foi encontrado.",
+                correlationId
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
 }
