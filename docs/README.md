@@ -12,6 +12,7 @@ Documentação oficial e versionada do **Gerenciador de Salas de Aula**.
 4. [Política obrigatória de commits](POLITICA_DE_COMMITS.md)
 5. [Guia operacional de cada tarefa](GUIA_DE_EXECUCAO.md)
 6. [Cobertura da especificação e das aulas](COBERTURA_ESPECIFICACAO.md)
+7. [Flyway e versionamento do banco](FLYWAY.md)
 
 ## Arquitetura e decisões
 
