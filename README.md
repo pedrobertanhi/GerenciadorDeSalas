@@ -85,7 +85,7 @@ docker compose up -d --wait postgres
 
 Consulte o [guia do PostgreSQL com Docker Compose](docs/POSTGRESQL_DOCKER.md) para verificar o healthcheck, testar a conexão, consultar logs e recriar o banco.
 
-> A criação do esquema e das migrations será implementada na BASE-04 (#8).
+O Flyway aplica automaticamente as migrations pendentes ao iniciar a aplicação. Consulte o [guia de versionamento do banco](docs/FLYWAY.md) para criar novas migrations, validar o histórico e testar um banco limpo.
 
 ## Antes de desenvolver
 
