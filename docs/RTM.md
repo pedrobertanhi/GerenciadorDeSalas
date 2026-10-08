@@ -77,3 +77,12 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | ERR-04 | Conflito de estado retorna 409 | Erro409ConflitoTest | Implementado |
 | ERR-05 | Erro interno retorna 500 sem stack trace | Erro500InternoTest | Implementado |
 | ERR-06 | Toda resposta de erro carrega correlationId | CorrelationIdFilter + todos os testes acima | Implementado |
+
+## BASE-04 — Flyway e esquema inicial
+
+| ID | Requisito | Verificação | Status |
+|---|---|---|---|
+| DB-01 | Banco PostgreSQL vazio recebe o esquema automaticamente | FlywayMigrationIntegrationTest | Automatizado |
+| DB-02 | Migration V1 cria a tabela inicial sem ação manual | FlywayMigrationIntegrationTest | Automatizado |
+| DB-03 | Histórico registra versão, checksum e sucesso | flyway_schema_history + FlywayMigrationIntegrationTest | Automatizado |
+| DB-04 | Novas migrations seguem convenção versionada e imutável | docs/FLYWAY.md | Documentado |
