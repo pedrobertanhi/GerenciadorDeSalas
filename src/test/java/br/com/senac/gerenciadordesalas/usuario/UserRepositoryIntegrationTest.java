@@ -112,4 +112,11 @@ class UserRepositoryIntegrationTest {
                 "Email Maiusculo", "MAIUSCULO@EXEMPLO.TEST", "hash", "SOLICITANTE"))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
+    @Test
+    void bancoRecusaEmailComEspacosEmBranco() {
+        assertThatThrownBy(() -> jdbcTemplate.update(
+                "INSERT INTO tb_usuarios (nome, email, senha_hash, perfil) VALUES (?, ?, ?, ?)",
+                "Email Com Espaco", " espaco@exemplo.test ", "hash", "SOLICITANTE"))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
 }
