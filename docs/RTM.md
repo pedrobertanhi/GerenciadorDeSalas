@@ -86,3 +86,13 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | DB-02 | Migration V1 cria a tabela inicial sem ação manual | FlywayMigrationIntegrationTest | Automatizado |
 | DB-03 | Histórico registra versão, checksum e sucesso | flyway_schema_history + FlywayMigrationIntegrationTest | Automatizado |
 | DB-04 | Novas migrations seguem convenção versionada e imutável | docs/FLYWAY.md | Documentado |
+
+## SEC-01 — Usuários, perfis e persistência
+
+| ID | Requisito | Verificação | Status |
+|---|---|---|---|
+| USR-01 | Usuário é persistido com perfil válido (SOLICITANTE, RESPONSAVEL, ADMINISTRADOR) | UserRepositoryIntegrationTest | Automatizado |
+| USR-02 | E-mail duplicado é recusado, sem diferenciar maiúsculas de minúsculas | UserRepositoryIntegrationTest + UserTest | Automatizado |
+| USR-03 | Perfil inválido é recusado pelo banco e pela validação | UserRepositoryIntegrationTest + UserTest | Automatizado |
+| USR-04 | Usuário inativo permanece no histórico | UserRepositoryIntegrationTest + UserTest | Automatizado |
+| USR-05 | Dados de demonstração são sintéticos e carregados só no perfil dev | R__seed_demo_users.sql + application-dev.yml | Documentado |
