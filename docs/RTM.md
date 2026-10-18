@@ -96,3 +96,5 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | USR-03 | Perfil inválido é recusado pelo banco e pela validação | UserRepositoryIntegrationTest + UserTest | Automatizado |
 | USR-04 | Usuário inativo permanece no histórico | UserRepositoryIntegrationTest + UserTest | Automatizado |
 | USR-05 | Dados de demonstração são sintéticos e carregados só no perfil dev | R__seed_demo_users.sql + application-dev.yml | Documentado |
+| USR-06 | Banco recusa e-mail com espaços e nome ou hash de senha em branco | UserRepositoryIntegrationTest | Automatizado |
+| USR-07 | Usuário não pode ser excluído fisicamente pelo repositório | UserRepositoryContractTest | Automatizado |
