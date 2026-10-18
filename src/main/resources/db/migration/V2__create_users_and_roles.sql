@@ -9,5 +9,6 @@ CREATE TABLE tb_usuarios (
     atualizado_em TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     CONSTRAINT uq_usuarios_email UNIQUE (email),
     CONSTRAINT ck_usuarios_email_minusculo CHECK (email = LOWER(email)),
+    CONSTRAINT ck_usuarios_email_sem_espacos CHECK (email ~ '^[^[:space:]]+$'),
     CONSTRAINT ck_usuarios_perfil CHECK (perfil IN ('SOLICITANTE', 'RESPONSAVEL', 'ADMINISTRADOR'))
 );
