@@ -119,4 +119,19 @@ class UserRepositoryIntegrationTest {
                 "Email Com Espaco", " espaco@exemplo.test ", "hash", "SOLICITANTE"))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
+    @Test
+    void bancoRecusaNomeEmBranco() {
+        assertThatThrownBy(() -> jdbcTemplate.update(
+                "INSERT INTO tb_usuarios (nome, email, senha_hash, perfil) VALUES (?, ?, ?, ?)",
+                "   ", "nome.branco@exemplo.test", "hash", "SOLICITANTE"))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void bancoRecusaHashDeSenhaEmBranco() {
+        assertThatThrownBy(() -> jdbcTemplate.update(
+                "INSERT INTO tb_usuarios (nome, email, senha_hash, perfil) VALUES (?, ?, ?, ?)",
+                "Hash Em Branco", "hash.branco@exemplo.test", "   ", "SOLICITANTE"))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
 }
