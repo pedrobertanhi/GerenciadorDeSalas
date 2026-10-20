@@ -138,3 +138,14 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | RATE-04 | Conta existente e inexistente mantêm resposta neutra | LimiteTentativasLoginWebTest | Automatizado |
 | RATE-05 | Resposta e registro não expõem e-mail, senha ou origem em texto puro | LimiteTentativasLoginWebTest + FiltroLimiteTentativasLogin | Automatizado |
 | RATE-06 | Login válido limpa a contagem e preserva o fluxo legítimo | LimitadorTentativasLoginTest + LimiteTentativasLoginWebTest | Automatizado |
+
+## QA-02 — PostgreSQL real em testes de integração
+
+| ID | Requisito | Verificação | Status |
+|---|---|---|---|
+| TC-01 | Dependências do Testcontainers suportam JUnit 5 e PostgreSQL | `pom.xml` | Configurado |
+| TC-02 | Testes iniciam PostgreSQL automaticamente sem banco manual | `FlywayMigrationIntegrationTest` + `UserRepositoryIntegrationTest` | Automatizado |
+| TC-03 | Flyway aplica e registra migrations em banco vazio | `FlywayMigrationIntegrationTest` | Automatizado |
+| TC-04 | Casos de persistência não compartilham dados | rollback de `@DataJpaTest` | Automatizado |
+| TC-05 | Execução local e no CI é reproduzível | `docs/TESTCONTAINERS.md` + job `Maven Verify` | Documentado e automatizado |
+
