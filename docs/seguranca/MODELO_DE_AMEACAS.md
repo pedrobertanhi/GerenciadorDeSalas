@@ -33,6 +33,7 @@
 | A06 | Exposição de erro interno | aplicação/dados | Alto | handler seguro | 400/403/404/409/500 | #9, #14 | Planejada |
 | A07 | Alteração sem rastreabilidade | auditoria | Alto | evento imutável e atômico | integração | #39, #88 | Planejada |
 | A08 | Imagem com pacote vulnerável | release | Crítico | Trivy image | scan por digest | #96 | Planejada |
+| A09 | Tentativas ilimitadas de login (adivinhação de senha) | contas, perfis e sessões | Médio | limite e atraso progressivo de tentativas, com resposta neutra e uniforme | teste de tentativas repetidas | #12 (origem); Issue a definir | Planejada |
 
 ## Revisão
 
