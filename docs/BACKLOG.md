@@ -1,6 +1,6 @@
 # Backlog completo
 
-> Catálogo versionado das **110 Issues abertas** após auditoria da especificação e dos materiais das aulas. A fonte operacional continua sendo a aba Issues/GitHub Project.
+> Catálogo versionado das Issues planejadas após auditoria da especificação e dos materiais das aulas. A fonte operacional continua sendo a aba Issues/GitHub Project. Os itens marcados abaixo refletem somente entregas já integradas à `main`.
 
 ## Como usar
 
@@ -17,10 +17,10 @@ Planejamento total: **584 pontos**, sendo **552 até a semana 46** e **32 após 
 
 ## Governança (10)
 
-- [ ] [#1 — Validar escopo, requisitos e decisões técnicas](https://github.com/pedrobertanhi/gerenciadordesalas/issues/1) — semana 34, 3 pts
-- [ ] [#2 — Definir modelo de domínio e matriz de permissões](https://github.com/pedrobertanhi/gerenciadordesalas/issues/2) — semana 34, 5 pts
-- [ ] [#3 — Criar diagramas de contexto, componentes e dados](https://github.com/pedrobertanhi/gerenciadordesalas/issues/3) — semana 34, 5 pts
-- [ ] [#4 — Configurar fluxo de trabalho no GitHub](https://github.com/pedrobertanhi/gerenciadordesalas/issues/4) — semana 34, 3 pts
+- [x] [#1 — Validar escopo, requisitos e decisões técnicas](https://github.com/pedrobertanhi/gerenciadordesalas/issues/1) — semana 34, 3 pts
+- [x] [#2 — Definir modelo de domínio e matriz de permissões](https://github.com/pedrobertanhi/gerenciadordesalas/issues/2) — semana 34, 5 pts
+- [x] [#3 — Criar diagramas de contexto, componentes e dados](https://github.com/pedrobertanhi/gerenciadordesalas/issues/3) — semana 34, 5 pts
+- [x] [#4 — Configurar fluxo de trabalho no GitHub](https://github.com/pedrobertanhi/gerenciadordesalas/issues/4) — semana 34, 3 pts
 - [ ] [#57 — Criar diagramas de sequências críticas](https://github.com/pedrobertanhi/gerenciadordesalas/issues/57) — semana 45, 8 pts
 - [ ] [#58 — Configurar quadro, campos e marcos do projeto](https://github.com/pedrobertanhi/gerenciadordesalas/issues/58) — semana 34, 5 pts
 - [ ] [#60 — Comprovar autoria dos quatro integrantes](https://github.com/pedrobertanhi/gerenciadordesalas/issues/60) — semana 34, 5 pts
@@ -34,18 +34,19 @@ Planejamento total: **584 pontos**, sendo **552 até a semana 46** e **32 após 
 
 ## Fundação Java/Spring (6)
 
-- [ ] [#5 — Criar estrutura inicial do Spring Boot](https://github.com/pedrobertanhi/gerenciadordesalas/issues/5) — semana 34, 3 pts
-- [ ] [#6 — Configurar dependências e perfis de ambiente](https://github.com/pedrobertanhi/gerenciadordesalas/issues/6) — semana 34, 3 pts
-- [ ] [#7 — Configurar PostgreSQL com Docker Compose](https://github.com/pedrobertanhi/gerenciadordesalas/issues/7) — semana 34, 3 pts
-- [ ] [#8 — Configurar Flyway e esquema inicial](https://github.com/pedrobertanhi/gerenciadordesalas/issues/8) — semana 34, 5 pts
-- [ ] [#9 — Padronizar validações e tratamento seguro de erros](https://github.com/pedrobertanhi/gerenciadordesalas/issues/9) — semana 34, 5 pts
+- [x] [#5 — Criar estrutura inicial do Spring Boot](https://github.com/pedrobertanhi/gerenciadordesalas/issues/5) — semana 34, 3 pts
+- [x] [#6 — Configurar dependências e perfis de ambiente](https://github.com/pedrobertanhi/gerenciadordesalas/issues/6) — semana 34, 3 pts
+- [x] [#7 — Configurar PostgreSQL com Docker Compose](https://github.com/pedrobertanhi/gerenciadordesalas/issues/7) — semana 34, 3 pts
+- [x] [#8 — Configurar Flyway e esquema inicial](https://github.com/pedrobertanhi/gerenciadordesalas/issues/8) — semana 34, 5 pts
+- [x] [#9 — Padronizar validações e tratamento seguro de erros](https://github.com/pedrobertanhi/gerenciadordesalas/issues/9) — semana 34, 5 pts
 - [ ] [#10 — Configurar documentação OpenAPI](https://github.com/pedrobertanhi/gerenciadordesalas/issues/10) — semana 34, 3 pts
 
 ## Segurança (14)
 
-- [ ] [#11 — Implementar usuários, perfis e persistência](https://github.com/pedrobertanhi/gerenciadordesalas/issues/11) — semana 36, 5 pts
-- [ ] [#12 — Implementar autenticação e armazenamento seguro de senha](https://github.com/pedrobertanhi/gerenciadordesalas/issues/12) — semana 36, 5 pts
-- [ ] [#13 — Aplicar autorização por perfil](https://github.com/pedrobertanhi/gerenciadordesalas/issues/13) — semana 37, 8 pts
+- [x] [#11 — Implementar usuários, perfis e persistência](https://github.com/pedrobertanhi/gerenciadordesalas/issues/11) — semana 36, 5 pts
+- [x] [#12 — Implementar autenticação e armazenamento seguro de senha](https://github.com/pedrobertanhi/gerenciadordesalas/issues/12) — semana 36, 5 pts
+- [x] [#13 — Aplicar autorização por perfil](https://github.com/pedrobertanhi/gerenciadordesalas/issues/13) — semana 37, 8 pts
+- [x] [#133 — Corrigir tentativas ilimitadas no login](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/133) — correção adicional de segurança
 - [ ] [#14 — Criar testes automatizados de segurança](https://github.com/pedrobertanhi/gerenciadordesalas/issues/14) — semana 37, 5 pts
 - [ ] [#64 — Modelar solicitante professor ou coordenador e propriedade da reserva](https://github.com/pedrobertanhi/gerenciadordesalas/issues/64) — semana 36, 5 pts
 - [ ] [#85 — Implementar gerenciamento administrativo de usuários](https://github.com/pedrobertanhi/gerenciadordesalas/issues/85) — semana 44, 8 pts

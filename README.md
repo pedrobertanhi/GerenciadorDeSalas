@@ -10,13 +10,14 @@ Sistema acadêmico em **Java 21 e Spring Boot 3.x** para alocar salas, professor
 
 ## Estado atual
 
-**Planejamento e documentação. A aplicação ainda não foi implementada.**
+**Fundação técnica e segurança inicial implementadas. O domínio funcional de recursos e reservas ainda está em desenvolvimento.**
 
-- 110 Issues abertas e atribuídas.
-- 584 pontos planejados; 552 até a semana 46.
-- Semana 34 possui trabalho atrasado que precisa ser recuperado com evidência.
-- Resultados, cobertura e segurança permanecem pendentes até existirem execuções reais.
-- A divisão será feita somente depois que os quatro integrantes entrarem.
+- Governança inicial (GOV-01 a GOV-04) integrada.
+- Spring Boot, perfis, PostgreSQL com Docker Compose, Flyway e tratamento seguro de erros integrados (BASE-01 a BASE-05).
+- Usuários e perfis, autenticação, autorização inicial e limitação de tentativas de login integrados (SEC-01 a SEC-03 e #133).
+- O pipeline mais recente executou 63 testes sem falhas, erros ou testes ignorados.
+- OpenAPI (BASE-06), cadastros de recursos, reservas, interface e demais funcionalidades permanecem pendentes conforme o Project.
+- A autorização atual define e testa a matriz de acesso; ela deverá ser aplicada aos controllers reais conforme cada módulo funcional for implementado.
 
 ## Produto
 
