@@ -111,3 +111,15 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | AUT-06 | 401 e 403 do Spring Security usam o contrato padronizado com correlationId | RespostasDeSegurancaTest + AutenticacaoWebTest | Automatizado |
 | AUT-07 | Login sem token CSRF é recusado | AutenticacaoWebTest | Automatizado |
 | AUT-08 | Hash das contas de demonstração corresponde à senha documentada; contas só no perfil dev | SenhaCodificadaTest + PLANO_DE_SEGURANCA.md | Automatizado e documentado |
+
+## SEC-03 — Autorização por perfil e propriedade
+
+| ID | Requisito | Verificação | Status |
+|---|---|---|---|
+| AUTZ-01 | Rotas sem autenticação são recusadas com resposta 401 padronizada | AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-02 | Solicitante cria reservas e acessa somente recursos próprios | AutorizacaoPorPerfilWebTest + AutorizacaoDePropriedade | Automatizado |
+| AUTZ-03 | Somente Responsável executa aprovação e movimentações operacionais | AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-04 | Somente Administrador executa operações administrativas | AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-05 | Administrador não herda automaticamente operações do Responsável | AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-06 | Acesso negado retorna 403 padronizado e não executa efeito colateral | AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-07 | Exclusões físicas de usuários, reservas, movimentações e auditoria são negadas | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
