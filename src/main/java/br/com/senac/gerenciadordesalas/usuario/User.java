@@ -86,7 +86,7 @@ public class User {
         this.active = false;
     }
 
-    private static String normalizarEmail(String email) {
+    public static String normalizarEmail(String email) {
         return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 
