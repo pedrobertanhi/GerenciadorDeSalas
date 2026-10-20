@@ -74,3 +74,12 @@ A #98 reprova a release se houver:
 ## Evidências
 
 Registrar ferramenta/versão, configuração, comando, ambiente, commit/tag, resultado bruto sanitizado, triagem e conclusão. O parecer declara limitações e nunca generaliza além do ambiente testado.
+
+## Autenticação e contas de demonstração (SEC-02)
+
+- Login por formulário com sessão no servidor (ADR-005); a senha é armazenada somente como hash BCrypt.
+- Falha de login (senha errada, e-mail inexistente ou usuário inativo) recebe a mesma resposta 401, `CREDENCIAIS_INVALIDAS`, para não revelar se a conta existe ou está inativa.
+- Os 401 e 403 produzidos pelo Spring Security usam o contrato padronizado (`ErroResposta`) com `correlationId`.
+- CSRF permanece habilitado. O cookie de sessão é `HttpOnly` e `SameSite=Lax`, e `Secure` no perfil `prod`. O logout invalida a sessão.
+- As contas de demonstração (`db/demo`) existem somente no perfil `dev`, usam e-mails `.test` e uma senha sintética documentada no próprio arquivo de seed. O perfil `dev` é de uso local e não deve ser exposto. O perfil `prod` nunca carrega essas contas.
+- A política de 401, 403 e 404 por perfil e propriedade é a SEC-03 (#13).
