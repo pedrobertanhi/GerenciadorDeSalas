@@ -19,6 +19,8 @@ public interface UserRepository extends Repository<User, Long> {
 
     List<User> findAll();
 
+    Optional<User> findByEmail(String email);
+
     Optional<User> findByEmailIgnoreCase(String email);
 
     boolean existsByEmailIgnoreCase(String email);
