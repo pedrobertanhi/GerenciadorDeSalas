@@ -17,7 +17,7 @@ docs/diagramas/
 Cada diagrama deve possuir:
 
 - fonte editável versionada;
-- imagem exportada legível;
+- visualização legível no GitHub; para Mermaid embutido, a renderização do próprio Markdown é a evidência visual, enquanto outros formatos exigem imagem exportada;
 - título, versão e data;
 - nomes coerentes com código, API e RTM;
 - revisão de um integrante que não seja o autor.
