@@ -111,3 +111,14 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | AUT-06 | 401 e 403 do Spring Security usam o contrato padronizado com correlationId | RespostasDeSegurancaTest + AutenticacaoWebTest | Automatizado |
 | AUT-07 | Login sem token CSRF é recusado | AutenticacaoWebTest | Automatizado |
 | AUT-08 | Hash das contas de demonstração corresponde à senha documentada; contas só no perfil dev | SenhaCodificadaTest + PLANO_DE_SEGURANCA.md | Automatizado e documentado |
+
+## SEC-15 — Limitação de tentativas de autenticação
+
+| ID | Requisito | Verificação | Status |
+|---|---|---|---|
+| RATE-01 | Cinco falhas por conta ou origem ativam bloqueio temporário | LimitadorTentativasLoginTest + LimiteTentativasLoginWebTest | Automatizado |
+| RATE-02 | Novas falhas aumentam a espera sem exceder quinze minutos | LimitadorTentativasLoginTest | Automatizado |
+| RATE-03 | Estado expira em quinze minutos e não causa bloqueio permanente | LimitadorTentativasLoginTest | Automatizado |
+| RATE-04 | Conta existente e inexistente mantêm resposta neutra | LimiteTentativasLoginWebTest | Automatizado |
+| RATE-05 | Resposta e registro não expõem e-mail, senha ou origem em texto puro | LimiteTentativasLoginWebTest + FiltroLimiteTentativasLogin | Automatizado |
+| RATE-06 | Login válido limpa a contagem e preserva o fluxo legítimo | LimitadorTentativasLoginTest + LimiteTentativasLoginWebTest | Automatizado |
