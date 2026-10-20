@@ -25,6 +25,17 @@ public class SecurityConfig {
     }
 
     @Bean
+    public LimitadorTentativasLogin limitadorTentativasLogin() {
+        return new LimitadorTentativasLogin();
+    }
+
+    @Bean
+    public FiltroLimiteTentativasLogin filtroLimiteTentativasLogin(
+            LimitadorTentativasLogin limitador, RespostasDeSeguranca respostas) {
+        return new FiltroLimiteTentativasLogin(limitador, respostas);
+    }
+
+    @Bean
     public SecurityFilterChain filtrosDeSeguranca(
             HttpSecurity http,
             RespostasDeSeguranca respostas,
