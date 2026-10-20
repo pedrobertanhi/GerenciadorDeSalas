@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/test-seguranca")
+@RequestMapping("/api")
 class ProtegidoTestController {
 
-    @GetMapping("/protegido")
+    @GetMapping("/perfil")
     String protegido() {
         return "ok";
     }
