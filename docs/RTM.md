@@ -124,3 +124,6 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | AUTZ-06 | Acesso negado retorna 403 padronizado e não executa efeito colateral | AutorizacaoPorPerfilWebTest | Automatizado |
 | AUTZ-07 | Exclusões físicas de usuários, reservas, movimentações e auditoria são negadas | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
 | AUTZ-08 | Rotas não mapeadas são negadas inclusive para usuário autenticado | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-09 | Alteração e cancelamento de reserva ficam negados até a propriedade persistida ser consultável | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-10 | Auditoria permite consulta administrativa e proíbe criação, alteração ou exclusão manual | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-11 | Solicitante consulta movimentações somente quando identificado como dono | AutorizacaoPorPerfilWebTest + AutorizacaoDePropriedade | Automatizado |
