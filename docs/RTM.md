@@ -98,3 +98,16 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | USR-05 | Dados de demonstração são sintéticos e carregados só no perfil dev | R__seed_demo_users.sql + application-dev.yml | Documentado |
 | USR-06 | Banco recusa e-mail com espaços e nome ou hash de senha em branco | UserRepositoryIntegrationTest | Automatizado |
 | USR-07 | Usuário não pode ser excluído fisicamente pelo repositório | UserRepositoryContractTest | Automatizado |
+
+## SEC-02 — Autenticação e armazenamento seguro de senha
+
+| ID | Requisito | Verificação | Status |
+|---|---|---|---|
+| AUT-01 | Credencial válida autentica e mantém sessão no servidor | AutenticacaoWebTest | Automatizado |
+| AUT-02 | Senha é armazenada somente como hash BCrypt | SenhaCodificadaTest | Automatizado |
+| AUT-03 | Senha inválida e e-mail inexistente recebem a mesma resposta 401 | AutenticacaoWebTest | Automatizado |
+| AUT-04 | Usuário inativo é recusado com resposta idêntica à de senha inválida | AutenticacaoWebTest + UsuarioDetailsServiceTest | Automatizado |
+| AUT-05 | Logout invalida a sessão | AutenticacaoWebTest | Automatizado |
+| AUT-06 | 401 e 403 do Spring Security usam o contrato padronizado com correlationId | RespostasDeSegurancaTest + AutenticacaoWebTest | Automatizado |
+| AUT-07 | Login sem token CSRF é recusado | AutenticacaoWebTest | Automatizado |
+| AUT-08 | Hash das contas de demonstração corresponde à senha documentada; contas só no perfil dev | SenhaCodificadaTest + PLANO_DE_SEGURANCA.md | Automatizado e documentado |
