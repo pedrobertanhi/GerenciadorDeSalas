@@ -34,9 +34,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/usuarios/**",
+                                "/api/admin/usuarios/**",
                                 "/api/reservas/**",
                                 "/api/movimentacoes/**",
                                 "/api/auditoria/**").denyAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auditoria/**").denyAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/auditoria/**").denyAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/auditoria/**").denyAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auditoria/**")
+                                .hasRole("ADMINISTRADOR")
                         .requestMatchers("/api/admin/**", "/api/usuarios/**")
                                 .hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST,
@@ -48,18 +54,17 @@ public class SecurityConfig {
                                 .hasRole("RESPONSAVEL")
                         .requestMatchers(HttpMethod.POST, "/api/movimentacoes/**")
                                 .hasRole("RESPONSAVEL")
-                        .requestMatchers(HttpMethod.GET, "/api/movimentacoes/**")
+                        .requestMatchers(HttpMethod.GET, "/api/movimentacoes/minhas/**")
+                                .hasRole("SOLICITANTE")
+                        .requestMatchers(HttpMethod.GET, "/api/movimentacoes/operacionais/**")
                                 .hasAnyRole("RESPONSAVEL", "ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST, "/api/reservas")
                                 .hasRole("SOLICITANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/reservas/*/cancelar").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/reservas/minhas/**")
                                 .hasRole("SOLICITANTE")
                         .requestMatchers(HttpMethod.GET, "/api/reservas/operacionais/**")
                                 .hasAnyRole("RESPONSAVEL", "ADMINISTRADOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/reservas/**")
-                                .hasRole("SOLICITANTE")
-                        .requestMatchers(HttpMethod.PATCH, "/api/reservas/**")
-                                .hasRole("SOLICITANTE")
                         .requestMatchers(HttpMethod.POST,
                                 "/api/salas/**", "/api/materiais/**", "/api/manutencoes/**")
                                 .hasRole("ADMINISTRADOR")
