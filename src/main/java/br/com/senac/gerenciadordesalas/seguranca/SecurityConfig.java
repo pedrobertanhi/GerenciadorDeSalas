@@ -52,6 +52,10 @@ public class SecurityConfig {
                                 .hasAnyRole("RESPONSAVEL", "ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST, "/api/reservas")
                                 .hasRole("SOLICITANTE")
+                        .requestMatchers(HttpMethod.GET, "/api/reservas/minhas/**")
+                                .hasRole("SOLICITANTE")
+                        .requestMatchers(HttpMethod.GET, "/api/reservas/operacionais/**")
+                                .hasAnyRole("RESPONSAVEL", "ADMINISTRADOR")
                         .requestMatchers(HttpMethod.PUT, "/api/reservas/**")
                                 .hasRole("SOLICITANTE")
                         .requestMatchers(HttpMethod.PATCH, "/api/reservas/**")
@@ -73,9 +77,17 @@ public class SecurityConfig {
                                 .hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.PATCH, "/api/professores/**")
                                 .hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/perfil",
+                                "/api/disponibilidade/**",
+                                "/api/professores/**",
+                                "/api/salas/**",
+                                "/api/materiais/**",
+                                "/api/manutencoes/**")
+                                .authenticated()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
                                 .authenticated()
-                        .anyRequest().authenticated())
+                        .anyRequest().denyAll())
                 .exceptionHandling(excecoes -> excecoes
                         .authenticationEntryPoint(respostas)
                         .accessDeniedHandler(respostas))
