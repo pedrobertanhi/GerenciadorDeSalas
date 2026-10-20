@@ -26,8 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ProtegidoTestController.class)
 @Import({SecurityConfig.class, RespostasDeSeguranca.class, UsuarioDetailsService.class,
-        CorrelationIdFilter.class, LimitadorTentativasLogin.class,
-        FiltroLimiteTentativasLogin.class})
+        CorrelationIdFilter.class})
 class LimiteTentativasLoginWebTest {
 
     private static final String EMAIL = "ana.limite@exemplo.test";
