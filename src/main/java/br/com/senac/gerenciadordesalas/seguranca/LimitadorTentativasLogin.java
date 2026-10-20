@@ -1,7 +1,5 @@
 package br.com.senac.gerenciadordesalas.seguranca;
 
-import org.springframework.stereotype.Component;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,7 +18,6 @@ import java.util.Map;
  * máximo para não permitir crescimento ilimitado. Nenhum e-mail ou endereço de
  * origem é armazenado em texto puro.</p>
  */
-@Component
 public class LimitadorTentativasLogin {
 
     static final int LIMITE_DE_FALHAS = 5;
