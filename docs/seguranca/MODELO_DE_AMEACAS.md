@@ -33,7 +33,18 @@
 | A06 | Exposição de erro interno | aplicação/dados | Alto | handler seguro | 400/403/404/409/500 | #9, #14 | Planejada |
 | A07 | Alteração sem rastreabilidade | auditoria | Alto | evento imutável e atômico | integração | #39, #88 | Planejada |
 | A08 | Imagem com pacote vulnerável | release | Crítico | Trivy image | scan por digest | #96 | Planejada |
-| A09 | Tentativas ilimitadas de login (adivinhação de senha) | contas, perfis e sessões | Médio | limite e atraso progressivo de tentativas, com resposta neutra e uniforme | teste de tentativas repetidas | #12 (origem); Issue a definir | Planejada |
+| A09 | Tentativas ilimitadas de login (adivinhação de senha) | contas, perfis e sessões | Médio | limite temporário e progressivo por conta e origem, resposta neutra, chaves anonimizadas e estado limitado/expirável | LimitadorTentativasLoginTest + LimiteTentativasLoginWebTest | #12, #133 | Implementada |
+
+## A09 — decisões do controle
+
+- limite inicial: cinco falhas dentro de uma janela de quinze minutos;
+- bloqueio temporário inicial de trinta segundos, dobrado após nova falha e limitado a quinze minutos;
+- contagem independente por conta e por endereço observado pela aplicação;
+- conta e origem armazenadas somente como resumo SHA-256, sem credenciais em logs;
+- no máximo dez mil chaves mantidas em memória, com descarte das menos recentes;
+- sucesso limpa o estado correspondente e a expiração impede bloqueio permanente;
+- resposta de limitação não informa se a conta existe, está inativa ou possui senha incorreta;
+- em implantação com múltiplas instâncias, o estado deverá migrar para armazenamento compartilhado.
 
 ## Revisão
 

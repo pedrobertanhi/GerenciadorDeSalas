@@ -2,14 +2,15 @@ package br.com.senac.gerenciadordesalas.seguranca;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Autenticação por formulário com sessão no servidor (ADR-005).
@@ -27,8 +28,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filtrosDeSeguranca(HttpSecurity http, RespostasDeSeguranca respostas)
-            throws Exception {
+    public LimitadorTentativasLogin limitadorTentativasLogin() {
+        return new LimitadorTentativasLogin();
+    }
+
+    @Bean
+    public FiltroLimiteTentativasLogin filtroLimiteTentativasLogin(
+            LimitadorTentativasLogin limitador, RespostasDeSeguranca respostas) {
+        return new FiltroLimiteTentativasLogin(limitador, respostas);
+    }
+
+    @Bean
+    public SecurityFilterChain filtrosDeSeguranca(
+            HttpSecurity http,
+            RespostasDeSeguranca respostas,
+            FiltroLimiteTentativasLogin filtroLimite,
+            LimitadorTentativasLogin limitador) throws Exception {
         http
                 .authorizeHttpRequests(requisicoes -> requisicoes
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
@@ -100,18 +115,25 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
                         .passwordParameter("senha")
-                        .successHandler((requisicao, resposta, autenticacao) ->
-                                respostas.escreverLoginRealizado(resposta, autenticacao))
-                        .failureHandler((requisicao, resposta, excecao) ->
-                                respostas.escrever(requisicao, resposta, HttpStatus.UNAUTHORIZED,
-                                        "CREDENCIAIS_INVALIDAS", "E-mail ou senha invalidos.")))
+                        .successHandler((requisicao, resposta, autenticacao) -> {
+                            limitador.registrarSucesso(
+                                    requisicao.getParameter("email"), requisicao.getRemoteAddr());
+                            respostas.escreverLoginRealizado(resposta, autenticacao);
+                        })
+                        .failureHandler((requisicao, resposta, excecao) -> {
+                            limitador.registrarFalha(
+                                    requisicao.getParameter("email"), requisicao.getRemoteAddr());
+                            respostas.escrever(requisicao, resposta, HttpStatus.UNAUTHORIZED,
+                                    "CREDENCIAIS_INVALIDAS", "E-mail ou senha invalidos.");
+                        }))
                 .logout(saida -> saida
                         .logoutUrl("/logout")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler((requisicao, resposta, autenticacao) ->
-                                resposta.setStatus(HttpStatus.NO_CONTENT.value())));
+                                resposta.setStatus(HttpStatus.NO_CONTENT.value())))
+                .addFilterBefore(filtroLimite, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

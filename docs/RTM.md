@@ -127,3 +127,14 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | AUTZ-09 | Alteração e cancelamento de reserva ficam negados até a propriedade persistida ser consultável | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
 | AUTZ-10 | Auditoria permite consulta administrativa e proíbe criação, alteração ou exclusão manual | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
 | AUTZ-11 | Solicitante consulta movimentações somente quando identificado como dono | AutorizacaoPorPerfilWebTest + AutorizacaoDePropriedade | Automatizado |
+
+## Correção de segurança no login — Limitação de tentativas
+
+| ID | Requisito | Verificação | Status |
+|---|---|---|---|
+| RATE-01 | Cinco falhas por conta ou origem ativam bloqueio temporário | LimitadorTentativasLoginTest + LimiteTentativasLoginWebTest | Automatizado |
+| RATE-02 | Novas falhas aumentam a espera sem exceder quinze minutos | LimitadorTentativasLoginTest | Automatizado |
+| RATE-03 | Estado expira em quinze minutos e não causa bloqueio permanente | LimitadorTentativasLoginTest | Automatizado |
+| RATE-04 | Conta existente e inexistente mantêm resposta neutra | LimiteTentativasLoginWebTest | Automatizado |
+| RATE-05 | Resposta e registro não expõem e-mail, senha ou origem em texto puro | LimiteTentativasLoginWebTest + FiltroLimiteTentativasLogin | Automatizado |
+| RATE-06 | Login válido limpa a contagem e preserva o fluxo legítimo | LimitadorTentativasLoginTest + LimiteTentativasLoginWebTest | Automatizado |
