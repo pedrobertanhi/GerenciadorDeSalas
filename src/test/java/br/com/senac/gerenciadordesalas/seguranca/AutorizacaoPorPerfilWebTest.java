@@ -14,7 +14,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,6 +65,26 @@ class AutorizacaoPorPerfilWebTest {
                 .andExpect(content().string("reserva-propria"));
 
         mockMvc.perform(get("/api/reservas/minhas/{emailDoDono}", "outra.pessoa@exemplo.test"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/movimentacoes/minhas/{emailDoDono}", EMAIL_SOLICITANTE))
+                .andExpect(status().isOk())
+                .andExpect(content().string("movimentacoes-proprias"));
+
+        mockMvc.perform(get("/api/movimentacoes/minhas/{emailDoDono}", "outra.pessoa@exemplo.test"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = EMAIL_SOLICITANTE, roles = "SOLICITANTE")
+    void alteracaoECancelamentoFicamNegadosAteExistirConsultaDoDonoPersistido() throws Exception {
+        mockMvc.perform(put("/api/reservas/1").with(csrf()))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(patch("/api/reservas/1").with(csrf()))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/api/reservas/1/cancelar").with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
@@ -123,6 +145,22 @@ class AutorizacaoPorPerfilWebTest {
                 .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
 
         mockMvc.perform(delete("/api/reservas/1").with(csrf()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
+
+        mockMvc.perform(delete("/api/admin/usuarios/1").with(csrf()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@exemplo.test", roles = "ADMINISTRADOR")
+    void administradorConsultaAuditoriaMasNaoCriaEventoManual() throws Exception {
+        mockMvc.perform(get("/api/auditoria"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("auditoria"));
+
+        mockMvc.perform(post("/api/auditoria").with(csrf()))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
     }
