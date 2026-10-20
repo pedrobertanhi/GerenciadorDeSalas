@@ -54,6 +54,24 @@ class LimitadorTentativasLoginTest {
     }
 
     @Test
+    void bloqueioAtivoContinuaMesmoDepoisDoFimDaJanela() {
+        registrarFalhas(EMAIL, ORIGEM, 5);
+        relogio.avancar(Duration.ofSeconds(31));
+        limitador.registrarFalha(EMAIL, ORIGEM);
+        relogio.avancar(Duration.ofSeconds(61));
+        limitador.registrarFalha(EMAIL, ORIGEM);
+        relogio.avancar(Duration.ofSeconds(121));
+        limitador.registrarFalha(EMAIL, ORIGEM);
+        relogio.avancar(Duration.ofSeconds(241));
+        limitador.registrarFalha(EMAIL, ORIGEM);
+
+        relogio.avancar(Duration.ofMinutes(7).plusSeconds(26));
+
+        assertThat(limitador.tempoRestante(EMAIL, ORIGEM))
+                .isEqualTo(Duration.ofSeconds(34));
+    }
+
+    @Test
     void mesmaContaEhLimitadaMesmoComOrigensDiferentes() {
         for (int tentativa = 1; tentativa <= 5; tentativa++) {
             limitador.registrarFalha(EMAIL, "192.0.2." + tentativa);
