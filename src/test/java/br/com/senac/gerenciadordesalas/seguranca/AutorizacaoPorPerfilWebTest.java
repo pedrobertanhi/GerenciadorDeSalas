@@ -44,6 +44,14 @@ class AutorizacaoPorPerfilWebTest {
     }
 
     @Test
+    @WithMockUser(username = "admin@exemplo.test", roles = "ADMINISTRADOR")
+    void rotaNaoMapeadaPermaneceNegadaMesmoParaAdministrador() throws Exception {
+        mockMvc.perform(get("/api/rota-nao-mapeada"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
+    }
+
+    @Test
     @WithMockUser(username = EMAIL_SOLICITANTE, roles = "SOLICITANTE")
     void solicitante_criaReservaEConsultaSomenteAPropria() throws Exception {
         mockMvc.perform(post("/api/reservas").with(csrf()))
