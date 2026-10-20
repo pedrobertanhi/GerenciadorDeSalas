@@ -14,9 +14,9 @@ import java.util.Map;
 /**
  * Limita falhas de autenticação por conta e por origem.
  *
- * <p>O estado fica somente em memória, expira em quinze minutos e tem tamanho
- * máximo para não permitir crescimento ilimitado. Nenhum e-mail ou endereço de
- * origem é armazenado em texto puro.</p>
+ * <p>O estado fica somente em memória, é mantido até o fim da janela e de
+ * eventual bloqueio, e tem tamanho máximo para não permitir crescimento
+ * ilimitado. Nenhum e-mail ou endereço de origem é armazenado em texto puro.</p>
  */
 public class LimitadorTentativasLogin {
 
@@ -73,11 +73,14 @@ public class LimitadorTentativasLogin {
         if (estado == null) {
             return Duration.ZERO;
         }
-        if (!agora.isBefore(estado.inicioDaJanela().plus(JANELA))) {
+        boolean janelaExpirada = !agora.isBefore(estado.inicioDaJanela().plus(JANELA));
+        boolean bloqueioExpirado = estado.bloqueadoAte() == null
+                || !agora.isBefore(estado.bloqueadoAte());
+        if (janelaExpirada && bloqueioExpirado) {
             estados.remove(chave);
             return Duration.ZERO;
         }
-        if (estado.bloqueadoAte() == null || !agora.isBefore(estado.bloqueadoAte())) {
+        if (bloqueioExpirado) {
             return Duration.ZERO;
         }
         return Duration.between(agora, estado.bloqueadoAte());
@@ -85,7 +88,12 @@ public class LimitadorTentativasLogin {
 
     private void registrarFalha(String chave, Instant agora) {
         Estado anterior = estados.get(chave);
-        if (anterior == null || !agora.isBefore(anterior.inicioDaJanela().plus(JANELA))) {
+        boolean janelaExpirada = anterior != null
+                && !agora.isBefore(anterior.inicioDaJanela().plus(JANELA));
+        boolean bloqueioAtivo = anterior != null
+                && anterior.bloqueadoAte() != null
+                && agora.isBefore(anterior.bloqueadoAte());
+        if (anterior == null || (janelaExpirada && !bloqueioAtivo)) {
             estados.put(chave, new Estado(agora, 1, null));
             return;
         }
