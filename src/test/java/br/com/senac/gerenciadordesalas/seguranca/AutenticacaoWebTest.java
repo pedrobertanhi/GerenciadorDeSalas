@@ -78,7 +78,7 @@ class AutenticacaoWebTest {
 
     @Test
     void semAutenticacao_retorna401PadronizadoComCorrelationIdConsistente() throws Exception {
-        MvcResult resultado = mockMvc.perform(get("/test-seguranca/protegido"))
+        MvcResult resultado = mockMvc.perform(get("/api/perfil"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.codigo").value("NAO_AUTENTICADO"))
                 .andExpect(jsonPath("$.correlationId").exists())
@@ -110,7 +110,7 @@ class AutenticacaoWebTest {
         MockHttpSession sessao = (MockHttpSession) login.getRequest().getSession(false);
         assertThat(sessao).isNotNull();
 
-        mockMvc.perform(get("/test-seguranca/protegido").session(sessao))
+        mockMvc.perform(get("/api/perfil").session(sessao))
                 .andExpect(status().isOk())
                 .andExpect(content().string("ok"));
     }
