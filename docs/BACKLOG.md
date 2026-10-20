@@ -46,6 +46,7 @@ Planejamento total: **584 pontos**, sendo **552 até a semana 46** e **32 após 
 - [x] [#11 — Implementar usuários, perfis e persistência](https://github.com/pedrobertanhi/gerenciadordesalas/issues/11) — semana 36, 5 pts
 - [x] [#12 — Implementar autenticação e armazenamento seguro de senha](https://github.com/pedrobertanhi/gerenciadordesalas/issues/12) — semana 36, 5 pts
 - [x] [#13 — Aplicar autorização por perfil](https://github.com/pedrobertanhi/gerenciadordesalas/issues/13) — semana 37, 8 pts
+- [x] [#133 — Corrigir tentativas ilimitadas no login](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/133) — correção adicional de segurança
 - [ ] [#14 — Criar testes automatizados de segurança](https://github.com/pedrobertanhi/gerenciadordesalas/issues/14) — semana 37, 5 pts
 - [ ] [#64 — Modelar solicitante professor ou coordenador e propriedade da reserva](https://github.com/pedrobertanhi/gerenciadordesalas/issues/64) — semana 36, 5 pts
 - [ ] [#85 — Implementar gerenciamento administrativo de usuários](https://github.com/pedrobertanhi/gerenciadordesalas/issues/85) — semana 44, 8 pts
