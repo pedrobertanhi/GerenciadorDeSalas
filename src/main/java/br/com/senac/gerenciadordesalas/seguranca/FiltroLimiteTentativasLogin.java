@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -18,7 +17,6 @@ import java.time.Duration;
  * Recusa temporariamente tentativas de login acima do limite antes de executar
  * a validação de senha, reduzindo adivinhação de credenciais e custo de BCrypt.
  */
-@Component
 public class FiltroLimiteTentativasLogin extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FiltroLimiteTentativasLogin.class);
