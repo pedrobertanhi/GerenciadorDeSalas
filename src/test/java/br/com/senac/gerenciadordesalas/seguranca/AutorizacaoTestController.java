@@ -35,10 +35,27 @@ class AutorizacaoTestController {
         return "retirada-registrada";
     }
 
+    @GetMapping("/movimentacoes/minhas/{emailDoDono}")
+    @PreAuthorize("hasRole('SOLICITANTE') and "
+            + "@autorizacaoDePropriedade.ehDono(authentication, #emailDoDono)")
+    String consultarMovimentacoesProprias(@PathVariable String emailDoDono) {
+        return "movimentacoes-proprias";
+    }
+
     @PostMapping("/admin/usuarios")
     String criarUsuario() {
         alteracoesAdministrativas.incrementAndGet();
         return "usuario-criado";
+    }
+
+    @GetMapping("/auditoria")
+    String consultarAuditoria() {
+        return "auditoria";
+    }
+
+    @PostMapping("/auditoria")
+    String criarAuditoriaManual() {
+        return "evento-manual";
     }
 
     @GetMapping("/reservas/minhas/{emailDoDono}")
