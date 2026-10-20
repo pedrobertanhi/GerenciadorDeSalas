@@ -87,6 +87,8 @@ Consulte o [guia do PostgreSQL com Docker Compose](docs/POSTGRESQL_DOCKER.md) pa
 
 O Flyway aplica automaticamente as migrations pendentes ao iniciar a aplicação. Consulte o [guia de versionamento do banco](docs/FLYWAY.md) para criar novas migrations, validar o histórico e testar um banco limpo.
 
+Os testes de integração usam PostgreSQL descartável. Consulte o [guia do Testcontainers](docs/TESTCONTAINERS.md) para execução local, isolamento e validação no CI.
+
 ## Antes de desenvolver
 
 Leia o [guia operacional de execução](docs/GUIA_DE_EXECUCAO.md). Ele mostra como transformar uma Issue em trabalho comprovado, incluindo branch, microcommits, testes, RTM, evidências, Pull Request, revisão e critérios de Done.
