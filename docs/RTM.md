@@ -112,7 +112,7 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | AUT-07 | Login sem token CSRF é recusado | AutenticacaoWebTest | Automatizado |
 | AUT-08 | Hash das contas de demonstração corresponde à senha documentada; contas só no perfil dev | SenhaCodificadaTest + PLANO_DE_SEGURANCA.md | Automatizado e documentado |
 
-## SEC-15 — Limitação de tentativas de autenticação
+## Correção de segurança no login — Limitação de tentativas
 
 | ID | Requisito | Verificação | Status |
 |---|---|---|---|
