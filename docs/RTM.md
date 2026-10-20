@@ -123,3 +123,4 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | AUTZ-05 | Administrador não herda automaticamente operações do Responsável | AutorizacaoPorPerfilWebTest | Automatizado |
 | AUTZ-06 | Acesso negado retorna 403 padronizado e não executa efeito colateral | AutorizacaoPorPerfilWebTest | Automatizado |
 | AUTZ-07 | Exclusões físicas de usuários, reservas, movimentações e auditoria são negadas | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
+| AUTZ-08 | Rotas não mapeadas são negadas inclusive para usuário autenticado | SecurityConfig + AutorizacaoPorPerfilWebTest | Automatizado |
