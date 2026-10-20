@@ -58,7 +58,9 @@ public class FiltroLimiteTentativasLogin extends OncePerRequestFilter {
     }
 
     private boolean ehTentativaDeLogin(HttpServletRequest request) {
-        return HttpMethod.POST.matches(request.getMethod())
-                && "/login".equals(request.getServletPath());
+        String uri = request.getRequestURI();
+        String contexto = request.getContextPath();
+        String caminho = uri.startsWith(contexto) ? uri.substring(contexto.length()) : uri;
+        return HttpMethod.POST.matches(request.getMethod()) && "/login".equals(caminho);
     }
 }
