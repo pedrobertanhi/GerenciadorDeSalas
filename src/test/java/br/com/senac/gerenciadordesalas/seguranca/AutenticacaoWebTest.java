@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ProtegidoTestController.class)
 @Import({SecurityConfig.class, RespostasDeSeguranca.class, UsuarioDetailsService.class,
         CorrelationIdFilter.class})
+@ActiveProfiles("test")
 class AutenticacaoWebTest {
 
     private static final String EMAIL = "ana.sintetica@exemplo.test";
