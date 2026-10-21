@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -43,7 +44,9 @@ public class ProfessorWebController {
     }
 
     @GetMapping
-    public String listar(@RequestParam(required = false) String competencia, Model model) {
+    public String listar(@RequestParam(required = false) String competencia, Model model, Authentication authentication) {
+        model.addAttribute("administrador", authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR")));
         model.addAttribute("professores", service.listar(competencia));
         model.addAttribute("competencia", competencia == null ? "" : competencia);
         return "professores/lista";
