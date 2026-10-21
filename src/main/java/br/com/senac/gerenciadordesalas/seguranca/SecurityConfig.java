@@ -89,6 +89,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH,
                                 "/api/salas/**", "/api/materiais/**", "/api/manutencoes/**")
                                 .hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/professores", "/professores/**")
+                                .authenticated()
+                        .requestMatchers(HttpMethod.POST, "/professores", "/professores/**")
+                                .hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST, "/api/professores/*/validacao")
                                 .hasRole("RESPONSAVEL")
                         .requestMatchers(HttpMethod.POST, "/api/professores/**")
