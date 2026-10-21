@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.salas;
 
+import jakarta.persistence.EntityExistsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,7 +37,8 @@ public class SalaServiceTest {
         Sala sala = new Sala("Sala Duplicada", 20, "Térreo");
         when(repository.existsByNome("Sala Duplicada")).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> service.criar(sala));
+        // Atualizado para esperar a nova exceção de conflito
+        assertThrows(EntityExistsException.class, () -> service.criar(sala));
         verify(repository, never()).save(any());
     }
 }
