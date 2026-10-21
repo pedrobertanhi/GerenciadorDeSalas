@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.salas;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,8 @@ public class SalaService {
     @Transactional
     public Sala criar(Sala sala) {
         if (repository.existsByNome(sala.getNome())) {
-            throw new IllegalArgumentException("Já existe uma sala cadastrada com este nome.");
+            // Lança EntityExistsException para que o Spring devolva 409 Conflict em vez de 500
+            throw new EntityExistsException("Já existe uma sala cadastrada com este nome.");
         }
         return repository.save(sala);
     }
@@ -29,15 +31,23 @@ public class SalaService {
 
     public Sala buscarPorId(Long id) {
         return repository.findById(id)
+                // Lança EntityNotFoundException para que o Spring devolva 404 Not Found
                 .orElseThrow(() -> new EntityNotFoundException("Sala não encontrada."));
     }
 
     @Transactional
     public Sala atualizar(Long id, Sala dadosAtualizados) {
-        Sala salaExistente = buscarPorId(id);
+        // Recarrega a sala do banco para garantir que temos a versão mais recente
+        Sala salaExistente = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Sala não encontrada."));
 
         if (repository.existsByNomeAndIdNot(dadosAtualizados.getNome(), id)) {
-            throw new IllegalArgumentException("Já existe outra sala cadastrada com este nome.");
+            throw new EntityExistsException("Já existe outra sala cadastrada com este nome.");
+        }
+
+        // Bloqueia a atualização se a sala tiver sido inativada concorrentemente
+        if (!salaExistente.getAtiva()) {
+            throw new IllegalStateException("Não é possível atualizar uma sala que já foi inativada.");
         }
 
         salaExistente.setNome(dadosAtualizados.getNome());
