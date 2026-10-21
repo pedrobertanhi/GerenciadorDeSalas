@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.salas;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class SalaService {
 
     public Sala buscarPorId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Sala não encontrada."));
+                .orElseThrow(() -> new EntityNotFoundException("Sala não encontrada."));
     }
 
     @Transactional
@@ -42,7 +43,6 @@ public class SalaService {
         salaExistente.setNome(dadosAtualizados.getNome());
         salaExistente.setCapacidade(dadosAtualizados.getCapacidade());
         salaExistente.setLocalizacao(dadosAtualizados.getLocalizacao());
-        // A inativação é tratada em um método separado para preservar histórico
         
         return repository.save(salaExistente);
     }
@@ -50,7 +50,7 @@ public class SalaService {
     @Transactional
     public void inativar(Long id) {
         Sala sala = buscarPorId(id);
-        sala.setAtiva(false); // Inativa em vez de deletar, preservando o histórico
+        sala.setAtiva(false);
         repository.save(sala);
     }
 }

@@ -6,12 +6,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import br.com.senac.gerenciadordesalas.salas.Sala;
-import br.com.senac.gerenciadordesalas.salas.SalaRepository;
-
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.is;
@@ -19,8 +23,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional // Garante que as alterações no banco de dados sejam revertidas após cada teste
+@ActiveProfiles("test")
+@Testcontainers
+@Transactional 
 public class SalaControllerTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,6 +56,7 @@ public class SalaControllerTest {
                 """;
 
         mockMvc.perform(post("/api/salas")
+                .with(csrf()) // Adicionado token CSRF necessário após a PR #138
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonRequest))
                 .andExpect(status().isCreated())
@@ -57,8 +74,8 @@ public class SalaControllerTest {
                 }
                 """;
 
-        // Valida que o sistema recusa a capacidade negativa (400 Bad Request)
         mockMvc.perform(post("/api/salas")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonRequest))
                 .andExpect(status().isBadRequest());
@@ -67,7 +84,6 @@ public class SalaControllerTest {
     @Test
     @WithMockUser(roles = "SOLICITANTE")
     void solicitanteNaoDeveAcessarCrudDeSalas() throws Exception {
-        // Valida que o perfil Solicitante recebe 403 Forbidden
         mockMvc.perform(get("/api/salas"))
                 .andExpect(status().isForbidden());
     }
@@ -77,10 +93,10 @@ public class SalaControllerTest {
     void deveInativarSalaPreservandoHistorico() throws Exception {
         Sala sala = repository.save(new Sala("Sala C3", 20, "Bloco C"));
 
-        mockMvc.perform(patch("/api/salas/" + sala.getId() + "/inativar"))
+        mockMvc.perform(patch("/api/salas/" + sala.getId() + "/inativar")
+                .with(csrf()))
                 .andExpect(status().isNoContent());
 
-        // Valida que a sala continua no banco, mas com o status ativa = false
         Sala salaAtualizada = repository.findById(sala.getId()).orElseThrow();
         assertFalse(salaAtualizada.getAtiva());
     }
