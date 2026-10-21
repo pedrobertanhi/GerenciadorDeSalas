@@ -3,6 +3,9 @@ package br.com.senac.gerenciadordesalas.professor;
 import br.com.senac.gerenciadordesalas.seguranca.SecurityConfig;
 import br.com.senac.gerenciadordesalas.seguranca.RespostasDeSeguranca;
 import br.com.senac.gerenciadordesalas.seguranca.UsuarioDetailsService;
+import br.com.senac.gerenciadordesalas.usuario.UserRepository;
+import br.com.senac.gerenciadordesalas.erro.CorrelationIdFilter;
+import org.springframework.test.context.ActiveProfiles;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,12 +19,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(ProfessorController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, RespostasDeSeguranca.class, UsuarioDetailsService.class, CorrelationIdFilter.class})
+@ActiveProfiles("test")
 class ProfessorControllerSecurityTest {
     @Autowired MockMvc mvc;
     @MockitoBean ProfessorService service;
-    @MockitoBean UsuarioDetailsService usuarioDetailsService;
-    @MockitoBean RespostasDeSeguranca respostas;
+    @MockitoBean UserRepository userRepository;
 
     @Test void solicitanteNaoPodeCadastrar() throws Exception {
         mvc.perform(post("/api/professores").with(user("solicitante").roles("SOLICITANTE")).with(csrf())
