@@ -5,14 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class AutorizacaoTest {
 
     @Autowired
@@ -23,14 +26,13 @@ public class AutorizacaoTest {
     @Test
     @WithMockUser(roles = "SOLICITANTE")
     void solicitanteDeveAcessarRotasPermitidas() throws Exception {
-        mockMvc.perform(post("/api/reservas"))
+        mockMvc.perform(post("/api/reservas").with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "matheus.moura@senac.br", roles = "SOLICITANTE")
     void solicitanteDeveAcessarPropriaReserva() throws Exception {
-        // Testa a regra @autorizacaoDePropriedade.ehDono
         mockMvc.perform(get("/api/reservas/minhas/matheus.moura@senac.br"))
                 .andExpect(status().isOk());
     }
@@ -38,14 +40,14 @@ public class AutorizacaoTest {
     @Test
     @WithMockUser(roles = "RESPONSAVEL")
     void responsavelDeveAprovarReservas() throws Exception {
-        mockMvc.perform(post("/api/reservas/1/aprovar"))
+        mockMvc.perform(post("/api/reservas/1/aprovar").with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(roles = "ADMINISTRADOR")
     void administradorDeveAcessarRotasAdministrativas() throws Exception {
-        mockMvc.perform(post("/api/admin/usuarios"))
+        mockMvc.perform(post("/api/admin/usuarios").with(csrf()))
                 .andExpect(status().isOk());
     }
 
@@ -54,7 +56,7 @@ public class AutorizacaoTest {
     @Test
     @WithMockUser(roles = "SOLICITANTE")
     void solicitanteNaoDeveAcessarRotasDeAdmin() throws Exception {
-        mockMvc.perform(post("/api/admin/usuarios"))
+        mockMvc.perform(post("/api/admin/usuarios").with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
@@ -68,7 +70,7 @@ public class AutorizacaoTest {
     @Test
     @WithMockUser(roles = "RESPONSAVEL")
     void responsavelNaoDeveCriarUsuariosAdmin() throws Exception {
-        mockMvc.perform(post("/api/admin/usuarios"))
+        mockMvc.perform(post("/api/admin/usuarios").with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
