@@ -1,43 +1,47 @@
 package br.com.senac.gerenciadordesalas.seguranca;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api")
-public class ProtegidoTestController {
+class ProtegidoTestController {
+
+    @GetMapping("/perfil")
+    String protegido() {
+        return "ok";
+    }
 
     @PostMapping("/reservas")
-    @PreAuthorize("hasRole('SOLICITANTE')")
-    public String criarReserva() {
-        return "Reserva criada";
+    String criarReserva(
+            @RequestBody(required = false) Map<String, Object> corpo
+    ) {
+        return "ok";
     }
 
     @GetMapping("/reservas/minhas/{email}")
-    // O PreAuthorize garante que apenas o próprio utilizador possa aceder às suas reservas
-    @PreAuthorize("hasRole('SOLICITANTE') and #email == authentication.name")
-    public String acessarMinhasReservas(@PathVariable String email) {
-        return "Minhas reservas de " + email;
+    String minhasReservas(@PathVariable String email) {
+        return "ok";
     }
 
     @PostMapping("/reservas/{id}/aprovar")
-    @PreAuthorize("hasRole('RESPONSAVEL')")
-    public String aprovarReserva(@PathVariable Long id) {
-        return "Reserva " + id + " aprovada";
+    String aprovar() {
+        return "ok";
     }
 
     @PostMapping("/admin/usuarios")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public String gerenciarUsuarios() {
-        return "Gerenciamento de usuários";
+    String adminUsuarios() {
+        return "ok";
     }
 
     @GetMapping("/disponibilidade")
-    public String verificarDisponibilidade() {
-        return "Disponível";
+    String disponibilidade() {
+        return "ok";
     }
 }
