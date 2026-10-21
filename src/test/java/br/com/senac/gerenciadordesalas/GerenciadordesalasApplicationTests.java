@@ -1,6 +1,8 @@
 package br.com.senac.gerenciadordesalas;
 
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
+import br.com.senac.gerenciadordesalas.professor.ProfessorRepository;
+import br.com.senac.gerenciadordesalas.professor.CompetenciaRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,6 +20,12 @@ class GerenciadordesalasApplicationTests {
     // Sem banco neste teste, o repositório não é criado; o mock mantém o contexto de pé.
     @MockitoBean
     UserRepository userRepository;
+
+    @MockitoBean
+    ProfessorRepository professorRepository;
+
+    @MockitoBean
+    CompetenciaRepository competenciaRepository;
 
     @Test
     void contextLoads() {
