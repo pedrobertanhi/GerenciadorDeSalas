@@ -1,5 +1,7 @@
 package br.com.senac.gerenciadordesalas.erro;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,6 +27,16 @@ class TestErrorController {
     @GetMapping("/conflito")
     void conflito() {
         throw new ConflitoDeEstadoException("Conflito de estado de teste");
+    }
+
+    @GetMapping("/entidade-inexistente")
+    void entidadeInexistente() {
+        throw new EntityNotFoundException("Entidade de teste inexistente");
+    }
+
+    @GetMapping("/entidade-existente")
+    void entidadeExistente() {
+        throw new EntityExistsException("Entidade de teste ja existe");
     }
 
     @GetMapping("/erro-interno")

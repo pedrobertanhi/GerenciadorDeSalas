@@ -1,5 +1,7 @@
 package br.com.senac.gerenciadordesalas.erro;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +136,34 @@ public class GlobalExceptionHandler {
         String correlationId = correlationIdDaRequisicao(request);
 
         log.warn("Conflito de estado. correlationId={}", correlationId);
+
+        ErroResposta erro = new ErroResposta(
+                "CONFLITO_DE_ESTADO",
+                "A operacao nao pode ser concluida devido a um conflito de estado atual do recurso.",
+                correlationId
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErroResposta> tratarEntidadeNaoEncontrada(EntityNotFoundException ex, HttpServletRequest request) {
+        String correlationId = correlationIdDaRequisicao(request);
+
+        log.warn("Entidade nao encontrada. correlationId={}", correlationId);
+
+        ErroResposta erro = new ErroResposta(
+                "RECURSO_NAO_ENCONTRADO",
+                "O recurso solicitado nao foi encontrado.",
+                correlationId
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
+
+    @ExceptionHandler(EntityExistsException.class)
+    public ResponseEntity<ErroResposta> tratarEntidadeJaExistente(EntityExistsException ex, HttpServletRequest request) {
+        String correlationId = correlationIdDaRequisicao(request);
+
+        log.warn("Entidade ja existente. correlationId={}", correlationId);
 
         ErroResposta erro = new ErroResposta(
                 "CONFLITO_DE_ESTADO",
