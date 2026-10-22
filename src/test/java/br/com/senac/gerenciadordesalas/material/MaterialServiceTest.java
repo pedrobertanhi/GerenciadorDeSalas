@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +75,7 @@ class MaterialServiceTest {
     void desativacaoPreservaRegistro() {
         Material material = materialAtivo();
         when(materiais.findById(1L)).thenReturn(Optional.of(material));
+        when(materiais.saveAndFlush(material)).thenReturn(material);
 
         service.desativar(1L);
 
@@ -97,6 +99,18 @@ class MaterialServiceTest {
 
         assertThat(resultado).hasSize(1);
         verify(materiais).buscarAtivos(MaterialTipo.EQUIPAMENTO, true);
+    }
+
+    @Test
+    void conflitoConcorrenteNaoSobrescreveEstado() {
+        Material material = materialAtivo();
+        when(materiais.findById(1L)).thenReturn(Optional.of(material));
+        when(materiais.saveAndFlush(material))
+                .thenThrow(new ObjectOptimisticLockingFailureException(Material.class, 1L));
+
+        assertThatThrownBy(() -> service.atualizar(1L, entrada("Projetor novo", "PAT-01", 4)))
+                .isInstanceOf(ConflitoDeEstadoException.class)
+                .hasMessageContaining("outra operacao");
     }
 
     private MaterialDto.Entrada entrada(String nome, String patrimonio, int quantidade) {
