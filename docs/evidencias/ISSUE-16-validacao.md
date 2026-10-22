@@ -4,7 +4,7 @@
 Issue: https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/16
 Pull Request (rascunho): https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/142
 
-- Entidade Professor e migration V3
+- Entidade Professor e migration V4 (V3 pertence a salas na base atual)
 - Competências e filtro
 - CRUD REST e telas Thymeleaf
 - Validação de e-mail, estado ativo, duplicidade e dados inválidos
