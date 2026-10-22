@@ -3,6 +3,7 @@ package br.com.senac.gerenciadordesalas.material;
 import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +52,9 @@ public class MaterialService {
 
     @Transactional
     public void desativar(Long id) {
-        obter(id).desativar();
+        Material material = obter(id);
+        material.desativar();
+        salvar(material);
     }
 
     @Transactional(readOnly = true)
@@ -76,6 +79,8 @@ public class MaterialService {
     private MaterialDto.Saida salvar(Material material) {
         try {
             return MaterialDto.Saida.de(materiais.saveAndFlush(material));
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            throw new ConflitoDeEstadoException("Material alterado por outra operacao");
         } catch (DataIntegrityViolationException ex) {
             throw new ConflitoDeEstadoException("Patrimonio ja cadastrado");
         }
