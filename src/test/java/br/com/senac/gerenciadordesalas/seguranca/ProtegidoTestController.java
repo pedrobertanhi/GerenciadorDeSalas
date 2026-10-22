@@ -3,8 +3,8 @@ package br.com.senac.gerenciadordesalas.seguranca;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -19,7 +19,9 @@ class ProtegidoTestController {
     }
 
     @PostMapping("/reservas")
-    String criarReserva(@RequestBody(required = false) Map<String, Object> corpo) {
+    String criarReserva(
+            @RequestBody(required = false) Map<String, Object> corpo
+    ) {
         return "ok";
     }
 
