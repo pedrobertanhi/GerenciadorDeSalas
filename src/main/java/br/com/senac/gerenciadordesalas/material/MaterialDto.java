@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.material;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,7 @@ public final class MaterialDto {
             @Schema(description = "Código patrimonial opcional e único", example = "PAT-2026-001")
             @Size(max = 100) String patrimonio,
             @Schema(description = "Quantidade total cadastrada", example = "4", minimum = "0")
+            @JsonDeserialize(using = QuantidadeInteiraDeserializer.class)
             @NotNull @PositiveOrZero Integer quantidadeTotal,
             @Schema(example = "Almoxarifado A")
             @NotBlank @Size(max = 150) String localizacao,
