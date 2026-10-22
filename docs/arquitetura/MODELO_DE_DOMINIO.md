@@ -84,6 +84,8 @@ Representa um material ou equipamento acadêmico disponível para reserva.
 - `id`: identificador único;
 - `name`: nome do material;
 - `description`: descrição;
+- `type`: classificação `MATERIAL` ou `EQUIPAMENTO`;
+- `assetTag`: patrimônio opcional do equipamento;
 - `totalQuantity`: quantidade total cadastrada;
 - `location`: local de armazenamento;
 - `restricted`: indica se exige aprovação;
@@ -92,6 +94,7 @@ Representa um material ou equipamento acadêmico disponível para reserva.
 ### Regras
 
 - a quantidade total não pode ser negativa;
+- o patrimônio deve ser único quando informado;
 - a quantidade disponível é calculada considerando reservas, retiradas, devoluções e manutenções;
 - uma reserva não pode solicitar quantidade maior que a disponível no período;
 - materiais inativos não podem ser incluídos em novas reservas.
