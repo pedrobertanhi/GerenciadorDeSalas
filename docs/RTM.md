@@ -15,7 +15,7 @@
 | Requisito | Risco principal | Casos/automação planejados | Issues | Execução | Status |
 |---|---|---|---|---|---|
 | RF-01 | acesso indevido horizontal/vertical | CT-AUTH-01 + matriz de perfis | #11–#14, #110 | PENDENTE | planejado |
-| RF-02 | cadastro inválido/duplicado | CRUD positivos, negativos e constraints | #15–#18 | PENDENTE | planejado |
+| RF-02 | cadastro inválido/duplicado | CRUD positivos, negativos e constraints (SalaIntegracaoTest, ProfessorIntegracaoTest, MaterialIntegracaoTest, ConstraintsDoBancoTest, ProvaDeIsolamentoTest) | #15–#18 | PENDENTE | planejado |
 | RF-03 | disponibilidade incorreta | filtros combinados e limites | #19, #20 | PENDENTE | planejado |
 | RF-04 | reserva em estado inválido | CT-TEMPO-01, estados e propriedade | #23–#27, #87 | PENDENTE | planejado |
 | RF-05 | sobreposição não detectada | CT-TEMPO-02, CT-PROF-01, CT-MAT-01 | #28–#31 | PENDENTE | planejado |
