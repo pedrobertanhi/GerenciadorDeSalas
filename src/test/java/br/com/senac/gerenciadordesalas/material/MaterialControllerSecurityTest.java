@@ -132,6 +132,17 @@ class MaterialControllerSecurityTest {
         verifyNoInteractions(service);
     }
 
+    @Test
+    void quantidadeFracionariaRetorna400SemTruncar() throws Exception {
+        mvc.perform(post("/api/materiais")
+                        .with(user("admin").roles("ADMINISTRADOR")).with(csrf())
+                        .contentType("application/json")
+                        .content(jsonValido().replace("\"quantidadeTotal\":2", "\"quantidadeTotal\":1.5")))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
+    }
+
     private String jsonValido() {
         return """
                 {
