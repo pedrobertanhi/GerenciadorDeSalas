@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.professor;
 
+import br.com.senac.gerenciadordesalas.material.MaterialService;
 import br.com.senac.gerenciadordesalas.salas.SalaService;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,6 +30,7 @@ class ProfessorOpenApiTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @MockitoBean ProfessorService professores;
+    @MockitoBean MaterialService materiais;
     @MockitoBean SalaService salas;
     @MockitoBean UserRepository usuarios;
 
