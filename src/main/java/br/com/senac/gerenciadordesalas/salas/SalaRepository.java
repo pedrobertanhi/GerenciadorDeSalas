@@ -8,5 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface SalaRepository extends JpaRepository<Sala, Long>, JpaSpecificationExecutor<Sala> {
     
     boolean existsByNome(String nome);
+
+    boolean existsByNomeAndIdNot(String nome, Long id);
     
 }
