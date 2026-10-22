@@ -46,7 +46,7 @@ public class SecurityConfig {
             LimitadorTentativasLogin limitador) throws Exception {
         http
                 .authorizeHttpRequests(requisicoes -> requisicoes
-                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/usuarios/**",
                                 "/api/admin/usuarios/**",
@@ -89,6 +89,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH,
                                 "/api/salas/**", "/api/materiais/**", "/api/manutencoes/**")
                                 .hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/professores", "/professores/**")
+                                .authenticated()
+                        .requestMatchers(HttpMethod.POST, "/professores", "/professores/**")
+                                .hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST, "/api/professores/*/validacao")
                                 .hasRole("RESPONSAVEL")
                         .requestMatchers(HttpMethod.POST, "/api/professores/**")
@@ -109,7 +113,14 @@ public class SecurityConfig {
                                 .authenticated()
                         .anyRequest().denyAll())
                 .exceptionHandling(excecoes -> excecoes
-                        .authenticationEntryPoint(respostas)
+                        .authenticationEntryPoint((request, response, ex) -> {
+                            if (request.getHeader("Accept") != null
+                                    && request.getHeader("Accept").contains("text/html")) {
+                                response.sendRedirect(request.getContextPath() + "/login");
+                            } else {
+                                respostas.commence(request, response, ex);
+                            }
+                        })
                         .accessDeniedHandler(respostas))
                 .formLogin(formulario -> formulario
                         .loginProcessingUrl("/login")
@@ -118,13 +129,23 @@ public class SecurityConfig {
                         .successHandler((requisicao, resposta, autenticacao) -> {
                             limitador.registrarSucesso(
                                     requisicao.getParameter("email"), requisicao.getRemoteAddr());
-                            respostas.escreverLoginRealizado(resposta, autenticacao);
+                            if (requisicao.getHeader("Accept") != null
+                                    && requisicao.getHeader("Accept").contains("text/html")) {
+                                resposta.sendRedirect(requisicao.getContextPath() + "/professores");
+                            } else {
+                                respostas.escreverLoginRealizado(resposta, autenticacao);
+                            }
                         })
                         .failureHandler((requisicao, resposta, excecao) -> {
                             limitador.registrarFalha(
                                     requisicao.getParameter("email"), requisicao.getRemoteAddr());
-                            respostas.escrever(requisicao, resposta, HttpStatus.UNAUTHORIZED,
-                                    "CREDENCIAIS_INVALIDAS", "E-mail ou senha invalidos.");
+                            if (requisicao.getHeader("Accept") != null
+                                    && requisicao.getHeader("Accept").contains("text/html")) {
+                                resposta.sendRedirect(requisicao.getContextPath() + "/login?erro");
+                            } else {
+                                respostas.escrever(requisicao, resposta, HttpStatus.UNAUTHORIZED,
+                                        "CREDENCIAIS_INVALIDAS", "E-mail ou senha invalidos.");
+                            }
                         }))
                 .logout(saida -> saida
                         .logoutUrl("/logout")
