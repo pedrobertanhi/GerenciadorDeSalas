@@ -1,5 +1,6 @@
 CREATE TABLE tb_materiais (
     id BIGSERIAL PRIMARY KEY,
+    versao BIGINT NOT NULL DEFAULT 0,
     nome VARCHAR(150) NOT NULL,
     descricao VARCHAR(500),
     tipo VARCHAR(20) NOT NULL,
