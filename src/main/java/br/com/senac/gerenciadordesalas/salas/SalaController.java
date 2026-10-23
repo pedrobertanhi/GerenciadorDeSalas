@@ -33,6 +33,7 @@ public class SalaController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()") // Matriz de permissões: pesquisa liberada aos três perfis
     public ResponseEntity<Page<SalaResponseDTO>> pesquisar(
             @Valid SalaFiltroDTO filtro,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
@@ -40,6 +41,7 @@ public class SalaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()") // Matriz de permissões: consulta liberada aos três perfis
     public ResponseEntity<SalaResponseDTO> buscarPorId(@PathVariable Long id) {
         Sala sala = service.buscarPorId(id);
         return ResponseEntity.ok(new SalaResponseDTO(sala));
