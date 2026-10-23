@@ -150,7 +150,7 @@ class SalaIntegracaoTest extends IntegracaoPostgresBase {
 
     @ParameterizedTest
     @ValueSource(strings = {"SOLICITANTE", "RESPONSAVEL"})
-    void perfilSemPermissao_recebe403SemAlterarDados(String perfil) throws Exception {
+    void perfilSemPermissaoDeEscrita_recebe403MasPodePesquisar(String perfil) throws Exception {
         mockMvc.perform(post("/api/salas")
                         .with(user("usuario.teste").roles(perfil))
                         .with(csrf())
@@ -159,7 +159,7 @@ class SalaIntegracaoTest extends IntegracaoPostgresBase {
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/salas").with(user("usuario.teste").roles(perfil)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
 
         assertThat(contar("salas")).isZero();
     }
