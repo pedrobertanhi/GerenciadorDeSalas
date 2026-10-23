@@ -83,8 +83,16 @@ public class SalaControllerTest {
 
     @Test
     @WithMockUser(roles = "SOLICITANTE")
-    void solicitanteNaoDeveAcessarCrudDeSalas() throws Exception {
+    void solicitantePodePesquisarMasNaoCadastrarSalas() throws Exception {
         mockMvc.perform(get("/api/salas"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/salas")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"nome": "Sala Proibida", "capacidade": 10, "localizacao": "Anexo"}
+                        """))
                 .andExpect(status().isForbidden());
     }
 
