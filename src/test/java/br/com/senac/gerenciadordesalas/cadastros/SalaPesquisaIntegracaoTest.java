@@ -126,6 +126,13 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
                         contains("Auditorio", "Sala 101", "Laboratorio 1", "Sala 102")));
     }
 
+    @Test
+    void ordenacaoPorCampoInexistente_retorna400() throws Exception {
+        mockMvc.perform(get("/api/salas").param("sort", "campoInexistente,asc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("REQUISICAO_INVALIDA"));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"0", "-1"})
     void capacidadeMinimaInvalida_retorna400(String capacidade) throws Exception {
