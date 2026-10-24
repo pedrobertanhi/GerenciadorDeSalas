@@ -19,6 +19,14 @@ class IntervaloDisponibilidadeTest {
     }
 
     @Test
+    void rejeitaInstanteExtremoForaDoLimite() {
+        assertThrows(IllegalArgumentException.class, () ->
+                IntervaloDisponibilidade.de(
+                        "+999999999-12-31T23:59:59-18:00",
+                        "+999999999-12-31T23:59:59Z"));
+    }
+
+    @Test
     void horariosAdjacentesNaoSeSobrepoem() {
         var primeiro = intervalo("2026-10-22T08:00:00Z", "2026-10-22T10:00:00Z");
         var segundo = intervalo("2026-10-22T10:00:00Z", "2026-10-22T12:00:00Z");
