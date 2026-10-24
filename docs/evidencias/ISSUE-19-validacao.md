@@ -20,10 +20,10 @@
 | Laboratorio 1 | 30         | Bloco B - 2o andar | ativa    |
 | Sala 101      | 40         | Bloco A - 1o andar | ativa    |
 | Sala 102      | 25         | Bloco A - 1o andar | ativa    |
-
 | Sala Antiga   | 60         | Bloco A - Terreo   | inativa  |
 
 Os três casos de busca literal criam, além dessa massa, pares de salas próprios (sala alvo e sala-isca) para provar que o curinga não vaza: `Bloco_1` contra `BlocoA1`, `Bloco 100% novo` contra `Bloco 100 novo` e `Bloco A\B` contra `Bloco AB`.
+
 Cada teste confere a lista exata de nomes devolvida, na ordem esperada.
 
 ## Testes localizáveis
