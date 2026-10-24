@@ -19,7 +19,7 @@ public class ConsultaDisponibilidadeController {
 
     @GetMapping("/consulta")
     public ResponseEntity<ConsultaDisponibilidadeResposta> consultar(
-            @RequestParam String inicio, @RequestParam String termino) {
+            @RequestParam(required = false) String inicio, @RequestParam(required = false) String termino) {
         IntervaloDisponibilidade intervalo;
         try {
             intervalo = IntervaloDisponibilidade.de(inicio, termino);
@@ -31,6 +31,7 @@ public class ConsultaDisponibilidadeController {
                 new ConsultaDisponibilidadeResposta(
                         "CONSULTA_INDISPONIVEL",
                         "A verificacao de reservas e manutencao ainda nao foi integrada.",
-                        intervalo.inicio(), intervalo.termino()));
+                        ConsultaDisponibilidadeResposta.noFusoLocal(intervalo.inicio()),
+                        ConsultaDisponibilidadeResposta.noFusoLocal(intervalo.termino())));
     }
 }
