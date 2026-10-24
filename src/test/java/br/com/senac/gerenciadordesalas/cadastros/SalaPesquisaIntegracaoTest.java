@@ -1,5 +1,5 @@
 package br.com.senac.gerenciadordesalas.cadastros;
-
+ 
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
-
+ 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -17,14 +17,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+ 
 /**
  * Pesquisa combinada e paginada de salas (RES-05, #19) com massa controlada:
  * cinco salas conhecidas, sendo uma inativa, criadas antes de cada teste.
  */
 @WithMockUser(roles = "ADMINISTRADOR")
 class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
-
+ 
     @BeforeEach
     void criarMassaControlada() throws Exception {
         criarSala("Auditorio", 120, "Bloco A - Terreo");
@@ -35,7 +35,7 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
         mockMvc.perform(patch("/api/salas/{id}/inativar", inativa).with(csrf()))
                 .andExpect(status().isNoContent());
     }
-
+ 
     private long criarSala(String nome, int capacidade, String localizacao) throws Exception {
         String json = """
                 {"nome":"%s","capacidade":%d,"localizacao":"%s"}
@@ -49,7 +49,7 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
         Number id = JsonPath.read(resultado.getResponse().getContentAsString(), "$.id");
         return id.longValue();
     }
-
+ 
     @Test
     void semFiltros_retornaSomenteAtivasOrdenadasPorNome() throws Exception {
         mockMvc.perform(get("/api/salas"))
@@ -58,21 +58,21 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
                 .andExpect(jsonPath("$.content[*].nome",
                         contains("Auditorio", "Laboratorio 1", "Sala 101", "Sala 102")));
     }
-
+ 
     @Test
     void filtroVazio_equivaleAAusenciaDeFiltro() throws Exception {
         mockMvc.perform(get("/api/salas").param("localizacao", "   "))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(4));
     }
-
+ 
     @Test
     void capacidadeMinima_incluiOLimiteEExcluiMenores() throws Exception {
         mockMvc.perform(get("/api/salas").param("capacidadeMinima", "40"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].nome", contains("Auditorio", "Sala 101")));
     }
-
+ 
     @Test
     void localizacao_buscaParcialSemDiferenciarMaiusculas() throws Exception {
         mockMvc.perform(get("/api/salas").param("localizacao", "  bloco a  "))
@@ -80,7 +80,7 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
                 .andExpect(jsonPath("$.content[*].nome",
                         contains("Auditorio", "Sala 101", "Sala 102")));
     }
-
+ 
     @Test
     void filtrosCombinados_aplicamTodasAsCondicoes() throws Exception {
         mockMvc.perform(get("/api/salas")
@@ -89,7 +89,7 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].nome", contains("Sala 101")));
     }
-
+ 
     @Test
     void salaInativaNaoApareceMesmoAtendendoAosFiltros() throws Exception {
         mockMvc.perform(get("/api/salas")
@@ -98,7 +98,7 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].nome", contains("Auditorio")));
     }
-
+ 
     @Test
     void semResultado_retornaPaginaVaziaCom200() throws Exception {
         mockMvc.perform(get("/api/salas")
@@ -108,7 +108,7 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
                 .andExpect(jsonPath("$.content", hasSize(0)))
                 .andExpect(jsonPath("$.totalElements").value(0));
     }
-
+ 
     @Test
     void paginacao_respeitaTamanhoENumeroDaPagina() throws Exception {
         mockMvc.perform(get("/api/salas").param("size", "2").param("page", "1"))
@@ -117,7 +117,7 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
                 .andExpect(jsonPath("$.totalElements").value(4))
                 .andExpect(jsonPath("$.totalPages").value(2));
     }
-
+ 
     @Test
     void ordenacao_porCapacidadeDecrescente() throws Exception {
         mockMvc.perform(get("/api/salas").param("sort", "capacidade,desc"))
@@ -125,19 +125,58 @@ class SalaPesquisaIntegracaoTest extends IntegracaoPostgresBase {
                 .andExpect(jsonPath("$.content[*].nome",
                         contains("Auditorio", "Sala 101", "Laboratorio 1", "Sala 102")));
     }
-
+ 
     @Test
     void ordenacaoPorCampoInexistente_retorna400() throws Exception {
         mockMvc.perform(get("/api/salas").param("sort", "campoInexistente,asc"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.codigo").value("REQUISICAO_INVALIDA"));
     }
-
+ 
     @ParameterizedTest
     @ValueSource(strings = {"0", "-1"})
     void capacidadeMinimaInvalida_retorna400(String capacidade) throws Exception {
         mockMvc.perform(get("/api/salas").param("capacidadeMinima", capacidade))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.codigo").value("VALIDACAO_INVALIDA"));
+    }
+ 
+    @Test
+    void localizacaoComUnderline_eBuscadaComoTextoLiteral() throws Exception {
+        criarSala("Sala Underline", 10, "Bloco_1");
+        criarSala("Sala Semelhante", 10, "BlocoA1");
+ 
+        // Sem escape, o _ casaria com qualquer caractere e "BlocoA1" tambem viria.
+        mockMvc.perform(get("/api/salas").param("localizacao", "Bloco_1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[*].nome", contains("Sala Underline")));
+    }
+ 
+    @Test
+    void localizacaoComPorcentagem_eBuscadaComoTextoLiteral() throws Exception {
+        criarSala("Sala Porcentagem", 10, "Bloco 100% novo");
+        criarSala("Sala Sem Porcentagem", 10, "Bloco 100 novo");
+ 
+        // Sem escape, o % casaria com qualquer sequencia e "Bloco 100 novo" tambem viria.
+        mockMvc.perform(get("/api/salas").param("localizacao", "100% novo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[*].nome", contains("Sala Porcentagem")));
+    }
+ 
+    @Test
+    void localizacaoComBarraInvertida_eBuscadaComoTextoLiteral() throws Exception {
+        // "\\\\" em Java vira \\ no texto, que o JSON decodifica como uma unica barra:
+        // a sala e gravada com a localizacao Bloco A\B.
+        criarSala("Sala Com Barra", 10, "Bloco A\\\\B");
+        criarSala("Sala Sem Barra", 10, "Bloco AB");
+ 
+        // Se a barra nao fosse escapada antes dos curingas, o \B do padrao escaparia o B
+        // e a pesquisa encontraria "Bloco AB" em vez da sala correta.
+        mockMvc.perform(get("/api/salas").param("localizacao", "Bloco A\\B"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[*].nome", contains("Sala Com Barra")));
     }
 }
