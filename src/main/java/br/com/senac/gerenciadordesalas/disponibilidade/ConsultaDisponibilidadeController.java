@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("isAuthenticated()")
 public class ConsultaDisponibilidadeController {
 
-    @GetMapping
+    @GetMapping("/consulta")
     public ResponseEntity<ConsultaDisponibilidadeResposta> consultar(
             @RequestParam String inicio, @RequestParam String termino) {
         IntervaloDisponibilidade intervalo;
