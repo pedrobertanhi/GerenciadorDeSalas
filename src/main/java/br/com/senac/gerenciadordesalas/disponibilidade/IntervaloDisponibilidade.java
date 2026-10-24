@@ -23,9 +23,9 @@ public record IntervaloDisponibilidade(Instant inicio, Instant termino) {
             return new IntervaloDisponibilidade(
                     OffsetDateTime.parse(inicio).toInstant(),
                     OffsetDateTime.parse(termino).toInstant());
-        } catch (java.time.format.DateTimeParseException ex) {
+        } catch (java.time.DateTimeException ex) {
             throw new IllegalArgumentException(
-                    "Inicio e termino devem estar em ISO 8601 com deslocamento UTC", ex);
+                    "Inicio e termino devem estar em ISO 8601 com deslocamento explicito", ex);
         }
     }
 
