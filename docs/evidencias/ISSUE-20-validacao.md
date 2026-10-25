@@ -18,7 +18,7 @@ Sem esses provedores não é possível comprovar que recursos estão realmente l
 ## Verificação
 O primeiro CI falhou por conflito de mapeamento com o controlador auxiliar de testes de segurança, que ocupa `GET /api/disponibilidade`. O contrato parcial foi ajustado para `/api/disponibilidade/consulta` sem alterar os testes legados.
 
-O CI / Maven Verify passou no commit `bbdd8971e4bb29853916dc0b71d9f44a5f7752c8` (run 40141381791). Após a revisão do PR, foram adicionadas correções de `DateTimeException`, parâmetros ausentes, fuso horário e assertivas de valores esperados. **É necessária nova execução do CI para validar essas correções.**
+O CI / Maven Verify passou inicialmente no commit `bbdd8971e4bb29853916dc0b71d9f44a5f7752c8` (run 40141381791). Após a revisão, foram adicionadas correções de `DateTimeException`, parâmetros ausentes, fuso horário e assertivas de valores esperados. **A nova execução do CI / Maven Verify passou** no commit `e60fd012b5cf562a5cf6455f3d743a00e7df40fb` (run 40142654796). Os quatro apontamentos do Sourcery foram resolvidos e a revisão automatizada aprovou a atualização. Este registro documental não substitui a verificação de CI do commit mais recente.
 
 ## Próximos passos (fora do escopo deste PR parcial)
 1. Integrar contratos persistentes de reservas e manutenções quando as dependências estiverem prontas.
