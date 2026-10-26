@@ -138,3 +138,15 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | RATE-04 | Conta existente e inexistente mantêm resposta neutra | LimiteTentativasLoginWebTest | Automatizado |
 | RATE-05 | Resposta e registro não expõem e-mail, senha ou origem em texto puro | LimiteTentativasLoginWebTest + FiltroLimiteTentativasLogin | Automatizado |
 | RATE-06 | Login válido limpa a contagem e preserva o fluxo legítimo | LimitadorTentativasLoginTest + LimiteTentativasLoginWebTest | Automatizado |
+
+## MNT-01 — Bloqueios de manutenção
+
+| ID | Requisito | Verificação | Status |
+|---|---|---|---|
+| MNT-01 | Somente administrador gerencia bloqueios, e todos os perfis consultam | MaintenanceBlockControllerSecurityTest + BloqueioManutencaoIntegracaoTest | Automatizado |
+| MNT-02 | Período inválido é recusado: fim após o início e ainda no futuro | BloqueioDtoValidationTest + MaintenanceBlockTest + ConstraintsBloqueiosManutencaoTest | Automatizado |
+| MNT-03 | Recurso inexistente é recusado | MaintenanceBlockServiceTest + BloqueioManutencaoIntegracaoTest | Automatizado |
+| MNT-04 | Histórico preservado: sem exclusão, e concluídos e cancelados permanecem | MaintenanceBlockRepositoryContractTest + BloqueioManutencaoIntegracaoTest | Automatizado |
+| MNT-05 | Alterar e cancelar só em bloqueio ativo, e concluir só se já começou | MaintenanceBlockTest + MaintenanceBlockServiceTest + BloqueioManutencaoIntegracaoTest | Automatizado |
+| MNT-06 | Consulta por tipo, recurso e estado, do mais recente ao mais antigo | BloqueioManutencaoIntegracaoTest | Automatizado |
+| MNT-07 | Constraints do banco barram bloqueio inválido | ConstraintsBloqueiosManutencaoTest | Automatizado |
