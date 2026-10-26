@@ -32,7 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 abstract class IntegracaoPostgresBase {
 
     private static final String[] TABELAS = {
-            "tb_professor_competencias", "tb_professores", "tb_competencias", "salas", "tb_materiais"
+            "tb_professor_competencias", "tb_professores", "tb_competencias", "salas", "tb_materiais",
+            "tb_bloqueios_manutencao"
     };
 
     @DynamicPropertySource
