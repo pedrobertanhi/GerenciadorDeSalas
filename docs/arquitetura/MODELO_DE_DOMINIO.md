@@ -99,6 +99,36 @@ Representa um material ou equipamento acadêmico disponível para reserva.
 - uma reserva não pode solicitar quantidade maior que a disponível no período;
 - materiais inativos não podem ser incluídos em novas reservas.
 
+## MaintenanceBlock
+
+Representa a indisponibilidade temporária de um recurso (sala, professor ou material), registrada por um administrador.
+
+### Atributos
+
+- `id`: identificador único;
+- `resourceType`: tipo do recurso bloqueado, `SALA`, `PROFESSOR` ou `MATERIAL`;
+- `resourceId`: identificador do recurso, sem chave estrangeira, porque o mesmo campo aponta para três tabelas;
+- `reason`: motivo da manutenção, obrigatório, com até 500 caracteres;
+- `startAt`: início do bloqueio;
+- `endAt`: término previsto do bloqueio;
+- `status`: estado `ATIVO`, `CONCLUIDO` ou `CANCELADO`;
+- `closedAt`: instante em que o bloqueio foi concluído ou cancelado;
+- `createdAt`: instante do cadastro;
+- `updatedAt`: instante da última alteração.
+
+### Regras
+
+- o término deve ser posterior ao início, e na criação ou alteração ainda deve estar no futuro;
+- um bloqueio pode começar no passado, quando a manutenção já está em andamento;
+- o recurso deve existir no momento da criação e não pode ser trocado depois;
+- somente administradores criam, alteram, concluem ou cancelam bloqueios, e todos os perfis podem consultá-los;
+- alterar e cancelar exigem o estado `ATIVO`; concluir exige o estado `ATIVO` e que o bloqueio já tenha começado;
+- um bloqueio concluído libera o recurso a partir de `closedAt`, e um cancelado deixa de impedir o uso;
+- bloqueios nunca são excluídos: concluídos e cancelados permanecem como histórico;
+- bloqueios sobrepostos no mesmo recurso são aceitos, e a política para esse caso aguarda decisão do grupo;
+- períodos que apenas se tocam não se sobrepõem;
+- datas são persistidas como instantes e interpretadas no fuso `America/Sao_Paulo`.
+
 ## Reservation
 
 Representa a solicitação de utilização de sala, professor e materiais em determinado intervalo.
