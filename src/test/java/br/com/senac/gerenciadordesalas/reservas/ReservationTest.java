@@ -125,12 +125,31 @@ class ReservationTest {
     }
 
     @Test
-    void definirPeriodo_atualizaInicioETermino() {
+    void definirPeriodo_atualizaInicioETerminoEnquantoCRIADA() {
         Reservation r = novaReserva();
         Instant novoInicio = inicio.plus(1, ChronoUnit.DAYS);
         Instant novoTermino = termino.plus(1, ChronoUnit.DAYS);
         r.definirPeriodo(novoInicio, novoTermino);
         assertThat(r.getInicio()).isEqualTo(novoInicio);
         assertThat(r.getTermino()).isEqualTo(novoTermino);
+    }
+
+    @Test
+    void definirPeriodo_rejeitadoAposTransicaoDeStatus() {
+        Reservation r = novaReserva();
+        r.transicionarPara(StatusReserva.APROVADA);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> r.definirPeriodo(
+                        inicio.plus(1, ChronoUnit.DAYS),
+                        termino.plus(1, ChronoUnit.DAYS)));
+    }
+
+    @Test
+    void adicionarMaterial_rejeitaDuplicata() {
+        Reservation r = novaReserva();
+        r.adicionarMaterial(material, 2);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> r.adicionarMaterial(material, 1));
+        assertThat(r.getMateriais()).hasSize(1);
     }
 }
