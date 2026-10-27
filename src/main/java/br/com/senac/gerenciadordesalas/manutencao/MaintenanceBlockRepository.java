@@ -28,4 +28,27 @@ public interface MaintenanceBlockRepository extends Repository<MaintenanceBlock,
             @Param("recursoTipo") TipoRecurso recursoTipo,
             @Param("recursoId") Long recursoId,
             @Param("status") StatusBloqueio status);
+
+    /**
+     * Verifica a indisponibilidade no intervalo semiaberto [inicio, fim). Bloqueios
+     * cancelados não impedem uso; bloqueios concluídos valem somente até o encerramento.
+     */
+    @Query("""
+            select count(b) > 0 from MaintenanceBlock b
+             where b.recursoTipo = :recursoTipo
+               and b.recursoId = :recursoId
+               and b.inicio < :fim
+               and (
+                    (b.status = br.com.senac.gerenciadordesalas.manutencao.StatusBloqueio.ATIVO
+                     and b.fim > :inicio)
+                 or (b.status = br.com.senac.gerenciadordesalas.manutencao.StatusBloqueio.CONCLUIDO
+                     and b.fim > :inicio
+                     and b.encerradoEm > :inicio)
+               )
+            """)
+    boolean existeBloqueioNoPeriodo(
+            @Param("recursoTipo") TipoRecurso recursoTipo,
+            @Param("recursoId") Long recursoId,
+            @Param("inicio") java.time.Instant inicio,
+            @Param("fim") java.time.Instant fim);
 }

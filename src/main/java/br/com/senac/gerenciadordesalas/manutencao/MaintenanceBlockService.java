@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -89,6 +90,17 @@ public class MaintenanceBlockService {
         return bloqueios.buscar(recursoTipo, recursoId, status).stream()
                 .map(BloqueioDto.Saida::de)
                 .toList();
+    }
+
+    /**
+     * Porta única para os casos de uso que precisam decidir se um recurso pode ser utilizado.
+     * O intervalo segue a regra semiaberta [inicio, fim), portanto horários adjacentes são
+     * permitidos. A criação de reservas (RSV-02) deve chamar este método antes de persistir.
+     */
+    @Transactional(readOnly = true)
+    public boolean recursoEmManutencao(TipoRecurso recursoTipo, Long recursoId,
+                                       Instant inicio, Instant fim) {
+        return bloqueios.existeBloqueioNoPeriodo(recursoTipo, recursoId, inicio, fim);
     }
 
     private MaintenanceBlock obter(Long id) {
