@@ -26,6 +26,7 @@ class StatusReservaTest {
     void aprovada_transicionaParaEmAndamentoOuCancelada() {
         assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.EM_ANDAMENTO)).isTrue();
         assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.CANCELADA)).isTrue();
+        assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.NAO_COMPARECEU)).isTrue();
         assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.CRIADA)).isFalse();
         assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.REJEITADA)).isFalse();
         assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.CONCLUIDA)).isFalse();
@@ -40,7 +41,7 @@ class StatusReservaTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = StatusReserva.class, names = {"REJEITADA", "CANCELADA", "CONCLUIDA"})
+    @EnumSource(value = StatusReserva.class, names = {"REJEITADA", "CANCELADA", "CONCLUIDA", "NAO_COMPARECEU"})
     void statusFinal_naoAceitaNenhumaTransicao(StatusReserva estadoFinal) {
         for (StatusReserva alvo : StatusReserva.values()) {
             assertThat(estadoFinal.podeTransicionarPara(alvo))
