@@ -28,7 +28,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               AND r.status NOT IN (
                   br.com.senac.gerenciadordesalas.reservas.StatusReserva.REJEITADA,
                   br.com.senac.gerenciadordesalas.reservas.StatusReserva.CANCELADA,
-                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.CONCLUIDA)
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.CONCLUIDA,
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.NAO_COMPARECEU)
               AND r.inicio < :termino
               AND r.termino > :inicio
             """)
@@ -44,7 +45,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               AND r.status NOT IN (
                   br.com.senac.gerenciadordesalas.reservas.StatusReserva.REJEITADA,
                   br.com.senac.gerenciadordesalas.reservas.StatusReserva.CANCELADA,
-                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.CONCLUIDA)
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.CONCLUIDA,
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.NAO_COMPARECEU)
               AND r.inicio < :termino
               AND r.termino > :inicio
             """)
