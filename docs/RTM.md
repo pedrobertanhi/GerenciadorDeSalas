@@ -27,7 +27,7 @@
 | RF-11 | falha externa derruba/vaza | CT-INT-01 e matriz WireMock | #41, #42, #104 | PENDENTE | planejado |
 | RF-12 | relatório inconsistente | consultas, período e agregações | #43, #44 | PENDENTE | planejado |
 | RF-13 | fluxo inacessível/erro inseguro | E2E responsivo + assertions de ausência | #9, #45–#47, #62–#75, #110 | PENDENTE | planejado |
-| RF-14 | contrato desatualizado | geração/validação OpenAPI e clone limpo | #10, #80 | PENDENTE | planejado |
+| RF-14 | contrato desatualizado | geração/validação OpenAPI e clone limpo (OpenApiDocumentoTest) | #10, #80 | PENDENTE | planejado |
 
 ## Regras críticas
 
