@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,19 +52,27 @@ public class MaintenanceBlockController {
 
     @Operation(summary = "Consultar bloqueios de manutenção",
             description = "Qualquer usuário autenticado. Inclui concluídos e cancelados, que permanecem como histórico. "
-                    + "Filtros opcionais por tipo de recurso, recurso e estado.")
-    @ApiResponse(responseCode = "200", description = "Lista de bloqueios, do mais recente ao mais antigo",
+                    + "Filtros opcionais por tipo de recurso, recurso e estado; o filtro por recurso exige o tipo, "
+                    + "porque o mesmo número pode existir em salas, professores e materiais. "
+                    + "Ordenados pelo início do período, do mais recente ao mais antigo.")
+    @ApiResponse(responseCode = "200", description = "Lista de bloqueios, ordenada pelo início do período",
             content = @Content(mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = BloqueioDto.Saida.class))))
+    @ApiResponse(responseCode = "400", description = "Filtro por recurso sem o tipo, ou valor de filtro inválido",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErroResposta.class)))
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public List<BloqueioDto.Saida> listar(
             @Parameter(description = "SALA, PROFESSOR ou MATERIAL")
             @RequestParam(required = false) TipoRecurso recursoTipo,
-            @Parameter(description = "Identificador do recurso")
+            @Parameter(description = "Identificador do recurso; exige o parâmetro recursoTipo")
             @RequestParam(required = false) Long recursoId,
             @Parameter(description = "ATIVO, CONCLUIDO ou CANCELADO")
-            @RequestParam(required = false) StatusBloqueio status) {
+            @RequestParam(required = false) StatusBloqueio status) throws MissingServletRequestParameterException {
+        if (recursoId != null && recursoTipo == null) {
+            throw new MissingServletRequestParameterException("recursoTipo", "TipoRecurso");
+        }
         return service.listar(recursoTipo, recursoId, status);
     }
 
