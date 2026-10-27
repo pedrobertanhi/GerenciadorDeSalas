@@ -18,7 +18,8 @@ CREATE TABLE tb_bloqueios_manutencao (
     CONSTRAINT ck_bloqueios_encerramento CHECK (
         (status = 'ATIVO' AND encerrado_em IS NULL)
         OR (status <> 'ATIVO' AND encerrado_em IS NOT NULL)
-    )
+    ),
+    CONSTRAINT ck_bloqueios_conclusao CHECK (status <> 'CONCLUIDO' OR encerrado_em >= inicio)
 );
 
 CREATE INDEX idx_bloqueios_recurso_periodo
