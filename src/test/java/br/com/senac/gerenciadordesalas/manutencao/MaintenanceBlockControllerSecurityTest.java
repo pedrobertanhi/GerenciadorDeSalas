@@ -185,4 +185,22 @@ class MaintenanceBlockControllerSecurityTest {
 
         verifyNoInteractions(service);
     }
+    @Test
+    void filtroPorRecursoSemTipoEhRecusado() throws Exception {
+        mvc.perform(get("/api/manutencoes").param("recursoId", "12")
+                        .with(user("leitor").roles("SOLICITANTE")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("REQUISICAO_INVALIDA"));
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void filtroPorRecursoComTipoEhAceito() throws Exception {
+        when(service.listar(TipoRecurso.SALA, 12L, null)).thenReturn(List.of(saida()));
+
+        mvc.perform(get("/api/manutencoes").param("recursoTipo", "SALA").param("recursoId", "12")
+                        .with(user("leitor").roles("SOLICITANTE")))
+                .andExpect(status().isOk());
+    }
 }
