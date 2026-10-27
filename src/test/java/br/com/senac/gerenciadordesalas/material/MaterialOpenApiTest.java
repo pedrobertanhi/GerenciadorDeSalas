@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.material;
 
+import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.professor.ProfessorService;
 import br.com.senac.gerenciadordesalas.salas.SalaService;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
@@ -44,6 +45,9 @@ class MaterialOpenApiTest {
 
     @MockitoBean
     UserRepository usuarios;
+
+    @MockitoBean
+    MaintenanceBlockService bloqueios;
 
     @Test
     void publicaOsCincoEndpointsESeusContratos() throws Exception {
