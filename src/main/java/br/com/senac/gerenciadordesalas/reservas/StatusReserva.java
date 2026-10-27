@@ -15,10 +15,11 @@ public enum StatusReserva {
     REJEITADA,
     CANCELADA,
     EM_ANDAMENTO,
-    CONCLUIDA;
+    CONCLUIDA,
+    NAO_COMPARECEU;
 
     private static final Set<StatusReserva> FINAIS =
-            EnumSet.of(REJEITADA, CANCELADA, CONCLUIDA);
+            EnumSet.of(REJEITADA, CANCELADA, CONCLUIDA, NAO_COMPARECEU);
 
     /**
      * {@code true} se este status aceita a transicao para {@code novo}.
@@ -30,7 +31,7 @@ public enum StatusReserva {
         }
         return switch (this) {
             case CRIADA -> novo == APROVADA || novo == REJEITADA || novo == CANCELADA;
-            case APROVADA -> novo == EM_ANDAMENTO || novo == CANCELADA;
+            case APROVADA -> novo == EM_ANDAMENTO || novo == CANCELADA || novo == NAO_COMPARECEU;
             case EM_ANDAMENTO -> novo == CONCLUIDA;
             default -> false;
         };
