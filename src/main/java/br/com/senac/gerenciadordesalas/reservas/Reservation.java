@@ -89,7 +89,11 @@ public class Reservation {
         this.status = StatusReserva.CRIADA;
     }
 
-    public void definirPeriodo(Instant inicio, Instant termino) {
+   public void definirPeriodo(Instant inicio, Instant termino) {
+        if (this.status != null && this.status != StatusReserva.CRIADA) {
+            throw new IllegalStateException(
+                    "Periodo so pode ser alterado enquanto a reserva estiver CRIADA");
+        }
         if (inicio == null || termino == null || !termino.isAfter(inicio)) {
             throw new IllegalArgumentException("O termino deve ser posterior ao inicio");
         }
@@ -106,16 +110,34 @@ public class Reservation {
         this.status = novo;
     }
 
-    public ReservationMaterial adicionarMaterial(Material material, int quantidade) {
+        public ReservationMaterial adicionarMaterial(Material material, int quantidade) {
+        Objects.requireNonNull(material, "material e obrigatorio");
+        boolean jaExiste = this.materiais.stream()
+                .anyMatch(m -> material.equals(m.getMaterial()));
+        if (jaExiste) {
+            throw new IllegalStateException(
+                    "Material ja esta vinculado a esta reserva; remova antes de readicionar");
+        }
         ReservationMaterial item = new ReservationMaterial(this, material, quantidade);
         this.materiais.add(item);
+        marcarAtualizado();
         return item;
     }
 
     public void removerMaterial(ReservationMaterial item) {
         if (this.materiais.remove(item)) {
             item.desassociar();
+            marcarAtualizado();
         }
+    }
+
+     /**
+     * Marca a reserva como suja para o JPA, forcando o {@link #preUpdate()} a
+     * atualizar {@code atualizadoEm} mesmo quando a unica mudanca na transacao
+     * for na colecao de materiais.
+     */
+    private void marcarAtualizado() {
+        this.atualizadoEm = Instant.now();
     }
 
     @PrePersist
