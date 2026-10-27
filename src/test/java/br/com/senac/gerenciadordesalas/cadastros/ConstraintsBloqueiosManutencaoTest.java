@@ -23,6 +23,7 @@ class ConstraintsBloqueiosManutencaoTest extends IntegracaoPostgresBase {
             + "(recurso_tipo, recurso_id, motivo, inicio, fim, status, encerrado_em) VALUES ";
     private static final String INICIO = "'2099-01-01T08:00:00-03:00'";
     private static final String FIM = "'2099-01-01T18:00:00-03:00'";
+    private static final String ANTES_DO_INICIO = "'2098-12-31T08:00:00-03:00'";
     private static final String ATIVO_VALIDO =
             BLOQUEIO + "('SALA', 12, 'Troca do projetor', " + INICIO + ", " + FIM + ", 'ATIVO', NULL)";
 
@@ -57,6 +58,10 @@ class ConstraintsBloqueiosManutencaoTest extends IntegracaoPostgresBase {
                 arguments("CANCELADO sem encerrado_em",
                         BLOQUEIO + "('SALA', 12, 'Troca', " + INICIO + ", " + FIM + ", 'CANCELADO', NULL)",
                         "\"ck_bloqueios_encerramento\""),
+                arguments("CONCLUIDO com encerramento anterior ao inicio",
+                        BLOQUEIO + "('SALA', 12, 'Troca', " + INICIO + ", " + FIM + ", 'CONCLUIDO', "
+                                + ANTES_DO_INICIO + ")",
+                        "\"ck_bloqueios_conclusao\""),
                 arguments("motivo nulo",
                         "INSERT INTO tb_bloqueios_manutencao (recurso_tipo, recurso_id, inicio, fim) VALUES "
                                 + "('SALA', 12, " + INICIO + ", " + FIM + ")",
@@ -73,6 +78,9 @@ class ConstraintsBloqueiosManutencaoTest extends IntegracaoPostgresBase {
                 arguments("cancelado com encerramento",
                         new String[]{BLOQUEIO + "('PROFESSOR', 5, 'Licenca', " + INICIO + ", " + FIM
                                 + ", 'CANCELADO', " + INICIO + ")"}),
+                arguments("cancelado antes de comecar",
+                        new String[]{BLOQUEIO + "('SALA', 12, 'Troca', " + INICIO + ", " + FIM
+                                + ", 'CANCELADO', " + ANTES_DO_INICIO + ")"}),
                 arguments("dois bloqueios sobrepostos no mesmo recurso sao aceitos",
                         new String[]{ATIVO_VALIDO, ATIVO_VALIDO})
         );
