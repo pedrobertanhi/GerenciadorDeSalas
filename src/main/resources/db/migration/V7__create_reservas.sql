@@ -21,7 +21,7 @@ CREATE TABLE tb_reservas (
         FOREIGN KEY (professor_id) REFERENCES tb_professores (id),
     CONSTRAINT ck_reservas_periodo CHECK (termino > inicio),
     CONSTRAINT ck_reservas_status CHECK (
-        status IN ('CRIADA', 'APROVADA', 'REJEITADA', 'CANCELADA', 'EM_ANDAMENTO', 'CONCLUIDA')
+        status IN ('CRIADA', 'APROVADA', 'REJEITADA', 'CANCELADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'NAO_COMPARECEU')
     )
 );
 
