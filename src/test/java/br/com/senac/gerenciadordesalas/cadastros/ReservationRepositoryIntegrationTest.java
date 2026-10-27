@@ -105,6 +105,17 @@ class ReservationRepositoryIntegrationTest extends IntegracaoPostgresBase {
     }
 
     @Test
+    void alteracaoDeMateriais_atualizaAtualizadoEm() throws InterruptedException {
+        Reservation nova = reservas.saveAndFlush(
+                new Reservation(solicitante, sala, null, inicio, termino));
+        Instant antes = nova.getAtualizadoEm();
+        Thread.sleep(5);
+        nova.adicionarMaterial(projetor, 1);
+        Reservation apos = reservas.saveAndFlush(nova);
+        assertThat(apos.getAtualizadoEm()).isAfter(antes);
+    }
+
+    @Test
     void buscarAtivasDaSalaSobrepondo_retornaIntersecao() {
         reservas.saveAndFlush(new Reservation(solicitante, sala, null, inicio, termino));
 
@@ -128,10 +139,32 @@ class ReservationRepositoryIntegrationTest extends IntegracaoPostgresBase {
     }
 
     @Test
+    void buscarAtivasDaSalaSobrepondo_ignoraOutraSalaMesmoPeriodo() {
+        Sala outraSala = salas.save(new Sala("Sala 202", 40, "Bloco B"));
+        reservas.saveAndFlush(new Reservation(solicitante, outraSala, null, inicio, termino));
+        List<Reservation> achadas = reservas.buscarAtivasDaSalaSobrepondo(
+                sala.getId(), inicio, termino);
+        assertThat(achadas).isEmpty();
+    }
+
+    @Test
     void buscarAtivasDaSalaSobrepondo_ignoraReservaCancelada() {
         Reservation nova = reservas.saveAndFlush(
                 new Reservation(solicitante, sala, null, inicio, termino));
         nova.transicionarPara(StatusReserva.CANCELADA);
+        reservas.saveAndFlush(nova);
+        List<Reservation> achadas = reservas.buscarAtivasDaSalaSobrepondo(
+                sala.getId(), inicio, termino);
+        assertThat(achadas).isEmpty();
+    }
+
+    @Test
+    void buscarAtivasDaSalaSobrepondo_ignoraReservaNaoCompareceu() {
+        Reservation nova = reservas.saveAndFlush(
+                new Reservation(solicitante, sala, null, inicio, termino));
+        nova.transicionarPara(StatusReserva.APROVADA);
+        reservas.saveAndFlush(nova);
+        nova.transicionarPara(StatusReserva.NAO_COMPARECEU);
         reservas.saveAndFlush(nova);
         List<Reservation> achadas = reservas.buscarAtivasDaSalaSobrepondo(
                 sala.getId(), inicio, termino);
@@ -149,6 +182,16 @@ class ReservationRepositoryIntegrationTest extends IntegracaoPostgresBase {
     }
 
     @Test
+    void buscarAtivasDoProfessorSobrepondo_ignoraOutroProfessorMesmoPeriodo() {
+        Professor outroProfessor = professores.save(new Professor(
+                "Carla Souza", "carla@exemplo.test", Collections.emptySet()));
+        reservas.saveAndFlush(new Reservation(solicitante, sala, outroProfessor, inicio, termino));
+        List<Reservation> achadas = reservas.buscarAtivasDoProfessorSobrepondo(
+                professor.getId(), inicio, termino);
+        assertThat(achadas).isEmpty();
+    }
+
+    @Test
     void findBySolicitanteId_retornaReservasEmOrdemDescendentePorInicio() {
         reservas.saveAndFlush(new Reservation(solicitante, sala, null, inicio, termino));
         reservas.saveAndFlush(new Reservation(solicitante, sala, null,
@@ -156,5 +199,14 @@ class ReservationRepositoryIntegrationTest extends IntegracaoPostgresBase {
         List<Reservation> achadas = reservas.findBySolicitanteIdOrderByInicioDesc(solicitante.getId());
         assertThat(achadas).hasSize(2);
         assertThat(achadas.get(0).getInicio()).isAfter(achadas.get(1).getInicio());
+    }
+
+    @Test
+    void findBySolicitanteId_ignoraReservasDeOutroSolicitante() {
+        User outroSolicitante = usuarios.save(new User(
+                "Diego Alves", "diego@exemplo.test", "$2a$10$hashBcryptFalso", Role.SOLICITANTE));
+        reservas.saveAndFlush(new Reservation(outroSolicitante, sala, null, inicio, termino));
+        List<Reservation> achadas = reservas.findBySolicitanteIdOrderByInicioDesc(solicitante.getId());
+        assertThat(achadas).isEmpty();
     }
 }
