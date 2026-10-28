@@ -2,6 +2,7 @@ package br.com.senac.gerenciadordesalas.professor;
 
 import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationService;
+import br.com.senac.gerenciadordesalas.reservas.ReservationManagementService;
 import br.com.senac.gerenciadordesalas.material.MaterialService;
 import br.com.senac.gerenciadordesalas.salas.SalaService;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
@@ -37,6 +38,7 @@ class ProfessorOpenApiTest {
     @MockitoBean UserRepository usuarios;
     @MockitoBean MaintenanceBlockService bloqueios;
     @MockitoBean ReservationService reservas;
+    @MockitoBean ReservationManagementService gerenciamentoReservas;
 
     @Test void documentacaoExigeSessao() throws Exception {
         mvc.perform(get("/v3/api-docs").accept("application/json"))
