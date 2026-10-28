@@ -27,7 +27,7 @@ public final class ReservationDto {
             @NotNull(message = "termino e obrigatorio") OffsetDateTime termino,
             @NotBlank(message = "finalidade e obrigatoria")
             @Size(max = 500, message = "finalidade deve ter no maximo 500 caracteres") String finalidade,
-            @Valid List<MaterialPedido> materiais) {
+            List<@NotNull(message = "item de material nao pode ser nulo") @Valid MaterialPedido> materiais) {
 
         public Instant inicioInstant() {
             return inicio.toInstant();
