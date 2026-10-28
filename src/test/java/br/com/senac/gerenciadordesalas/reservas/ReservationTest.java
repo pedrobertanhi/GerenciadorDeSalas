@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.reservas;
 
+import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.material.Material;
 import br.com.senac.gerenciadordesalas.professor.Professor;
 import br.com.senac.gerenciadordesalas.salas.Sala;
