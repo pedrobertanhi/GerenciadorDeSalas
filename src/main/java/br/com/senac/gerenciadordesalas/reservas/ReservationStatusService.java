@@ -1,6 +1,7 @@
 package br.com.senac.gerenciadordesalas.reservas;
 
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import java.util.Objects;
  * este servico carrega a reserva e persiste somente uma transicao validada.
  */
 @Service
+@ConditionalOnBean(ReservationRepository.class)
 public class ReservationStatusService {
 
     private final ReservationRepository reservas;
