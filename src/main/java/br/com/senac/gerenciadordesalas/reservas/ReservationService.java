@@ -52,6 +52,7 @@ public class ReservationService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Sala nao encontrada ou inativa"));
 
         Professor professor = resolverProfessor(entrada.professorId());
+        validarConflitos(sala, professor, entrada.inicioInstant(), entrada.terminoInstant(), null);
 
         Reservation reserva = new Reservation(
                 solicitante, sala, professor,
@@ -88,5 +89,18 @@ public class ReservationService {
                 .filter(Professor::isAtivo)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Professor nao encontrado ou inativo"));
+    }
+
+    private void validarConflitos(Sala sala, Professor professor, java.time.Instant inicio,
+                                  java.time.Instant termino, Long reservaIgnorada) {
+        if (reservas.buscarAtivasDaSalaSobrepondo(sala.getId(), inicio, termino).stream()
+                .anyMatch(reserva -> !java.util.Objects.equals(reserva.getId(), reservaIgnorada))) {
+            throw new ConflitoDeEstadoException("Sala ja possui reserva no periodo informado");
+        }
+        if (professor != null && reservas.buscarAtivasDoProfessorSobrepondo(
+                professor.getId(), inicio, termino).stream()
+                .anyMatch(reserva -> !java.util.Objects.equals(reserva.getId(), reservaIgnorada))) {
+            throw new ConflitoDeEstadoException("Professor ja possui reserva no periodo informado");
+        }
     }
 }
