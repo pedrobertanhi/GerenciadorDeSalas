@@ -69,6 +69,9 @@ public class SalaController {
     @ApiResponse(responseCode = "200", description = "Pagina de salas ativas",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = SalaResponseDTO.class)))
+    @ApiResponse(responseCode = "400", description = "Filtro, ordenacao ou paginacao invalidos",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErroResposta.class)))
     @GetMapping
     @PreAuthorize("isAuthenticated()") // Matriz de permissoes: pesquisa liberada aos tres perfis
     public ResponseEntity<Page<SalaResponseDTO>> pesquisar(
@@ -82,6 +85,9 @@ public class SalaController {
     @ApiResponse(responseCode = "200", description = "Sala encontrada",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = SalaResponseDTO.class)))
+    @ApiResponse(responseCode = "400", description = "ID invalido",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErroResposta.class)))
     @ApiResponse(responseCode = "404", description = "Sala nao encontrada ou inativa",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
@@ -115,6 +121,9 @@ public class SalaController {
     @Operation(summary = "Inativar sala",
             description = "Exige ADMINISTRADOR e token CSRF. A inativacao e logica e preserva o historico.")
     @ApiResponse(responseCode = "204", description = "Sala inativada", content = @Content)
+    @ApiResponse(responseCode = "400", description = "ID invalido",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErroResposta.class)))
     @ApiResponse(responseCode = "404", description = "Sala nao encontrada",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
