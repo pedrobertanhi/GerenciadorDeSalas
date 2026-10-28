@@ -54,6 +54,7 @@ public class SalaController {
     @ApiResponse(responseCode = "409", description = "Nome de sala duplicado",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PostMapping
     public ResponseEntity<SalaResponseDTO> criar(@RequestBody @Valid SalaRequestDTO dto) {
         Sala salaCriada = service.criar(dto.toEntity());
@@ -112,6 +113,7 @@ public class SalaController {
     @ApiResponse(responseCode = "409", description = "Nome de sala duplicado",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PutMapping("/{id}")
     public ResponseEntity<SalaResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid SalaRequestDTO dto) {
         Sala salaAtualizada = service.atualizar(id, dto.toEntity());
@@ -127,6 +129,7 @@ public class SalaController {
     @ApiResponse(responseCode = "404", description = "Sala nao encontrada",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PatchMapping("/{id}/inativar")
     public ResponseEntity<Void> inativar(@PathVariable Long id) {
         service.inativar(id);
