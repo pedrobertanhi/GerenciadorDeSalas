@@ -48,6 +48,7 @@ public class ReservationManagementService {
         Reservation reserva = buscarAutorizada(reservaId, emailAtor);
         Sala sala = buscarSalaAtiva(entrada.salaId());
         Professor professor = buscarProfessorAtivo(entrada.professorId());
+        validarConflitos(sala, professor, entrada.inicioInstant(), entrada.terminoInstant(), reserva.getId());
 
         reserva.alterar(sala, professor, entrada.inicioInstant(), entrada.terminoInstant(), entrada.finalidade());
         substituirMateriais(reserva, entrada.materiaisOuVazio());
@@ -114,6 +115,19 @@ public class ReservationManagementService {
                         "Quantidade pedida de " + material.getNome() + " excede o saldo disponivel");
             }
             reserva.adicionarMaterial(material, pedido.quantidade());
+        }
+    }
+
+    private void validarConflitos(Sala sala, Professor professor, java.time.Instant inicio,
+                                  java.time.Instant termino, Long reservaIgnorada) {
+        if (reservas.buscarAtivasDaSalaSobrepondo(sala.getId(), inicio, termino).stream()
+                .anyMatch(reserva -> !java.util.Objects.equals(reserva.getId(), reservaIgnorada))) {
+            throw new ConflitoDeEstadoException("Sala ja possui reserva no periodo informado");
+        }
+        if (professor != null && reservas.buscarAtivasDoProfessorSobrepondo(
+                professor.getId(), inicio, termino).stream()
+                .anyMatch(reserva -> !java.util.Objects.equals(reserva.getId(), reservaIgnorada))) {
+            throw new ConflitoDeEstadoException("Professor ja possui reserva no periodo informado");
         }
     }
 }
