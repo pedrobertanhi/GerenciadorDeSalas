@@ -181,4 +181,59 @@ class ReservationCriacaoIntegrationTest extends IntegracaoPostgresBase {
 
         assertThat(contar("tb_reservas")).isZero();
     }
+    @Test
+    void materialNuloNaLista_recebe400() throws Exception {
+        String corpo = """
+                {
+                  "salaId": %d,
+                  "inicio": "%s",
+                  "termino": "%s",
+                  "finalidade": "Aula com item nulo",
+                  "materiais": [null]
+                }
+                """.formatted(salaId, inicio, termino);
+        mockMvc.perform(post("/api/reservas")
+                        .with(user(EMAIL).roles("SOLICITANTE"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("VALIDACAO_INVALIDA"));
+
+        assertThat(contar("tb_reservas")).isZero();
+    }
+
+    @Test
+    void periodoInvertidoOuZerado_recebe400() throws Exception {
+        String invertido = """
+                {
+                  "salaId": %d,
+                  "inicio": "%s",
+                  "termino": "%s",
+                  "finalidade": "Aula invertida",
+                  "materiais": []
+                }
+                """.formatted(salaId, termino, inicio);
+        String zerado = """
+                {
+                  "salaId": %d,
+                  "inicio": "%s",
+                  "termino": "%s",
+                  "finalidade": "Aula zerada",
+                  "materiais": []
+                }
+                """.formatted(salaId, inicio, inicio);
+
+        for (String corpo : new String[] {invertido, zerado}) {
+            mockMvc.perform(post("/api/reservas")
+                            .with(user(EMAIL).roles("SOLICITANTE"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(corpo))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.codigo").value("VALIDACAO_INVALIDA"));
+        }
+
+        assertThat(contar("tb_reservas")).isZero();
+    }
 }
