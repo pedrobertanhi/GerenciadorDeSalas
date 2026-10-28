@@ -55,6 +55,37 @@ public final class ReservationDto {
             @Positive(message = "quantidade deve ser maior que zero") int quantidade) {
     }
 
+    /**
+     * Dados substituiveis enquanto a reserva ainda estiver CRIADA (RSV-03, #25).
+     */
+    public record Alteracao(
+            @NotNull(message = "sala e obrigatoria") Long salaId,
+            Long professorId,
+            @NotNull(message = "inicio e obrigatorio") OffsetDateTime inicio,
+            @NotNull(message = "termino e obrigatorio") OffsetDateTime termino,
+            @NotBlank(message = "finalidade e obrigatoria")
+            @Size(max = 500, message = "finalidade deve ter no maximo 500 caracteres") String finalidade,
+            List<@NotNull(message = "item de material nao pode ser nulo") @Valid MaterialPedido> materiais) {
+
+        @JsonIgnore
+        @AssertTrue(message = "termino deve ser posterior ao inicio")
+        public boolean isPeriodoValido() {
+            return inicio == null || termino == null || termino.isAfter(inicio);
+        }
+
+        public Instant inicioInstant() {
+            return inicio.toInstant();
+        }
+
+        public Instant terminoInstant() {
+            return termino.toInstant();
+        }
+
+        public List<MaterialPedido> materiaisOuVazio() {
+            return materiais == null ? List.of() : materiais;
+        }
+    }
+
     public record Saida(
             Long id,
             Long versao,
