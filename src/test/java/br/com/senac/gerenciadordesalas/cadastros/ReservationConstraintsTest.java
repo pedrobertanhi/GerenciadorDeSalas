@@ -20,10 +20,11 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Constraints de banco do agregado Reservation (RSV-01, #23):
+ * Constraints de banco do agregado Reservation (RSV-01, #23; finalidade em RSV-02, #24):
  * valida que o PostgreSQL rejeita, mesmo quando a validacao do dominio Java
  * eh contornada por inserts diretos, periodo invertido/igual, quantidade de
- * material zero ou negativa e o mesmo material duplicado na mesma reserva.
+ * material zero ou negativa, mesmo material duplicado na mesma reserva e
+ * finalidade em branco.
  */
 class ReservationConstraintsTest extends IntegracaoPostgresBase {
 
@@ -36,6 +37,7 @@ class ReservationConstraintsTest extends IntegracaoPostgresBase {
     private Long materialId;
     private final Instant inicio = Instant.parse("2026-11-10T09:00:00Z");
     private final Instant termino = inicio.plus(2, ChronoUnit.HOURS);
+    private static final String FINALIDADE = "Reserva de teste";
 
     @BeforeEach
     void preparar() {
@@ -54,11 +56,12 @@ class ReservationConstraintsTest extends IntegracaoPostgresBase {
     @Test
     void periodoInvertido_eRejeitadoPorCheckDoBanco() {
         assertThatThrownBy(() -> jdbcTemplate.update(
-                "INSERT INTO tb_reservas (solicitante_id, sala_id, inicio, termino, status) "
-                        + "VALUES (?, ?, ?, ?, 'CRIADA')",
+                "INSERT INTO tb_reservas (solicitante_id, sala_id, inicio, termino, finalidade, status) "
+                        + "VALUES (?, ?, ?, ?, ?, 'CRIADA')",
                 solicitanteId, salaId,
                 Timestamp.from(termino),
-                Timestamp.from(inicio)))
+                Timestamp.from(inicio),
+                FINALIDADE))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("ck_reservas_periodo");
     }
@@ -66,13 +69,27 @@ class ReservationConstraintsTest extends IntegracaoPostgresBase {
     @Test
     void periodoIgual_eRejeitadoPorCheckDoBanco() {
         assertThatThrownBy(() -> jdbcTemplate.update(
-                "INSERT INTO tb_reservas (solicitante_id, sala_id, inicio, termino, status) "
-                        + "VALUES (?, ?, ?, ?, 'CRIADA')",
+                "INSERT INTO tb_reservas (solicitante_id, sala_id, inicio, termino, finalidade, status) "
+                        + "VALUES (?, ?, ?, ?, ?, 'CRIADA')",
                 solicitanteId, salaId,
                 Timestamp.from(inicio),
-                Timestamp.from(inicio)))
+                Timestamp.from(inicio),
+                FINALIDADE))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("ck_reservas_periodo");
+    }
+
+    @Test
+    void finalidadeEmBranco_eRejeitadaPorCheckDoBanco() {
+        assertThatThrownBy(() -> jdbcTemplate.update(
+                "INSERT INTO tb_reservas (solicitante_id, sala_id, inicio, termino, finalidade, status) "
+                        + "VALUES (?, ?, ?, ?, ?, 'CRIADA')",
+                solicitanteId, salaId,
+                Timestamp.from(inicio),
+                Timestamp.from(termino),
+                "   "))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("ck_reservas_finalidade");
     }
 
     @Test
@@ -114,11 +131,12 @@ class ReservationConstraintsTest extends IntegracaoPostgresBase {
 
     private Long inserirReservaValida() {
         jdbcTemplate.update(
-                "INSERT INTO tb_reservas (solicitante_id, sala_id, inicio, termino, status) "
-                        + "VALUES (?, ?, ?, ?, 'CRIADA')",
+                "INSERT INTO tb_reservas (solicitante_id, sala_id, inicio, termino, finalidade, status) "
+                        + "VALUES (?, ?, ?, ?, ?, 'CRIADA')",
                 solicitanteId, salaId,
                 Timestamp.from(inicio),
-                Timestamp.from(termino));
+                Timestamp.from(termino),
+                FINALIDADE);
         return jdbcTemplate.queryForObject(
                 "SELECT id FROM tb_reservas ORDER BY id DESC LIMIT 1", Long.class);
     }

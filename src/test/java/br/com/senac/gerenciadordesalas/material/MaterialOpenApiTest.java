@@ -1,5 +1,7 @@
 package br.com.senac.gerenciadordesalas.material;
 
+import br.com.senac.gerenciadordesalas.reservas.ReservationService;
+
 import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.professor.ProfessorService;
 import br.com.senac.gerenciadordesalas.salas.SalaService;
@@ -27,6 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class MaterialOpenApiTest {
+
+     @MockitoBean
+    ReservationService reservas;
 
     @Autowired
     MockMvc mvc;

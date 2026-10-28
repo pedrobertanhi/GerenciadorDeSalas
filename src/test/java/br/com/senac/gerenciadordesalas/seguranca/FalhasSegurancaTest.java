@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         UsuarioDetailsService.class,
         CorrelationIdFilter.class
 })
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "seguranca-stub"})
 public class FalhasSegurancaTest {
 
     @Autowired

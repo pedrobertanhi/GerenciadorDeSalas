@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ProtegidoTestController.class)
 @Import({SecurityConfig.class, RespostasDeSeguranca.class, UsuarioDetailsService.class,
         CorrelationIdFilter.class})
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "seguranca-stub"})
 class AutenticacaoWebTest {
 
     private static final String EMAIL = "ana.sintetica@exemplo.test";

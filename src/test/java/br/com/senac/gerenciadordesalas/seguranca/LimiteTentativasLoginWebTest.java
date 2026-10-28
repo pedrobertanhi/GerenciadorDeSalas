@@ -14,6 +14,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import org.springframework.test.context.ActiveProfiles;
+
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ProtegidoTestController.class)
 @Import({SecurityConfig.class, RespostasDeSeguranca.class, UsuarioDetailsService.class,
         CorrelationIdFilter.class})
+@ActiveProfiles("seguranca-stub")
 class LimiteTentativasLoginWebTest {
 
     private static final String EMAIL = "ana.limite@exemplo.test";
