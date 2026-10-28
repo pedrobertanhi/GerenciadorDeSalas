@@ -113,6 +113,35 @@ public class Reservation {
         this.finalidade = finalidade.trim();
     }
 
+    /**
+     * Altera os dados editaveis somente antes da decisao sobre a reserva.
+     * Uma reserva que ja saiu de CRIADA preserva o contexto que foi aprovado.
+     */
+    public void alterar(Sala sala, Professor professor, Instant inicio, Instant termino, String finalidade) {
+        if (this.status != StatusReserva.CRIADA) {
+            throw new ConflitoDeEstadoException(
+                    "Reserva so pode ser alterada enquanto estiver CRIADA");
+        }
+        this.sala = Objects.requireNonNull(sala, "sala e obrigatoria");
+        this.professor = professor;
+        definirPeriodo(inicio, termino);
+        definirFinalidade(finalidade);
+        marcarAtualizado();
+    }
+
+    /**
+     * Cancela sem remover o agregado ou seus materiais, preservando historico.
+     * Reservas em uso ou ja encerradas nao podem ser canceladas.
+     */
+    public void cancelar() {
+        if (this.status == StatusReserva.EM_ANDAMENTO || this.status.isFinal()) {
+            throw new ConflitoDeEstadoException(
+                    "Reserva em andamento ou finalizada nao pode ser cancelada");
+        }
+        this.status = StatusReserva.CANCELADA;
+        marcarAtualizado();
+    }
+
     /** Transiciona para {@code novo} se a regra permitir; caso contrario lanca. */
     public void transicionarPara(StatusReserva novo) {
         if (!this.status.podeTransicionarPara(novo)) {
