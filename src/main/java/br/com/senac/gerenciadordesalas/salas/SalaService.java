@@ -33,6 +33,7 @@ public class SalaService {
 
     public Sala buscarPorId(Long id) {
         return repository.findById(id)
+                .filter(sala -> Boolean.TRUE.equals(sala.getAtiva()))
                 .orElseThrow(() -> new EntityNotFoundException("Sala não encontrada."));
     }
 
@@ -64,7 +65,8 @@ public class SalaService {
 
     @Transactional
     public void inativar(Long id) {
-        Sala sala = buscarPorId(id);
+        Sala sala = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Sala não encontrada."));
         sala.setAtiva(false);
         repository.save(sala);
     }
