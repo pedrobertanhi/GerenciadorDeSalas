@@ -18,7 +18,7 @@
 ## Testes
 
 - `ReservationServiceTest`: 12 casos unitários cobrindo happy path, sem professor, 404 em solicitante/sala/professor/material (inexistente e inativo), 409 em material duplicado e quantidade acima do saldo.
-- `ReservationCriacaoIntegrationTest`: 6 casos ponta a ponta com PostgreSQL real via Testcontainers: SOLICITANTE cria com 201, sem autenticação 401, RESPONSAVEL e ADMINISTRADOR recebem 403, corpo sem finalidade recebe 400, sala inexistente recebe 404, quantidade acima do saldo recebe 409.
+- `ReservationCriacaoIntegrationTest`: 8 casos ponta a ponta com PostgreSQL real via Testcontainers: SOLICITANTE cria com 201, sem autenticação 401, RESPONSAVEL e ADMINISTRADOR recebem 403, corpo sem finalidade recebe 400, sala inexistente recebe 404, quantidade acima do saldo recebe 409, , item nulo em materiais recebe 400, período invertido ou zerado recebe 400.
 - `ReservationTest`, `ReservationRepositoryIntegrationTest` e `ReservationConstraintsTest` foram ajustados para o novo construtor com finalidade (passam `"Reserva de teste"` por padrão) e cobrem a nova constraint `ck_reservas_finalidade`.
 
 ## Como validar
