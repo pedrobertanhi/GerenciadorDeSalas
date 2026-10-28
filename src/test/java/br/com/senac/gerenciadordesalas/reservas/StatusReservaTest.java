@@ -7,8 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Matriz completa da maquina de estados (RSV-04, #26).
- * Para cada par origem/destino, a expectativa deriva da tabela oficial
- * exposta por {@link StatusReserva#transicoesPermitidas()}.
+ * Exercita todos os pares origem/destino contra a regra de negocio esperada.
  */
 class StatusReservaTest {
 
@@ -16,10 +15,9 @@ class StatusReservaTest {
     @EnumSource(StatusReserva.class)
     void matrizCompleta_respeitaTodasAsTransicoesPermitidasERecusas(StatusReserva origem) {
         for (StatusReserva destino : StatusReserva.values()) {
-            boolean esperada = origem.transicoesPermitidas().contains(destino);
             assertThat(origem.podeTransicionarPara(destino))
                     .as("transicao de %s para %s", origem, destino)
-                    .isEqualTo(esperada);
+                    .isEqualTo(transicaoEsperada(origem, destino));
         }
     }
 
@@ -38,5 +36,18 @@ class StatusReservaTest {
         assertThat(estado.isFinal()).isFalse();
         assertThat(estado.transicoesPermitidas()).doesNotContain(estado);
         assertThat(estado.podeTransicionarPara(null)).isFalse();
+    }
+
+    private boolean transicaoEsperada(StatusReserva origem, StatusReserva destino) {
+        return switch (origem) {
+            case CRIADA -> destino == StatusReserva.APROVADA
+                    || destino == StatusReserva.REJEITADA
+                    || destino == StatusReserva.CANCELADA;
+            case APROVADA -> destino == StatusReserva.EM_ANDAMENTO
+                    || destino == StatusReserva.CANCELADA
+                    || destino == StatusReserva.NAO_COMPARECEU;
+            case EM_ANDAMENTO -> destino == StatusReserva.CONCLUIDA;
+            case REJEITADA, CANCELADA, CONCLUIDA, NAO_COMPARECEU -> false;
+        };
     }
 }
