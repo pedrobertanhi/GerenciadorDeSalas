@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.reservas;
 
+import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.material.Material;
 import br.com.senac.gerenciadordesalas.professor.Professor;
 import br.com.senac.gerenciadordesalas.salas.Sala;
@@ -115,7 +116,7 @@ public class Reservation {
     /** Transiciona para {@code novo} se a regra permitir; caso contrario lanca. */
     public void transicionarPara(StatusReserva novo) {
         if (!this.status.podeTransicionarPara(novo)) {
-            throw new IllegalStateException(
+            throw new ConflitoDeEstadoException(
                     "Transicao invalida: " + this.status + " -> " + novo);
         }
         this.status = novo;
