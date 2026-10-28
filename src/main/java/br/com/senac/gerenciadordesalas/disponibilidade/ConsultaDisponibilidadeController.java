@@ -55,9 +55,9 @@ public class ConsultaDisponibilidadeController {
     @GetMapping("/consulta")
     public ResponseEntity<ConsultaDisponibilidadeResposta> consultar(
             @Parameter(description = "Inicio em ISO 8601 com deslocamento, por exemplo 2026-11-10T09:00:00-03:00")
-            @RequestParam(required = false) String inicio,
+            @RequestParam(required = true) String inicio,
             @Parameter(description = "Termino em ISO 8601 com deslocamento, posterior ao inicio")
-            @RequestParam(required = false) String termino) {
+            @RequestParam(required = true) String termino) {
         IntervaloDisponibilidade intervalo;
         try {
             intervalo = IntervaloDisponibilidade.de(inicio, termino);
