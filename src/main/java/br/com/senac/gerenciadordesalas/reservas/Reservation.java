@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Agregado central de reserva (RSV-01, #23).
+ * Agregado central de reserva (RSV-01, #23; finalidade em RSV-02, #24).
  * Relaciona solicitante, sala, professor opcional e materiais com quantidade.
  * O status inicial e as transicoes sao controlados pelo dominio.
  */
@@ -62,6 +62,9 @@ public class Reservation {
     @Column(name = "termino", nullable = false)
     private Instant termino;
 
+    @Column(name = "finalidade", nullable = false, length = 500)
+    private String finalidade;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private StatusReserva status;
@@ -81,15 +84,16 @@ public class Reservation {
     }
 
     public Reservation(User solicitante, Sala sala, Professor professor,
-                       Instant inicio, Instant termino) {
+                       Instant inicio, Instant termino, String finalidade) {
         this.solicitante = Objects.requireNonNull(solicitante, "solicitante e obrigatorio");
         this.sala = Objects.requireNonNull(sala, "sala e obrigatoria");
         this.professor = professor;
         definirPeriodo(inicio, termino);
+        definirFinalidade(finalidade);
         this.status = StatusReserva.CRIADA;
     }
 
-   public void definirPeriodo(Instant inicio, Instant termino) {
+    public void definirPeriodo(Instant inicio, Instant termino) {
         if (this.status != null && this.status != StatusReserva.CRIADA) {
             throw new IllegalStateException(
                     "Periodo so pode ser alterado enquanto a reserva estiver CRIADA");
@@ -101,6 +105,13 @@ public class Reservation {
         this.termino = termino;
     }
 
+    public void definirFinalidade(String finalidade) {
+        if (finalidade == null || finalidade.isBlank()) {
+            throw new IllegalArgumentException("A finalidade e obrigatoria");
+        }
+        this.finalidade = finalidade.trim();
+    }
+
     /** Transiciona para {@code novo} se a regra permitir; caso contrario lanca. */
     public void transicionarPara(StatusReserva novo) {
         if (!this.status.podeTransicionarPara(novo)) {
@@ -110,7 +121,7 @@ public class Reservation {
         this.status = novo;
     }
 
-        public ReservationMaterial adicionarMaterial(Material material, int quantidade) {
+    public ReservationMaterial adicionarMaterial(Material material, int quantidade) {
         Objects.requireNonNull(material, "material e obrigatorio");
         boolean jaExiste = this.materiais.stream()
                 .anyMatch(m -> material.equals(m.getMaterial()));
@@ -131,7 +142,7 @@ public class Reservation {
         }
     }
 
-     /**
+    /**
      * Marca a reserva como suja para o JPA, forcando o {@link #preUpdate()} a
      * atualizar {@code atualizadoEm} mesmo quando a unica mudanca na transacao
      * for na colecao de materiais.
@@ -159,6 +170,7 @@ public class Reservation {
     public Professor getProfessor() { return professor; }
     public Instant getInicio() { return inicio; }
     public Instant getTermino() { return termino; }
+    public String getFinalidade() { return finalidade; }
     public StatusReserva getStatus() { return status; }
     public List<ReservationMaterial> getMateriais() { return Collections.unmodifiableList(materiais); }
     public Instant getCriadoEm() { return criadoEm; }
