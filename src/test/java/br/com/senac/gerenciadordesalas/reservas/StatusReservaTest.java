@@ -1,66 +1,42 @@
 package br.com.senac.gerenciadordesalas.reservas;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Regras de transicao do {@link StatusReserva} (RSV-01, #23).
- * Garante que status finais nao transicionam e que o fluxo valido
- * CRIADA -> APROVADA -> EM_ANDAMENTO -> CONCLUIDA e preservado.
+ * Matriz completa da maquina de estados (RSV-04, #26).
+ * Para cada par origem/destino, a expectativa deriva da tabela oficial
+ * exposta por {@link StatusReserva#transicoesPermitidas()}.
  */
 class StatusReservaTest {
 
-    @Test
-    void criada_transicionaParaAprovadaRejeitadaOuCancelada() {
-        assertThat(StatusReserva.CRIADA.podeTransicionarPara(StatusReserva.APROVADA)).isTrue();
-        assertThat(StatusReserva.CRIADA.podeTransicionarPara(StatusReserva.REJEITADA)).isTrue();
-        assertThat(StatusReserva.CRIADA.podeTransicionarPara(StatusReserva.CANCELADA)).isTrue();
-        assertThat(StatusReserva.CRIADA.podeTransicionarPara(StatusReserva.EM_ANDAMENTO)).isFalse();
-        assertThat(StatusReserva.CRIADA.podeTransicionarPara(StatusReserva.CONCLUIDA)).isFalse();
-    }
-
-    @Test
-    void aprovada_transicionaParaEmAndamentoOuCancelada() {
-        assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.EM_ANDAMENTO)).isTrue();
-        assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.CANCELADA)).isTrue();
-        assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.NAO_COMPARECEU)).isTrue();
-        assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.CRIADA)).isFalse();
-        assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.REJEITADA)).isFalse();
-        assertThat(StatusReserva.APROVADA.podeTransicionarPara(StatusReserva.CONCLUIDA)).isFalse();
-    }
-
-    @Test
-    void emAndamento_soTransicionaParaConcluida() {
-        assertThat(StatusReserva.EM_ANDAMENTO.podeTransicionarPara(StatusReserva.CONCLUIDA)).isTrue();
-        assertThat(StatusReserva.EM_ANDAMENTO.podeTransicionarPara(StatusReserva.CRIADA)).isFalse();
-        assertThat(StatusReserva.EM_ANDAMENTO.podeTransicionarPara(StatusReserva.APROVADA)).isFalse();
-        assertThat(StatusReserva.EM_ANDAMENTO.podeTransicionarPara(StatusReserva.CANCELADA)).isFalse();
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = StatusReserva.class, names = {"REJEITADA", "CANCELADA", "CONCLUIDA", "NAO_COMPARECEU"})
-    void statusFinal_naoAceitaNenhumaTransicao(StatusReserva estadoFinal) {
-        for (StatusReserva alvo : StatusReserva.values()) {
-            assertThat(estadoFinal.podeTransicionarPara(alvo))
-                    .as("transicao de %s para %s", estadoFinal, alvo)
-                    .isFalse();
-        }
-        assertThat(estadoFinal.isFinal()).isTrue();
-    }
-
     @ParameterizedTest
     @EnumSource(StatusReserva.class)
-    void nenhumStatusTransicionaParaOProprioOuParaNulo(StatusReserva atual) {
-        assertThat(atual.podeTransicionarPara(atual)).isFalse();
-        assertThat(atual.podeTransicionarPara(null)).isFalse();
+    void matrizCompleta_respeitaTodasAsTransicoesPermitidasERecusas(StatusReserva origem) {
+        for (StatusReserva destino : StatusReserva.values()) {
+            boolean esperada = origem.transicoesPermitidas().contains(destino);
+            assertThat(origem.podeTransicionarPara(destino))
+                    .as("transicao de %s para %s", origem, destino)
+                    .isEqualTo(esperada);
+        }
     }
 
     @ParameterizedTest
-    @EnumSource(value = StatusReserva.class, names = {"CRIADA", "APROVADA", "EM_ANDAMENTO"})
-    void statusNaoFinal_naoEhFinal(StatusReserva atual) {
-        assertThat(atual.isFinal()).isFalse();
+    @EnumSource(value = StatusReserva.class,
+            names = {"REJEITADA", "CANCELADA", "CONCLUIDA", "NAO_COMPARECEU"})
+    void estadoFinal_naoPossuiTransicoes(StatusReserva estadoFinal) {
+        assertThat(estadoFinal.isFinal()).isTrue();
+        assertThat(estadoFinal.transicoesPermitidas()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = StatusReserva.class,
+            names = {"CRIADA", "APROVADA", "EM_ANDAMENTO"})
+    void estadoNaoFinal_expoeApenasSeusProximosEstados(StatusReserva estado) {
+        assertThat(estado.isFinal()).isFalse();
+        assertThat(estado.transicoesPermitidas()).doesNotContain(estado);
+        assertThat(estado.podeTransicionarPara(null)).isFalse();
     }
 }
