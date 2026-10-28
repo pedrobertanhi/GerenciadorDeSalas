@@ -50,6 +50,7 @@ public class ProfessorController {
     @ApiResponse(responseCode = "201", description = "Cadastro salvo", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfessorDto.Saida.class)))
     @ApiResponse(responseCode = "400", description = "JSON, ID ou campos inválidos", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErroResposta.class)))
     @ApiResponse(responseCode = "409", description = "Cadastro duplicado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -61,6 +62,7 @@ public class ProfessorController {
     @ApiResponse(responseCode = "400", description = "JSON, ID ou campos inválidos", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErroResposta.class)))
     @ApiResponse(responseCode = "409", description = "Cadastro duplicado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErroResposta.class)))
     @ApiResponse(responseCode = "404", description = "Professor não encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ProfessorDto.Saida atualizar(@Parameter(description = "Identificador do professor", example = "1") @PathVariable Long id, @Valid @RequestBody ProfessorDto.Entrada entrada) {
@@ -70,6 +72,7 @@ public class ProfessorController {
     @ApiResponse(responseCode = "204", description = "Professor desativado, sem corpo", content = @Content)
     @ApiResponse(responseCode = "400", description = "ID com formato inválido", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErroResposta.class)))
     @ApiResponse(responseCode = "404", description = "Professor não encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PatchMapping("/{id}/desativar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMINISTRADOR')")
