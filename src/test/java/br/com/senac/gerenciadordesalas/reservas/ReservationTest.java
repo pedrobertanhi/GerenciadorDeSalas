@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 /**
- * Regras do agregado {@link Reservation} (RSV-01, #23):
- * criacao, periodo, transicao de status e manipulacao de materiais.
+ * Regras do agregado {@link Reservation} (RSV-01, #23; finalidade em RSV-02, #24):
+ * criacao, periodo, finalidade, transicao de status e manipulacao de materiais.
  */
 class ReservationTest {
 
@@ -31,7 +31,7 @@ class ReservationTest {
     private final Instant termino = inicio.plus(2, ChronoUnit.HOURS);
 
     private Reservation novaReserva() {
-        return new Reservation(solicitante, sala, professor, inicio, termino);
+        return new Reservation(solicitante, sala, professor, inicio, termino, "Reserva de teste");
     }
 
     @Test
@@ -43,28 +43,36 @@ class ReservationTest {
 
     @Test
     void professorEhOpcional() {
-        Reservation r = new Reservation(solicitante, sala, null, inicio, termino);
+        Reservation r = new Reservation(solicitante, sala, null, inicio, termino, "Reserva de teste");
         assertThat(r.getProfessor()).isNull();
     }
 
     @Test
     void solicitanteSalaInicioETerminoSaoObrigatorios() {
         assertThatNullPointerException()
-                .isThrownBy(() -> new Reservation(null, sala, professor, inicio, termino));
+                .isThrownBy(() -> new Reservation(null, sala, professor, inicio, termino, "Reserva de teste"));
         assertThatNullPointerException()
-                .isThrownBy(() -> new Reservation(solicitante, null, professor, inicio, termino));
+                .isThrownBy(() -> new Reservation(solicitante, null, professor, inicio, termino, "Reserva de teste"));
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Reservation(solicitante, sala, professor, null, termino));
+                .isThrownBy(() -> new Reservation(solicitante, sala, professor, null, termino, "Reserva de teste"));
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Reservation(solicitante, sala, professor, inicio, null));
+                .isThrownBy(() -> new Reservation(solicitante, sala, professor, inicio, null, "Reserva de teste"));
     }
 
     @Test
     void periodoInvertidoOuZeradoEhRejeitado() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Reservation(solicitante, sala, professor, termino, inicio));
+                .isThrownBy(() -> new Reservation(solicitante, sala, professor, termino, inicio, "Reserva de teste"));
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Reservation(solicitante, sala, professor, inicio, inicio));
+                .isThrownBy(() -> new Reservation(solicitante, sala, professor, inicio, inicio, "Reserva de teste"));
+    }
+
+    @Test
+    void finalidadeNulaOuEmBrancoEhRejeitada() {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new Reservation(solicitante, sala, professor, inicio, termino, null));
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new Reservation(solicitante, sala, professor, inicio, termino, "   "));
     }
 
     @Test
