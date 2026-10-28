@@ -101,6 +101,7 @@ public class MaintenanceBlockController {
     @ApiResponse(responseCode = "404", description = "Recurso não encontrado",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -123,6 +124,7 @@ public class MaintenanceBlockController {
     @ApiResponse(responseCode = "409", description = "Bloqueio não está ativo",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public BloqueioDto.Saida alterar(@PathVariable Long id, @Valid @RequestBody BloqueioDto.Entrada entrada) {
@@ -141,6 +143,7 @@ public class MaintenanceBlockController {
     @ApiResponse(responseCode = "409", description = "Bloqueio não está ativo ou ainda não começou",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PatchMapping("/{id}/concluir")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public BloqueioDto.Saida concluir(@PathVariable Long id) {
@@ -159,6 +162,7 @@ public class MaintenanceBlockController {
     @ApiResponse(responseCode = "409", description = "Bloqueio não está ativo",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PatchMapping("/{id}/cancelar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public BloqueioDto.Saida cancelar(@PathVariable Long id) {

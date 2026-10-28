@@ -89,6 +89,7 @@ public class MaterialController {
     @ApiResponse(responseCode = "409", description = "Patrimônio duplicado",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -110,6 +111,7 @@ public class MaterialController {
     @ApiResponse(responseCode = "409", description = "Patrimônio duplicado",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public MaterialDto.Saida atualizar(@PathVariable Long id,
@@ -123,6 +125,7 @@ public class MaterialController {
     @ApiResponse(responseCode = "404", description = "Material não encontrado",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
     @PatchMapping("/{id}/desativar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMINISTRADOR')")

@@ -144,8 +144,8 @@ class SalaIntegracaoTest extends IntegracaoPostgresBase {
         assertThat(contar("salas")).isEqualTo(1);
 
         mockMvc.perform(get("/api/salas/{id}", id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.ativa").value(false));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.codigo").value("RECURSO_NAO_ENCONTRADO"));
     }
 
     @ParameterizedTest
