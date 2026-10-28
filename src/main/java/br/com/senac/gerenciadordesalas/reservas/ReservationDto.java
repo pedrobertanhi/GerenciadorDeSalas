@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.AssertTrue;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -35,6 +37,12 @@ public final class ReservationDto {
 
         public Instant terminoInstant() {
             return termino.toInstant();
+        }
+        
+        @JsonIgnore
+        @AssertTrue(message = "termino deve ser posterior ao inicio")
+        public boolean isPeriodoValido() {
+            return inicio == null || termino == null || termino.isAfter(inicio);
         }
 
         public List<MaterialPedido> materiaisOuVazio() {
