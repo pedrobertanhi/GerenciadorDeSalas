@@ -194,6 +194,38 @@ class ReservationRepositoryIntegrationTest extends IntegracaoPostgresBase {
     }
 
     @Test
+    void quantidadeAtivaDoMaterialSobrepondo_somaReservasAtivasEIgnoraAdjacencia() {
+        Reservation primeira = new Reservation(solicitante, sala, null, inicio, termino, FINALIDADE);
+        primeira.adicionarMaterial(projetor, 2);
+        reservas.saveAndFlush(primeira);
+
+        Reservation segunda = new Reservation(solicitante, sala, null,
+                inicio.plus(30, ChronoUnit.MINUTES), termino.plus(30, ChronoUnit.MINUTES), FINALIDADE);
+        segunda.adicionarMaterial(projetor, 3);
+        reservas.saveAndFlush(segunda);
+
+        assertThat(reservas.quantidadeAtivaDoMaterialSobrepondo(
+                projetor.getId(), inicio, termino, null)).isEqualTo(5);
+        assertThat(reservas.quantidadeAtivaDoMaterialSobrepondo(
+                projetor.getId(), termino, termino.plus(1, ChronoUnit.HOURS), null)).isZero();
+    }
+
+    @Test
+    void quantidadeAtivaDoMaterialSobrepondo_ignoraCanceladaEPropriaReserva() {
+        Reservation reserva = new Reservation(solicitante, sala, null, inicio, termino, FINALIDADE);
+        reserva.adicionarMaterial(projetor, 4);
+        reservas.saveAndFlush(reserva);
+
+        assertThat(reservas.quantidadeAtivaDoMaterialSobrepondo(
+                projetor.getId(), inicio, termino, reserva.getId())).isZero();
+
+        reserva.transicionarPara(StatusReserva.CANCELADA);
+        reservas.saveAndFlush(reserva);
+        assertThat(reservas.quantidadeAtivaDoMaterialSobrepondo(
+                projetor.getId(), inicio, termino, null)).isZero();
+    }
+
+    @Test
     void findBySolicitanteId_retornaReservasEmOrdemDescendentePorInicio() {
         reservas.saveAndFlush(new Reservation(solicitante, sala, null, inicio, termino, FINALIDADE));
         reservas.saveAndFlush(new Reservation(solicitante, sala, null,
