@@ -54,4 +54,27 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("professorId") Long professorId,
             @Param("inicio") Instant inicio,
             @Param("termino") Instant termino);
+
+    /**
+     * Soma as quantidades do material comprometidas por reservas ativas no
+     * período semiaberto informado. A reserva ignorada permite validar uma
+     * alteração sem contabilizar seus próprios itens.
+     */
+    @Query("""
+            SELECT COALESCE(SUM(rm.quantidade), 0) FROM ReservationMaterial rm
+            WHERE rm.material.id = :materialId
+              AND rm.reserva.status NOT IN (
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.REJEITADA,
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.CANCELADA,
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.CONCLUIDA,
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.NAO_COMPARECEU)
+              AND rm.reserva.inicio < :termino
+              AND rm.reserva.termino > :inicio
+              AND (:reservaIgnorada IS NULL OR rm.reserva.id <> :reservaIgnorada)
+            """)
+    long quantidadeAtivaDoMaterialSobrepondo(
+            @Param("materialId") Long materialId,
+            @Param("inicio") Instant inicio,
+            @Param("termino") Instant termino,
+            @Param("reservaIgnorada") Long reservaIgnorada);
 }
