@@ -199,6 +199,9 @@ class ReservationRepositoryIntegrationTest extends IntegracaoPostgresBase {
         primeira.adicionarMaterial(projetor, 2);
         reservas.saveAndFlush(primeira);
 
+        assertThat(reservas.quantidadeAtivaDoMaterialSobrepondo(
+                projetor.getId(), termino, termino.plus(1, ChronoUnit.HOURS), null)).isZero();
+
         Reservation segunda = new Reservation(solicitante, sala, null,
                 inicio.plus(30, ChronoUnit.MINUTES), termino.plus(30, ChronoUnit.MINUTES), FINALIDADE);
         segunda.adicionarMaterial(projetor, 3);
@@ -206,8 +209,6 @@ class ReservationRepositoryIntegrationTest extends IntegracaoPostgresBase {
 
         assertThat(reservas.quantidadeAtivaDoMaterialSobrepondo(
                 projetor.getId(), inicio, termino, null)).isEqualTo(5);
-        assertThat(reservas.quantidadeAtivaDoMaterialSobrepondo(
-                projetor.getId(), termino, termino.plus(1, ChronoUnit.HOURS), null)).isZero();
     }
 
     @Test
