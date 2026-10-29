@@ -51,7 +51,8 @@ public class ReservationManagementService {
         validarConflitos(sala, professor, entrada.inicioInstant(), entrada.terminoInstant(), reserva.getId());
 
         reserva.alterar(sala, professor, entrada.inicioInstant(), entrada.terminoInstant(), entrada.finalidade());
-        substituirMateriais(reserva, entrada.materiaisOuVazio());
+        substituirMateriais(reserva, entrada.materiaisOuVazio(),
+                entrada.inicioInstant(), entrada.terminoInstant());
         return ReservationDto.Saida.de(reservas.save(reserva));
     }
 
@@ -96,7 +97,8 @@ public class ReservationManagementService {
                         "Professor nao encontrado ou inativo"));
     }
 
-    private void substituirMateriais(Reservation reserva, List<ReservationDto.MaterialPedido> pedidos) {
+    private void substituirMateriais(Reservation reserva, List<ReservationDto.MaterialPedido> pedidos,
+                                     java.time.Instant inicio, java.time.Instant termino) {
         List<ReservationMaterial> atuais = new ArrayList<>(reserva.getMateriais());
         atuais.forEach(reserva::removerMaterial);
 
@@ -114,6 +116,7 @@ public class ReservationManagementService {
                 throw new ConflitoDeEstadoException(
                         "Quantidade pedida de " + material.getNome() + " excede o saldo disponivel");
             }
+            validarDisponibilidadeMaterial(material, pedido.quantidade(), inicio, termino, reserva.getId());
             reserva.adicionarMaterial(material, pedido.quantidade());
         }
     }
@@ -128,6 +131,17 @@ public class ReservationManagementService {
                 professor.getId(), inicio, termino).stream()
                 .anyMatch(reserva -> !java.util.Objects.equals(reserva.getId(), reservaIgnorada))) {
             throw new ConflitoDeEstadoException("Professor ja possui reserva no periodo informado");
+        }
+    }
+
+    private void validarDisponibilidadeMaterial(Material material, int quantidadeSolicitada,
+                                                java.time.Instant inicio, java.time.Instant termino,
+                                                Long reservaIgnorada) {
+        long quantidadeReservada = reservas.quantidadeAtivaDoMaterialSobrepondo(
+                material.getId(), inicio, termino, reservaIgnorada);
+        if (quantidadeReservada + quantidadeSolicitada > material.getQuantidadeTotal()) {
+            throw new ConflitoDeEstadoException(
+                    "Material " + material.getNome() + " nao possui quantidade disponivel no periodo informado");
         }
     }
 }

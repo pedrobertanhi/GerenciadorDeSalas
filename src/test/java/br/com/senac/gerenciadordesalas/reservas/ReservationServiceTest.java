@@ -177,4 +177,22 @@ class ReservationServiceTest {
         assertThatExceptionOfType(ConflitoDeEstadoException.class)
                 .isThrownBy(() -> service.criar(entrada, EMAIL));
     }
+
+    @Test
+    void criar_quantidadeSomadaComReservasSobrepostas_acimaDoTotal_retorna409() {
+        when(reservas.quantidadeAtivaDoMaterialSobrepondo(
+                Mockito.eq(30L), Mockito.any(), Mockito.any(), Mockito.isNull())).thenReturn(4L);
+
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(() -> service.criar(entradaValida(), EMAIL))
+                .withMessageContaining("quantidade disponivel");
+    }
+
+    @Test
+    void criar_quantidadeExataConsiderandoReservasSobrepostas_ehAceita() {
+        when(reservas.quantidadeAtivaDoMaterialSobrepondo(
+                Mockito.eq(30L), Mockito.any(), Mockito.any(), Mockito.isNull())).thenReturn(3L);
+
+        assertThat(service.criar(entradaValida(), EMAIL).materiais()).hasSize(1);
+    }
 }

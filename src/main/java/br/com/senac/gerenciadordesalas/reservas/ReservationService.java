@@ -77,6 +77,8 @@ public class ReservationService {
                         "Quantidade pedida de " + material.getNome()
                                 + " excede o saldo disponivel");
             }
+            validarDisponibilidadeMaterial(material, pedido.quantidade(),
+                    entrada.inicioInstant(), entrada.terminoInstant(), null);
             reserva.adicionarMaterial(material, pedido.quantidade());
         }
 
@@ -104,6 +106,17 @@ public class ReservationService {
                 professor.getId(), inicio, termino).stream()
                 .anyMatch(reserva -> !java.util.Objects.equals(reserva.getId(), reservaIgnorada))) {
             throw new ConflitoDeEstadoException("Professor ja possui reserva no periodo informado");
+        }
+    }
+
+    private void validarDisponibilidadeMaterial(Material material, int quantidadeSolicitada,
+                                                java.time.Instant inicio, java.time.Instant termino,
+                                                Long reservaIgnorada) {
+        long quantidadeReservada = reservas.quantidadeAtivaDoMaterialSobrepondo(
+                material.getId(), inicio, termino, reservaIgnorada);
+        if (quantidadeReservada + quantidadeSolicitada > material.getQuantidadeTotal()) {
+            throw new ConflitoDeEstadoException(
+                    "Material " + material.getNome() + " nao possui quantidade disponivel no periodo informado");
         }
     }
 }
