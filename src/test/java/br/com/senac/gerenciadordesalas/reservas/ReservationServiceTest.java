@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -38,7 +40,8 @@ class ReservationServiceTest {
     private final MaterialRepository materiais = Mockito.mock(MaterialRepository.class);
 
     private final ReservationService service = new ReservationService(
-            reservas, usuarios, salas, professores, materiais);
+            reservas, usuarios, salas, professores, materiais,
+            new ReservationTimePolicy(Clock.fixed(Instant.parse("2026-11-01T00:00:00Z"), ZoneOffset.UTC)));
 
     private User solicitante;
     private Sala sala;
