@@ -30,19 +30,22 @@ public class ReservationService {
     private final SalaRepository salas;
     private final ProfessorRepository professores;
     private final MaterialRepository materiais;
+    private final ReservationTimePolicy politicaTemporal;
 
     public ReservationService(ReservationRepository reservas, UserRepository usuarios,
                               SalaRepository salas, ProfessorRepository professores,
-                              MaterialRepository materiais) {
+                              MaterialRepository materiais, ReservationTimePolicy politicaTemporal) {
         this.reservas = reservas;
         this.usuarios = usuarios;
         this.salas = salas;
         this.professores = professores;
         this.materiais = materiais;
+        this.politicaTemporal = politicaTemporal;
     }
 
     @Transactional
     public ReservationDto.Saida criar(ReservationDto.Entrada entrada, String emailSolicitante) {
+        politicaTemporal.validarParaReserva(entrada.inicioInstant(), entrada.terminoInstant());
         User solicitante = usuarios.findByEmailIgnoreCase(emailSolicitante)
                 .filter(User::isActive)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitante nao encontrado"));

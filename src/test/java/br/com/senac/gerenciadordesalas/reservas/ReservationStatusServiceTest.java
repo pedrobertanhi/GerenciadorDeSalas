@@ -7,6 +7,7 @@ import br.com.senac.gerenciadordesalas.usuario.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -36,7 +37,7 @@ class ReservationStatusServiceTest {
                 solicitante, sala, null, inicio, inicio.plus(2, ChronoUnit.HOURS), "Aula de teste");
 
         when(reservas.findById(10L)).thenReturn(Optional.of(reserva));
-        when(reservas.save(reserva)).thenReturn(reserva);
+        when(reservas.saveAndFlush(reserva)).thenReturn(reserva);
     }
 
     @Test
@@ -44,7 +45,7 @@ class ReservationStatusServiceTest {
         Reservation resultado = service.transicionar(10L, StatusReserva.APROVADA);
 
         assertThat(resultado.getStatus()).isEqualTo(StatusReserva.APROVADA);
-        verify(reservas).save(reserva);
+        verify(reservas).saveAndFlush(reserva);
     }
 
     @Test
@@ -53,7 +54,17 @@ class ReservationStatusServiceTest {
                 .isInstanceOf(ConflitoDeEstadoException.class)
                 .hasMessage("Transicao invalida: CRIADA -> CONCLUIDA");
 
-        verify(reservas, never()).save(reserva);
+        verify(reservas, never()).saveAndFlush(reserva);
+    }
+
+    @Test
+    void transicionar_traduzConflitoDeConcorrenciaParaErroDeNegocio() {
+        when(reservas.saveAndFlush(reserva))
+                .thenThrow(new ObjectOptimisticLockingFailureException(Reservation.class, 10L));
+
+        assertThatThrownBy(() -> service.transicionar(10L, StatusReserva.APROVADA))
+                .isInstanceOf(ConflitoDeEstadoException.class)
+                .hasMessage("Reserva alterada por outra operacao");
     }
 
     @Test

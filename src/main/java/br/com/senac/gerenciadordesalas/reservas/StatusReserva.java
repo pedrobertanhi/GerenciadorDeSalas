@@ -23,9 +23,9 @@ public enum StatusReserva {
             EnumSet.of(REJEITADA, CANCELADA, CONCLUIDA, NAO_COMPARECEU);
 
     private static final Map<StatusReserva, Set<StatusReserva>> TRANSICOES_PERMITIDAS = Map.of(
-            CRIADA, EnumSet.of(APROVADA, REJEITADA, CANCELADA),
-            APROVADA, EnumSet.of(EM_ANDAMENTO, CANCELADA, NAO_COMPARECEU),
-            EM_ANDAMENTO, EnumSet.of(CONCLUIDA)
+            CRIADA, Set.copyOf(EnumSet.of(APROVADA, REJEITADA, CANCELADA)),
+            APROVADA, Set.copyOf(EnumSet.of(EM_ANDAMENTO, CANCELADA, NAO_COMPARECEU)),
+            EM_ANDAMENTO, Set.copyOf(EnumSet.of(CONCLUIDA))
     );
 
     /**

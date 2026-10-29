@@ -1,7 +1,9 @@
 package br.com.senac.gerenciadordesalas.reservas;
 
+import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,10 @@ public class ReservationStatusService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Reserva nao encontrada"));
 
         reserva.transicionarPara(novoStatus);
-        return reservas.save(reserva);
+        try {
+            return reservas.saveAndFlush(reserva);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            throw new ConflitoDeEstadoException("Reserva alterada por outra operacao");
+        }
     }
 }
