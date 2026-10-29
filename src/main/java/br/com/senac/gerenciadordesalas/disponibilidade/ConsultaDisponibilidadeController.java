@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Consulta recursos ativos e disponiveis considerando reservas e manutencao.
+ * Consulta indicativa de recursos ativos e disponiveis considerando reservas e manutencao.\n * A resposta nao garante disponibilidade no instante da confirmacao da reserva.
  */
 @Tag(name = "Disponibilidade",
-        description = "Consulta recursos ativos sem conflito de reserva ou manutencao.")
+        description = "Consulta indicativa (best-effort): disponibilidade deve ser revalidada na reserva.")
 @SecurityRequirement(name = "sessao")
 @ApiResponses({
         @ApiResponse(responseCode = "401", description = "Sessao ausente ou expirada",
