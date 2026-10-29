@@ -13,8 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.time.Instant;
+import br.com.senac.gerenciadordesalas.reservas.ReservationMaterial;
 
-/** Consulta recursos ativos e livres no intervalo semiaberto [inicio, termino). */
+/** Consulta indicativa (best-effort) de recursos livres no intervalo semiaberto.
+ * O resultado nao reserva recursos: criacao/alteracao devem revalidar conflitos
+ * atomicamente sob bloqueio transacional antes de confirmar a operacao.
+ */
 @Service
 public class ConsultaDisponibilidadeService {
     private final SalaRepository salas;
@@ -48,10 +55,37 @@ public class ConsultaDisponibilidadeService {
                 .map(Professor::getId).toList();
         List<Long> idsMateriais = materiais.buscarAtivos(null, null).stream()
                 .filter(m -> !bloqueado(TipoRecurso.MATERIAL, m.getId(), intervalo))
-                .filter(m -> m.getQuantidadeTotal() > reservas.quantidadeAtivaDoMaterialSobrepondo(
-                        m.getId(), intervalo.inicio(), intervalo.termino(), null))
+                .filter(m -> m.getQuantidadeTotal() > picoOcupacao(m.getId(), intervalo))
                 .map(Material::getId).toList();
         return new RecursosDisponiveis(idsSalas, idsProfessores, idsMateriais);
+    }
+
+    /** Intervalos semiabertos: libera unidades no termino antes de novas entradas. */
+    static long picoSimultaneo(List<ReservationMaterial> compromissos, IntervaloDisponibilidade intervalo) {
+        record Evento(Instant instante, int delta) {}
+        List<Evento> eventos = new ArrayList<>();
+        for (ReservationMaterial item : compromissos) {
+            Instant inicio = item.getReserva().getInicio();
+            Instant fim = item.getReserva().getTermino();
+            Instant a = inicio.isAfter(intervalo.inicio()) ? inicio : intervalo.inicio();
+            Instant b = fim.isBefore(intervalo.termino()) ? fim : intervalo.termino();
+            if (a.isBefore(b)) {
+                eventos.add(new Evento(a, item.getQuantidade()));
+                eventos.add(new Evento(b, -item.getQuantidade()));
+            }
+        }
+        eventos.sort(Comparator.comparing(Evento::instante).thenComparingInt(Evento::delta));
+        long atual = 0, pico = 0;
+        for (Evento evento : eventos) {
+            atual += evento.delta();
+            pico = Math.max(pico, atual);
+        }
+        return pico;
+    }
+
+    private long picoOcupacao(Long materialId, IntervaloDisponibilidade intervalo) {
+        return picoSimultaneo(reservas.materiaisAtivosSobrepondo(materialId,
+                intervalo.inicio(), intervalo.termino()), intervalo);
     }
 
     private boolean bloqueado(TipoRecurso tipo, Long id, IntervaloDisponibilidade intervalo) {
