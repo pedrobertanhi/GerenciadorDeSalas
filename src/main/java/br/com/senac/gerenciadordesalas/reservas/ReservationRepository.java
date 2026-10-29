@@ -77,4 +77,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("inicio") Instant inicio,
             @Param("termino") Instant termino,
             @Param("reservaIgnorada") Long reservaIgnorada);
+
+    @Query("""
+            SELECT rm FROM ReservationMaterial rm JOIN FETCH rm.reserva r
+            WHERE rm.material.id = :materialId
+              AND r.status NOT IN (
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.REJEITADA,
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.CANCELADA,
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.CONCLUIDA,
+                  br.com.senac.gerenciadordesalas.reservas.StatusReserva.NAO_COMPARECEU)
+              AND r.inicio < :termino AND r.termino > :inicio
+            """)
+    List<ReservationMaterial> materiaisAtivosSobrepondo(
+            @Param("materialId") Long materialId,
+            @Param("inicio") Instant inicio,
+            @Param("termino") Instant termino);
 }
