@@ -4,6 +4,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Matriz completa da maquina de estados (RSV-04, #26).
@@ -36,6 +37,13 @@ class StatusReservaTest {
         assertThat(estado.isFinal()).isFalse();
         assertThat(estado.transicoesPermitidas()).doesNotContain(estado);
         assertThat(estado.podeTransicionarPara(null)).isFalse();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = StatusReserva.class, names = {"CRIADA", "APROVADA", "EM_ANDAMENTO"})
+    void transicoesPermitidas_naoPermiteAlterarAMatrizDoDominio(StatusReserva estado) {
+        assertThatThrownBy(() -> estado.transicoesPermitidas().clear())
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     private boolean transicaoEsperada(StatusReserva origem, StatusReserva destino) {

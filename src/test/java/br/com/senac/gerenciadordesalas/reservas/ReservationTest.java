@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
@@ -87,9 +88,9 @@ class ReservationTest {
     }
 
     @Test
-    void transicionarPara_invalida_lancaIllegalState() {
+    void transicionarPara_invalida_lancaConflitoDeEstado() {
         Reservation r = novaReserva();
-        assertThatIllegalStateException()
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
                 .isThrownBy(() -> r.transicionarPara(StatusReserva.CONCLUIDA));
     }
 
@@ -97,7 +98,7 @@ class ReservationTest {
     void aposStatusFinal_naoTransicionaMais() {
         Reservation r = novaReserva();
         r.transicionarPara(StatusReserva.CANCELADA);
-        assertThatIllegalStateException()
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
                 .isThrownBy(() -> r.transicionarPara(StatusReserva.APROVADA));
     }
 
