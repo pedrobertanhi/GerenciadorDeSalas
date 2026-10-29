@@ -124,6 +124,55 @@
 - **Passos:** disparar notificação; observar resposta e logs.
 - **Esperado:** erro interno neutro; token/corpo não atravessa a API nem os logs; reserva não é corrompida.
 
+
+## Casos complementares reproduzíveis — QA-01 (#48)
+
+Os casos abaixo são especificações de teste, **não evidências de execução**. Cada cenário parte de massa independente e deve ser ligado à automação e ao resultado real na RTM.
+
+### CT-DISP-01 — disponibilidade exclui sala reservada
+
+- **Origem:** RF-03, RF-05, RC-03; issue #20.
+- **Nível/técnica:** integração/API; partição de equivalência e caixa-cinza.
+- **Pré-condições:** sala A ativa, sala B ativa; somente A tem reserva ativa de `2026-11-10T09:00:00-03:00` a `2026-11-10T10:00:00-03:00`. Banco PostgreSQL isolado.
+- **Dados:** consultar `2026-11-10T09:30:00-03:00` até `2026-11-10T10:30:00-03:00`.
+- **Passos:** (1) criar massa sintética; (2) autenticar solicitante; (3) consultar disponibilidade; (4) conferir IDs retornados.
+- **Esperado:** B aparece; A não aparece; nenhuma reserva é alterada.
+- **Automação/evidência:** integração/API a implementar em #20; commit e CI pendentes.
+- **Status:** planejado.
+
+### CT-DISP-02 — adjacência não bloqueia disponibilidade
+
+- **Origem:** RF-03, RC-02; issue #20.
+- **Nível/técnica:** integração/API; análise de valor limite.
+- **Pré-condições:** sala A ativa com reserva de `2026-11-10T09:00:00-03:00` a `2026-11-10T10:00:00-03:00`.
+- **Dados:** três consultas independentes: 09:59–10:30, 10:00–11:00 e 08:00–09:00, todas em 10/11/2026 com deslocamento -03:00.
+- **Passos:** (1) reiniciar massa entre casos; (2) autenticar; (3) consultar cada intervalo; (4) comparar IDs.
+- **Esperado:** A ausente na primeira consulta; A presente nas outras duas; nenhuma mudança no banco.
+- **Automação/evidência:** parametrizado em #20; execução pendente.
+- **Status:** planejado.
+
+### CT-MNT-02 — manutenção bloqueia somente o intervalo afetado
+
+- **Origem:** RF-08, RC-07; issues #20 e #22 incorporada.
+- **Nível/técnica:** integração/API; tabela de decisão e fronteiras.
+- **Pré-condições:** sala A ativa; bloqueio ATIVO de 09:00 a 10:00 em 10/11/2026, fuso -03:00; nenhuma reserva.
+- **Dados:** tentativas de reserva de 08:00–09:00, 09:00–10:00, 09:30–10:30 e 10:00–11:00.
+- **Passos:** (1) criar bloqueio; (2) autenticar solicitante; (3) executar cada tentativa isoladamente; (4) consultar reservas persistidas.
+- **Esperado:** primeira e última permitidas; segunda e terceira recusadas com 409 controlado; tentativas recusadas não persistem reservas.
+- **Automação/evidência:** integração PostgreSQL em #20; execução pendente.
+- **Status:** planejado.
+
+### CT-SEC-02 — perfil sem permissão não revela recurso
+
+- **Origem:** RF-01, RNF-ERR-01; issue #14.
+- **Nível/técnica:** API caixa-preta; tabela de decisão e teste negativo de ausência.
+- **Pré-condições:** usuário sintético autenticado sem permissão para rota administrativa; recurso de outro usuário cadastrado.
+- **Dados:** sessão sem privilégios; identificador existente e inexistente em execuções independentes.
+- **Passos:** (1) iniciar sessão; (2) solicitar rota protegida; (3) verificar corpo e cabeçalhos; (4) conferir banco.
+- **Esperado:** negação conforme política 403/404 documentada; nenhum campo privado, token, SQL ou stack trace na resposta; banco inalterado.
+- **Automação/evidência:** suíte de segurança #14; execução pendente.
+- **Status:** planejado.
+
 ## Execução cruzada
 
 Antes de fechar #101, outro integrante deve executar uma amostra sem explicação oral. Dúvida ou dependência implícita significa caso incompleto. Nenhum caso usa senha, token, matrícula ou dado pessoal real.
