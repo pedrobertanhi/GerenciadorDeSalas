@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Contrato inicial da RES-06. Nao afirma disponibilidade antes de
- * integrar os conflitos de reservas e periodos de manutencao.
+ * Consulta indicativa de recursos ativos e disponiveis considerando reservas e manutencao.\n * A resposta nao garante disponibilidade no instante da confirmacao da reserva.
  */
 @Tag(name = "Disponibilidade",
-        description = "Consulta de disponibilidade de recursos em um intervalo. "
-                + "Enquanto a integracao com reservas e manutencao nao e concluida, "
-                + "o endpoint responde 503 com codigo CONSULTA_INDISPONIVEL.")
+        description = "Consulta indicativa (best-effort): disponibilidade deve ser revalidada na reserva.")
 @SecurityRequirement(name = "sessao")
 @ApiResponses({
         @ApiResponse(responseCode = "401", description = "Sessao ausente ou expirada",
@@ -42,11 +38,16 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("isAuthenticated()")
 public class ConsultaDisponibilidadeController {
 
+    private final ConsultaDisponibilidadeService service;
+
+    public ConsultaDisponibilidadeController(ConsultaDisponibilidadeService service) {
+        this.service = service;
+    }
+
     @Operation(summary = "Consultar disponibilidade de recurso em um intervalo",
-            description = "Qualquer usuario autenticado. Enquanto a integracao com reservas e manutencao "
-                    + "nao e concluida, a resposta e sempre 503 com codigo CONSULTA_INDISPONIVEL. "
-                    + "Intervalo invalido retorna 400 com codigo INTERVALO_INVALIDO.")
-    @ApiResponse(responseCode = "503", description = "Consulta temporariamente indisponivel ate a integracao",
+            description = "Qualquer usuario autenticado. Intervalo invalido retorna 400; "
+                    + "consulta valida retorna IDs de recursos disponiveis.")
+    @ApiResponse(responseCode = "200", description = "Recursos disponiveis no intervalo",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ConsultaDisponibilidadeResposta.class)))
     @ApiResponse(responseCode = "400", description = "Intervalo invalido (inicio e termino em ISO 8601 com deslocamento, termino posterior ao inicio)",
@@ -65,11 +66,11 @@ public class ConsultaDisponibilidadeController {
             return ResponseEntity.badRequest().body(new ConsultaDisponibilidadeResposta(
                     "INTERVALO_INVALIDO", ex.getMessage(), null, null));
         }
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
-                new ConsultaDisponibilidadeResposta(
-                        "CONSULTA_INDISPONIVEL",
-                        "A verificacao de reservas e manutencao ainda nao foi integrada.",
-                        ConsultaDisponibilidadeResposta.noFusoLocal(intervalo.inicio()),
-                        ConsultaDisponibilidadeResposta.noFusoLocal(intervalo.termino())));
+        var disponiveis = service.consultar(intervalo);
+        return ResponseEntity.ok(new ConsultaDisponibilidadeResposta(
+                "CONSULTA_OK", "Recursos disponiveis no intervalo consultado.",
+                ConsultaDisponibilidadeResposta.noFusoLocal(intervalo.inicio()),
+                ConsultaDisponibilidadeResposta.noFusoLocal(intervalo.termino()),
+                disponiveis.salas(), disponiveis.professores(), disponiveis.materiais()));
     }
 }
