@@ -1,6 +1,7 @@
 package br.com.senac.gerenciadordesalas.material;
 
 import br.com.senac.gerenciadordesalas.reservas.ReservationService;
+import br.com.senac.gerenciadordesalas.reservas.ReservationManagementService;
 
 import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.professor.ProfessorService;
@@ -32,6 +33,9 @@ class MaterialOpenApiTest {
 
      @MockitoBean
     ReservationService reservas;
+
+    @MockitoBean
+    ReservationManagementService gerenciamentoReservas;
 
     @Autowired
     MockMvc mvc;

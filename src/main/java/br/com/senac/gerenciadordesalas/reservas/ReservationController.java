@@ -12,7 +12,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,9 +40,11 @@ import java.net.URI;
 public class ReservationController {
 
     private final ReservationService service;
+    private final ReservationManagementService managementService;
 
-    public ReservationController(ReservationService service) {
+    public ReservationController(ReservationService service, ReservationManagementService managementService) {
         this.service = service;
+        this.managementService = managementService;
     }
 
     @Operation(summary = "Criar reserva",
@@ -70,5 +74,25 @@ public class ReservationController {
                 .buildAndExpand(criada.id())
                 .toUri();
         return ResponseEntity.created(location).body(criada);
+    }
+
+    @Operation(summary = "Alterar reserva criada",
+            description = "Exige sessao e CSRF. Somente o dono, RESPONSAVEL ou ADMINISTRADOR pode alterar; "
+                    + "a reserva precisa estar em CRIADA.")
+    @PutMapping("/{id}")
+    public ResponseEntity<ReservationDto.Saida> alterar(
+            @PathVariable Long id,
+            @RequestBody @Valid ReservationDto.Alteracao entrada,
+            @AuthenticationPrincipal UserDetails autenticado) {
+        return ResponseEntity.ok(managementService.alterar(id, entrada, autenticado.getUsername()));
+    }
+
+    @Operation(summary = "Cancelar reserva",
+            description = "Exige sessao e CSRF. Cancela sem apagar o historico; reservas em uso ou finais nao podem ser canceladas.")
+    @PostMapping("/{id}/cancelar")
+    public ResponseEntity<ReservationDto.Saida> cancelar(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails autenticado) {
+        return ResponseEntity.ok(managementService.cancelar(id, autenticado.getUsername()));
     }
 }

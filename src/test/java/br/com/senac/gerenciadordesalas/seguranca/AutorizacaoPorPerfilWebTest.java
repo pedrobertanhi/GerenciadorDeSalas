@@ -79,15 +79,15 @@ class AutorizacaoPorPerfilWebTest {
 
     @Test
     @WithMockUser(username = EMAIL_SOLICITANTE, roles = "SOLICITANTE")
-    void alteracaoECancelamentoFicamNegadosAteExistirConsultaDoDonoPersistido() throws Exception {
+    void rotasDeAlteracaoECancelamentoExigemAutenticacaoMasPropriedadeEhValidadaNoCasoDeUso() throws Exception {
         mockMvc.perform(put("/api/reservas/1").with(csrf()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isNotFound());
 
         mockMvc.perform(patch("/api/reservas/1").with(csrf()))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/reservas/1/cancelar").with(csrf()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isNotFound());
     }
 
     @Test
