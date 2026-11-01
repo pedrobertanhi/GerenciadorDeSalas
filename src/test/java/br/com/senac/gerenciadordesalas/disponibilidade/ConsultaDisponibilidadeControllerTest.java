@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
 import org.springframework.http.HttpStatus;
+import java.util.List;
+import org.mockito.Mockito;
 
 class ConsultaDisponibilidadeControllerTest {
 
-    private final ConsultaDisponibilidadeController controller = new ConsultaDisponibilidadeController();
+    private final ConsultaDisponibilidadeService service = Mockito.mock(ConsultaDisponibilidadeService.class);
+    private final ConsultaDisponibilidadeController controller = new ConsultaDisponibilidadeController(service);
 
     @Test
     void intervaloInvalidoRetorna400() {
@@ -42,10 +45,15 @@ class ConsultaDisponibilidadeControllerTest {
     }
 
     @Test
-    void consultaAindaNaoIntegradaNaoDeclaraDisponibilidade() {
+    void consultaIntegradaRetornaRecursosDisponiveis() {
+        Mockito.when(service.consultar(Mockito.any())).thenReturn(
+                new ConsultaDisponibilidadeService.RecursosDisponiveis(List.of(1L), List.of(2L), List.of(3L)));
         var resposta = controller.consultar("2026-10-22T10:00:00Z", "2026-10-22T11:00:00Z");
-        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, resposta.getStatusCode());
-        assertEquals("CONSULTA_INDISPONIVEL", resposta.getBody().codigo());
+        assertEquals(HttpStatus.OK, resposta.getStatusCode());
+        assertEquals("CONSULTA_OK", resposta.getBody().codigo());
+        assertEquals(List.of(1L), resposta.getBody().salas());
+        assertEquals(List.of(2L), resposta.getBody().professores());
+        assertEquals(List.of(3L), resposta.getBody().materiais());
         assertEquals(OffsetDateTime.parse("2026-10-22T07:00:00-03:00"), resposta.getBody().inicio());
         assertEquals(OffsetDateTime.parse("2026-10-22T08:00:00-03:00"), resposta.getBody().termino());
     }

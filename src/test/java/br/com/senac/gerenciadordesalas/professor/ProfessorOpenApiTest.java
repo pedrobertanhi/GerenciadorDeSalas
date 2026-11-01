@@ -1,6 +1,7 @@
 package br.com.senac.gerenciadordesalas.professor;
 
 import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
+import br.com.senac.gerenciadordesalas.disponibilidade.ConsultaDisponibilidadeService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationManagementService;
 import br.com.senac.gerenciadordesalas.material.MaterialService;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class ProfessorOpenApiTest {
+    @MockitoBean ConsultaDisponibilidadeService consultaDisponibilidade;
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
     @MockitoBean ProfessorService professores;
