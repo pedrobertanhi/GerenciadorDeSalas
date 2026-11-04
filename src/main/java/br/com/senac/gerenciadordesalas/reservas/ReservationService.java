@@ -2,6 +2,7 @@ package br.com.senac.gerenciadordesalas.reservas;
 
 import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
+import br.com.senac.gerenciadordesalas.manutencao.TipoRecurso;
 import br.com.senac.gerenciadordesalas.material.Material;
 import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.professor.Professor;
@@ -118,5 +119,19 @@ public class ReservationService {
             throw new ConflitoDeEstadoException(
                     "Material " + material.getNome() + " nao possui quantidade disponivel no periodo informado");
         }
+    }
+    /**
+     * Quantas reservas ativas (criada, aprovada ou em andamento) usam o recurso no período
+     * [inicio, fim). Serve à tela de manutenção para mostrar o impacto de um bloqueio. Nenhuma
+     * reserva é alterada: a política da MNT-02 mantém as reservas existentes como histórico.
+     */
+    @Transactional(readOnly = true)
+    public long contarReservasAtivasNoPeriodo(TipoRecurso tipo, Long recursoId,
+                                              java.time.Instant inicio, java.time.Instant fim) {
+        return switch (tipo) {
+            case SALA -> reservas.buscarAtivasDaSalaSobrepondo(recursoId, inicio, fim).size();
+            case PROFESSOR -> reservas.buscarAtivasDoProfessorSobrepondo(recursoId, inicio, fim).size();
+            case MATERIAL -> reservas.materiaisAtivosSobrepondo(recursoId, inicio, fim).size();
+        };
     }
 }
