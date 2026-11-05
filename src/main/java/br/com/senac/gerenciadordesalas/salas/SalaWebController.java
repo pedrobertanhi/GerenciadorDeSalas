@@ -64,7 +64,7 @@ public class SalaWebController {
     }
 
     @GetMapping
-    public String listar(@RequestParam(defaultValue = "0") int page,
+    public String listar(@RequestParam(required = false) String page,
                          @RequestParam(required = false) String capacidadeMinima,
                          @RequestParam(required = false) String localizacao,
                          @RequestParam(required = false) String aviso,
@@ -78,14 +78,19 @@ public class SalaWebController {
                         "A capacidade mínima deve ser um número inteiro maior que zero.");
                 digitada = "";
             }
-        }
+               }
         String local = localizacao == null ? "" : localizacao.trim();
+        int numeroDaPagina = converterPagina(page);
+        boolean paginaInvalida = preenchido(page) && numeroDaPagina < 0;
         var pagina = service.pesquisar(new SalaFiltroDTO(minima, local),
-                PageRequest.of(Math.max(page, 0), TAMANHO_PAGINA, Sort.by("nome")));
+                PageRequest.of(Math.max(numeroDaPagina, 0), TAMANHO_PAGINA, Sort.by("nome")));
         model.addAttribute("administrador", administrador(authentication));
         model.addAttribute("resultado", pagina);
         model.addAttribute("capacidadeMinima", digitada);
         model.addAttribute("localizacao", local);
+        if (paginaInvalida) {
+            model.addAttribute("aviso", "A página informada não é válida. Exibindo a primeira página.");
+        }
         if (AVISO_NAO_ENCONTRADA.equals(aviso)) {
             model.addAttribute("aviso", "Sala não encontrada ou já inativada.");
         }
@@ -190,6 +195,23 @@ public class SalaWebController {
                     "A capacidade informada é grande demais. O máximo é " + Integer.MAX_VALUE + ".");
         }
         return false;
+    }
+
+    /** Número da página pedido, 0 quando ausente, ou -1 quando o valor não é um inteiro maior ou igual a zero. */
+    private static int converterPagina(String texto) {
+        if (!preenchido(texto)) {
+            return 0;
+        }
+        try {
+            int valor = Integer.parseInt(texto.trim());
+            return valor >= 0 ? valor : -1;
+        } catch (NumberFormatException ex) {
+            return -1;
+        }
+    }
+
+    private static boolean preenchido(String texto) {
+        return texto != null && !texto.isBlank();
     }
 
     private static Integer converterCapacidadeMinima(String texto) {
