@@ -12,8 +12,7 @@
 | R06 | Vulnerabilidade crítica | Média | Crítico | Crítica | SonarCloud, revisão de hotspots e testes de segurança | #14, #53 | Não atribuído | Aberto |
 | R07 | Recurso em manutenção ser reservado | Média | Crítico | Crítica | Validação central e teste de integração | #21, #22 | Não atribuído | Aberto |
 | R08 | Falha externa afetar reserva | Média | Alto | Alta | Gateway isolado, timeout seguro e WireMock | #41, #42 | Não atribuído | Aberto |
-| R09 | Desempenho insuficiente sob carga | Média | Alto | Alta | Baseline e cenários JMeter | #54 | Não atribuído | Aberto |
-| R10 | Falta de autoria de integrante | Média | Alto | Alta | Distribuição de código/teste, PRs próprios e revisão cruzada | #60 | Não atribuído | Aberto |
+| R09 | Desempenho insuficiente sob carga | Média | Alto | Alta | Baseline e cenários JMeter | #54 | Não atribuído | Aberto || R10 | Falta de autoria de integrante | Média | Alto | Alta | Distribuição de código/teste, PRs próprios e revisão cruzada | #60 | Não atribuído | Aberto |
 | R11 | Evidência incompleta ou sem versão | Média | Alto | Alta | Índice versionado e auditoria dos links | #55, #78, #81 | Não atribuído | Aberto |
 | R12 | Crescimento indevido do escopo | Média | Médio | Média | Validar mudanças contra RF01–RF14 | #1 | Não atribuído | Aberto |
 | R13 | Cobertura alta com testes triviais | Média | Alto | Alta | Revisar assertions, cenários de limite e sensibilidade dos testes | #53, #89 | Não atribuído | Aberto |
