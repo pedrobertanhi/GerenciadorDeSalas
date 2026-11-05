@@ -31,9 +31,12 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Telas de manutenção (MNT/UI-08, #15): agenda de bloqueios, registro, edição, conclusão e
@@ -104,14 +107,15 @@ public class MaintenanceBlockWebController {
         TipoRecurso tipoFiltro = lerEnum(TipoRecurso.class, tipo);
         StatusBloqueio statusFiltro = lerEnum(StatusBloqueio.class, status);
         if ((preenchido(tipo) && tipoFiltro == null) || (preenchido(status) && statusFiltro == null)) {
-            model.addAttribute("erroFiltro", "O filtro informado não é válido e foi ignorado.");
+             model.addAttribute("erroFiltro", "O filtro informado não é válido e foi ignorado.");
         }
-        Map<String, String> nomes = nomesDosRecursos();
         List<BloqueioDto.Saida> todos = service.listar(tipoFiltro, null, statusFiltro);
         int pagina = Math.max(page, 0);
         int de = Math.min(pagina * TAMANHO_PAGINA, todos.size());
         int ate = Math.min(de + TAMANHO_PAGINA, todos.size());
-        List<Linha> linhas = todos.subList(de, ate).stream().map(b -> linha(b, nomes)).toList();
+        List<BloqueioDto.Saida> daPagina = todos.subList(de, ate);
+        Map<String, String> nomes = nomesDosRecursos(daPagina);
+        List<Linha> linhas = daPagina.stream().map(b -> linha(b, nomes)).toList();
         Page<Linha> resultado = new PageImpl<>(linhas, PageRequest.of(pagina, TAMANHO_PAGINA), todos.size());
 
         model.addAttribute("administrador", administrador(authentication));
@@ -131,7 +135,7 @@ public class MaintenanceBlockWebController {
     @GetMapping("/{id}")
     public String detalhe(@PathVariable Long id, Model model, Authentication authentication) {
         BloqueioDto.Saida bloqueio = service.consultar(id);
-        model.addAttribute("bloqueio", detalhe(bloqueio, nomesDosRecursos()));
+        model.addAttribute("bloqueio", detalhe(bloqueio, nomesDosRecursos(List.of(bloqueio))));
         model.addAttribute("administrador", administrador(authentication));
         return "manutencoes/detalhe";
     }
@@ -319,13 +323,33 @@ public class MaintenanceBlockWebController {
                 .map(m -> new Opcao("MATERIAL:" + m.id(), m.nome()))
                 .toList()));
         return grupos;
+        }
+
+    /**
+     * Nomes dos recursos citados, inclusive os inativados: o histórico de manutenção continua
+     * mostrando de que recurso se tratava. Só consulta o tipo que aparece nos bloqueios.
+     */
+    private Map<String, String> nomesDosRecursos(List<BloqueioDto.Saida> bloqueios) {
+        Map<TipoRecurso, Set<Long>> ids = new EnumMap<>(TipoRecurso.class);
+        for (BloqueioDto.Saida b : bloqueios) {
+            ids.computeIfAbsent(b.recursoTipo(), t -> new HashSet<>()).add(b.recursoId());
+        }
+        return nomesDosRecursos(ids);
     }
 
-    private Map<String, String> nomesDosRecursos() {
+    private Map<String, String> nomesDosRecursos(Map<TipoRecurso, Set<Long>> ids) {
         Map<String, String> nomes = new HashMap<>();
-        salas.listarTodas().forEach(s -> nomes.put("SALA:" + s.getId(), s.getNome()));
-        professores.listar(null).forEach(p -> nomes.put("PROFESSOR:" + p.id(), p.nome()));
-        materiais.listar(null, null).forEach(m -> nomes.put("MATERIAL:" + m.id(), m.nome()));
+        if (ids.containsKey(TipoRecurso.SALA)) {
+            salas.listarTodas().forEach(s -> nomes.put("SALA:" + s.getId(), s.getNome()));
+        }
+        if (ids.containsKey(TipoRecurso.PROFESSOR)) {
+            professores.nomesPorId(ids.get(TipoRecurso.PROFESSOR))
+                    .forEach((id, nome) -> nomes.put("PROFESSOR:" + id, nome));
+        }
+        if (ids.containsKey(TipoRecurso.MATERIAL)) {
+            materiais.nomesPorId(ids.get(TipoRecurso.MATERIAL))
+                    .forEach((id, nome) -> nomes.put("MATERIAL:" + id, nome));
+        }
         return nomes;
     }
 
@@ -335,7 +359,7 @@ public class MaintenanceBlockWebController {
             TipoRecurso tipo = lerEnum(TipoRecurso.class, partes[0]);
             Long id = lerLong(partes[1]);
             if (tipo != null && id != null) {
-                return rotuloDoRecurso(tipo, id, nomesDosRecursos());
+                return rotuloDoRecurso(tipo, id, nomesDosRecursos(Map.of(tipo, Set.of(id))));
             }
         }
         return "";
