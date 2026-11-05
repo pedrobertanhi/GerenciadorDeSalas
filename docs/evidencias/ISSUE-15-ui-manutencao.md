@@ -23,17 +23,19 @@ O detalhe mostra o que o bloqueio faz com o recurso e quantas reservas ativas ex
 
 ## Testes localizáveis
 
-- `MaintenanceBlockWebControllerTest`: 53 casos, renderizando as telas de verdade com a segurança real;
+- `MaintenanceBlockWebControllerTest`: 61 casos, renderizando as telas de verdade com a segurança real;
+- `ProfessorNomesPorIdTest` e `MaterialNomesPorIdTest`: 4 casos cada, nomes por identificador, inclusive de inativados, sem banco;
 - `ReservationImpactoManutencaoTest`: 7 casos da contagem de reservas ativas por recurso, sem banco.
 
 Cobertura por critério da Issue:
 
 - somente o administrador altera a manutenção: as telas e os POST de registro, edição, conclusão e cancelamento devolvem 403 aos outros perfis, e a lista e o detalhe não exibem os botões de escrita;
 - período inválido mostra mensagem compreensível: fim igual ou anterior ao início, fim no passado, datas vazias ou em formato inválido, motivo vazio ou com mais de 500 caracteres e recurso não escolhido, cada um com a mensagem junto do campo;
-- histórico permanece consultável: concluídos e cancelados aparecem na lista, e bloqueios encerrados não têm edição nem novas ações;
+- histórico permanece consultável: concluídos e cancelados aparecem na lista, bloqueios encerrados não têm edição nem novas ações, e professores e materiais inativados continuam com o nome no histórico;
 - interface funciona em desktop e mobile: todas as telas declaram `viewport` e usam a grade e a tabela responsivas do Bootstrap;
+- edição recusada explica a causa: recurso que não pode ser trocado e bloqueio já concluído ou cancelado têm mensagens diferentes;
+- página inválida na agenda: a tela continua, com uma mensagem e a primeira página, sem resposta JSON de erro;
 - erros não expõem detalhes internos: uma exceção inesperada devolve 500 sem o texto da causa, e o motivo é exibido com escape de HTML.
-
 ## Como validar
 
 Comando: `./mvnw --batch-mode --no-transfer-progress verify`.
@@ -60,6 +62,7 @@ Roteiro de validação manual, com o perfil administrador e depois com o solicit
 
 - a criação de reservas ainda não consulta `MaintenanceBlockService.recursoEmManutencao` (pendência da Issue #22): a tela informa que o recurso consta como indisponível, mas a recusa de novas reservas depende dessa integração;
 - as datas do formulário são interpretadas no horário de Brasília (`America/Sao_Paulo`), como no restante do projeto;
+- a consulta de manutenção é liberada a todos os perfis, como na matriz de permissões ("Consultar manutenção": solicitante, responsável e administrador), e a escrita é exclusiva do administrador, como pede a Issue;
 - o bloqueio é do recurso inteiro, sem quantidade parcial de material, como na MNT-01;
 - o projeto não tem ferramenta de teste em navegador real: os testes renderizam as telas com MockMvc e o roteiro manual cobre a visualização;
 - ainda não existe layout compartilhado com navegação por perfil (UI-01).
