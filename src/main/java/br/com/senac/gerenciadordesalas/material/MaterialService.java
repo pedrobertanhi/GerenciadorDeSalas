@@ -107,6 +107,19 @@ public class MaterialService {
         if (valor == null || valor.isBlank()) {
             return null;
         }
-        return valor.trim();
+               return valor.trim();
+    }
+
+    /**
+     * Nomes de materiais por identificador, inclusive os inativados. O histórico precisa continuar
+     * mostrando qual era o material depois que ele deixa de ser listado.
+     */
+    @Transactional(readOnly = true)
+    public java.util.Map<Long, String> nomesPorId(java.util.Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return java.util.Map.of();
+        }
+        return materiais.findAllById(ids).stream()
+                .collect(java.util.stream.Collectors.toMap(Material::getId, Material::getNome));
     }
 }
