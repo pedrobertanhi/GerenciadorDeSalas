@@ -25,6 +25,7 @@ O detalhe mostra o que o bloqueio faz com o recurso e quantas reservas ativas ex
 
 - `MaintenanceBlockWebControllerTest`: 61 casos, renderizando as telas de verdade com a segurança real;
 - `ProfessorNomesPorIdTest` e `MaterialNomesPorIdTest`: 4 casos cada, nomes por identificador, inclusive de inativados, sem banco;
+- `ManutencaoNavegadorTest` e `ManutencaoValidacaoAutorizacaoResponsividadeNavegadorTest`: 9 casos em navegador Chrome (Selenium), com a aplicação completa e PostgreSQL em container; as telas de salas têm os 7 casos em navegador do PR #167;
 - `ReservationImpactoManutencaoTest`: 7 casos da contagem de reservas ativas por recurso, sem banco.
 
 Cobertura por critério da Issue:
@@ -35,6 +36,7 @@ Cobertura por critério da Issue:
 - interface funciona em desktop e mobile: todas as telas declaram `viewport` e usam a grade e a tabela responsivas do Bootstrap;
 - edição recusada explica a causa: recurso que não pode ser trocado e bloqueio já concluído ou cancelado têm mensagens diferentes;
 - página inválida na agenda: a tela continua, com uma mensagem e a primeira página, sem resposta JSON de erro;
+- testes em navegador real (E2E): registro, edição, conclusão e cancelamento pela interface, validação de período e motivo, impacto sobre reservas existentes, autorização (visitante e solicitante) e responsividade em celular (390 px), tablet (768 px) e desktop (1280 px);
 - erros não expõem detalhes internos: uma exceção inesperada devolve 500 sem o texto da causa, e o motivo é exibido com escape de HTML.
 ## Como validar
 
@@ -64,7 +66,7 @@ Roteiro de validação manual, com o perfil administrador e depois com o solicit
 - as datas do formulário são interpretadas no horário de Brasília (`America/Sao_Paulo`), como no restante do projeto;
 - a consulta de manutenção é liberada a todos os perfis, como na matriz de permissões ("Consultar manutenção": solicitante, responsável e administrador), e a escrita é exclusiva do administrador, como pede a Issue;
 - o bloqueio é do recurso inteiro, sem quantidade parcial de material, como na MNT-01;
-- o projeto não tem ferramenta de teste em navegador real: os testes renderizam as telas com MockMvc e o roteiro manual cobre a visualização;
+- os testes em navegador usam Selenium com o Chrome sem interface gráfica. No CI o Chrome já vem instalado no `ubuntu-24.04`. Em um computador sem Docker ou sem Chrome eles ficam ignorados, e fora do CI não são obrigatórios; o roteiro manual continua como complemento;
 - ainda não existe layout compartilhado com navegação por perfil (UI-01).
 
 ## Resultado
