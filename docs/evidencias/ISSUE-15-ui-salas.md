@@ -12,7 +12,8 @@ Esta evidência cobre a parte de telas de salas (#63, consolidada na #15). A API
 
 ## Testes localizáveis
 
-- `SalaWebControllerTest`: 51 casos, renderizando as telas de verdade com a segurança real.
+- `SalaWebControllerTest`: 51 casos, renderizando as telas de verdade com a segurança real;
+- `SalasNavegadorTest` e `SalasAutorizacaoResponsividadeNavegadorTest`: 7 casos em navegador Chrome (Selenium), com a aplicação completa em uma porta real e PostgreSQL em container.
 
 Cobertura por critério da Issue:
 
@@ -21,7 +22,8 @@ Cobertura por critério da Issue:
 - o CRUD é exclusivo do administrador: os outros perfis recebem 403 em todas as telas de salas e nos POST de escrita;
 - erros não expõem detalhes internos: uma exceção inesperada devolve 500 sem o texto da causa, e o nome da sala é exibido com escape de HTML;
 - responsividade: todas as telas declaram `viewport` e usam grade e tabela responsivas do Bootstrap;
-- página inválida na listagem (texto, negativa, decimal ou grande demais): a tela de salas continua, com uma mensagem e a primeira página, sem resposta JSON de erro.
+- página inválida na listagem (texto, negativa, decimal ou grande demais): a tela de salas continua, com uma mensagem e a primeira página, sem resposta JSON de erro;
+- testes em navegador real (E2E): CRUD completo pela interface (cadastro, edição e inativação), validação do navegador e do servidor, autorização (visitante e solicitante) e responsividade em celular (390 px), tablet (768 px) e desktop (1280 px).
 
 ## Como validar
 
@@ -47,7 +49,7 @@ Roteiro de validação manual, com o perfil administrador e depois com o solicit
 ## Decisões para o grupo
 
 - a matriz de permissões libera a pesquisa de salas a todos os perfis, e o CRUD de salas é exclusivo do administrador, como pede a Issue: por isso as telas de `/salas` são restritas a ele;
-- o projeto não tem ferramenta de teste em navegador real (Playwright ou Selenium): os testes renderizam as telas com MockMvc e o roteiro manual cobre a visualização;
+- os testes em navegador usam Selenium com o Chrome sem interface gráfica. No CI o Chrome já vem instalado no `ubuntu-24.04`. Em um computador sem Docker ou sem Chrome eles ficam ignorados, e fora do CI não são obrigatórios; o roteiro manual continua como complemento;
 - ainda não existe layout compartilhado com navegação por perfil (UI-01): as telas de salas são autônomas, como a de professores;
 - inativar uma sala não cancela as reservas futuras dela: as existentes permanecem no histórico e novas reservas são recusadas;
 - as telas usam o Bootstrap por CDN, como as demais.
