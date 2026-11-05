@@ -64,4 +64,9 @@ Quantidade de bugs por pessoa não mede produtividade.
 
 | ID | Resumo | Requisito | Severidade | Prioridade | Estado | Causa raiz | Regressão | Evidência |
 |---|---|---|---|---|---|---|---|---|
-| — | Nenhum defeito real registrado ainda | — | — | — | — | — | — | PENDENTE |
+| D01 | Tela de salas recusa capacidade acima de 999999 | RF-02, Issue #15 | Baixa | Média | Em verificação | Regra da tela mais restrita que a da API e a do banco, sem teste de limite | `SalaWebControllerTest` (capacidade até o limite do Integer) | PR #167 |
+| D02 | Página inválida na listagem de salas devolve JSON de erro em vez da tela | RF-13 | Baixa | Média | Em verificação | Parâmetro numérico da rota web sem tratamento | `SalaWebControllerTest` (página inválida) | PR #167 |
+| D03 | Telas de salas consultáveis por todos os perfis, contra o critério "CRUD somente administrador" | RF-01, Issue #15 | Média | Alta | Em verificação | Critério da Issue lido só para a escrita, sem conferir a consulta | `SalaWebControllerTest` (outros perfis recebem 403) | PR #167 |
+| D04 | Histórico de manutenção mostra só o identificador de professor ou material inativado | RF-08, Issue #15 | Média | Média | Em verificação | Nomes obtidos de listagens que só trazem recursos ativos | `MaintenanceBlockWebControllerTest`, `ProfessorNomesPorIdTest`, `MaterialNomesPorIdTest` | PR #168 |
+| D05 | Edição recusada usa a mesma mensagem para recurso imutável e bloqueio encerrado | RF-08, Issue #15 | Baixa | Baixa | Em verificação | Duas regras distintas tratadas pela mesma exceção | `MaintenanceBlockWebControllerTest` (recurso diferente) | PR #168 |
+| D06 | Página inválida na agenda de manutenção devolve JSON de erro em vez da tela | RF-13 | Baixa | Média | Em verificação | Mesma causa do D02 | `MaintenanceBlockWebControllerTest` (página inválida) | PR #168 |
