@@ -56,4 +56,6 @@ Roteiro de validação manual, com o perfil administrador e depois com o solicit
 
 ## Resultado
 
-A registrar com o link da execução do **Maven Verify** do commit mesclado.
+Execução do **Maven Verify** do commit `8250f72`: <https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42056257536>.
+
+Resultado: `Tests run: 497, Failures: 0, Errors: 0, Skipped: 0`. O `8250f72` é o último commit de código. Nessa execução rodaram `SalaWebControllerTest` (51 casos) e, em navegador Chrome com PostgreSQL em container, `SalasNavegadorTest` (2 casos) e `SalasAutorizacaoResponsividadeNavegadorTest` (5 casos).
