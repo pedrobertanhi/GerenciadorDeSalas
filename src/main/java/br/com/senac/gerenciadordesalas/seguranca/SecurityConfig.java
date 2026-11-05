@@ -97,7 +97,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/professores", "/professores/**")
                                 .hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.GET, "/salas", "/salas/**")
-                                .authenticated()
+                                .hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST, "/salas", "/salas/**")
                                 .hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST, "/api/professores/*/validacao")
