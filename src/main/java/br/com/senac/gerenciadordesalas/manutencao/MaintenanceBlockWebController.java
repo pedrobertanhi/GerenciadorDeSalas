@@ -199,10 +199,11 @@ public class MaintenanceBlockWebController {
             return "manutencoes/formulario";
         }
         try {
-            service.atualizar(id, entrada);
+             service.atualizar(id, entrada);
         } catch (ConflitoDeEstadoException ex) {
-            redirect.addFlashAttribute("erro",
-                    "Este bloqueio não pode mais ser alterado: ele já foi concluído ou cancelado.");
+            redirect.addFlashAttribute("erro", service.consultar(id).status() == StatusBloqueio.ATIVO
+                    ? "O recurso de um bloqueio não pode ser trocado."
+                    : "Este bloqueio não pode mais ser alterado: ele já foi concluído ou cancelado.");
             return "redirect:/manutencoes/" + id;
         }
         redirect.addFlashAttribute("sucesso", "Bloqueio atualizado.");
