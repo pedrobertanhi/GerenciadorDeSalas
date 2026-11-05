@@ -33,6 +33,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -41,6 +42,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -111,9 +113,11 @@ class MaintenanceBlockWebControllerTest {
                 List.of(new ProfessorDto.Saida(7L, "Ana Souza", "ana@exemplo.test", true, List.of())));
         when(materiais.listar(null, null)).thenReturn(List.of(new MaterialDto.Saida(
                 3L, "Projetor", "Projetor HDMI", MaterialTipo.EQUIPAMENTO, "PAT-1", 1, "Almoxarifado", false, true)));
+        when(professores.nomesPorId(anyCollection())).thenReturn(Map.of(7L, "Ana Souza"));
+        when(materiais.nomesPorId(anyCollection())).thenReturn(Map.of(3L, "Projetor"));
     }
 
-    private static BloqueioDto.Saida bloqueio(long id, long recursoId, StatusBloqueio status,
+        private static BloqueioDto.Saida bloqueio(long id, long recursoId, StatusBloqueio status,
                                               String inicio, String fim, String encerradoEm, String motivo) {
         return new BloqueioDto.Saida(id, TipoRecurso.SALA, recursoId, motivo,
                 OffsetDateTime.parse(inicio), OffsetDateTime.parse(fim), status,
@@ -138,6 +142,12 @@ class MaintenanceBlockWebControllerTest {
     private static BloqueioDto.Saida cancelado(long id) {
         return bloqueio(id, 12L, StatusBloqueio.CANCELADO, "2099-01-10T08:00:00-03:00",
                 "2099-01-10T18:00:00-03:00", "2026-11-01T10:00:00-03:00", "Troca do projetor");
+    }
+
+    private static BloqueioDto.Saida bloqueioDe(TipoRecurso tipo, long id, long recursoId) {
+        return new BloqueioDto.Saida(id, tipo, recursoId, "Revisão geral",
+                OffsetDateTime.parse("2099-01-10T08:00:00-03:00"), OffsetDateTime.parse("2099-01-10T18:00:00-03:00"),
+                StatusBloqueio.ATIVO, null);
     }
 
     // ---------- agenda e histórico ----------
@@ -543,13 +553,75 @@ class MaintenanceBlockWebControllerTest {
     void atualizacaoDeBloqueioQueJaFoiEncerradoVoltaParaODetalheComAviso() throws Exception {
         when(service.atualizar(eq(6L), any(BloqueioDto.Entrada.class)))
                 .thenThrow(new ConflitoDeEstadoException("encerrado"));
+        when(service.consultar(6L)).thenReturn(concluido(6));
 
         mvc.perform(post("/manutencoes/6").with(admin()).with(csrf())
                         .param("recurso", "SALA:12").param("motivo", "Troca")
                         .param("inicio", INICIO).param("fim", FIM))
                 .andExpect(redirectedUrl("/manutencoes/6"))
-                .andExpect(flash().attribute("erro",
+                                .andExpect(flash().attribute("erro",
                         "Este bloqueio não pode mais ser alterado: ele já foi concluído ou cancelado."));
+    }
+
+    @Test
+    void atualizacaoComOutroRecursoExplicaQueORecursoNaoPodeSerTrocado() throws Exception {
+        when(service.atualizar(eq(5L), any(BloqueioDto.Entrada.class)))
+                .thenThrow(new ConflitoDeEstadoException("recurso diferente"));
+        when(service.consultar(5L)).thenReturn(futuro(5));
+
+        mvc.perform(post("/manutencoes/5").with(admin()).with(csrf())
+                        .param("recurso", "SALA:13").param("motivo", "Troca")
+                        .param("inicio", INICIO).param("fim", FIM))
+                .andExpect(redirectedUrl("/manutencoes/5"))
+                .andExpect(flash().attribute("erro", "O recurso de um bloqueio não pode ser trocado."));
+    }
+
+    @Test
+    void historicoMantemONomeDeProfessorEMaterialInativos() throws Exception {
+        when(professores.nomesPorId(anyCollection())).thenReturn(Map.of(8L, "Carlos Inativo"));
+        when(materiais.nomesPorId(anyCollection())).thenReturn(Map.of(9L, "Cabo Antigo"));
+        when(service.listar(null, null, null)).thenReturn(List.of(
+                bloqueioDe(TipoRecurso.PROFESSOR, 5, 8), bloqueioDe(TipoRecurso.MATERIAL, 6, 9)));
+
+        mvc.perform(get("/manutencoes").with(admin()))
+                .andExpect(content().string(containsString("Professor · Carlos Inativo")))
+                .andExpect(content().string(containsString("Material · Cabo Antigo")))
+                .andExpect(content().string(not(containsString("#8"))))
+                .andExpect(content().string(not(containsString("#9"))));
+    }
+
+    @Test
+    void detalheEEdicaoMantemONomeDeRecursoInativo() throws Exception {
+        when(professores.nomesPorId(anyCollection())).thenReturn(Map.of(8L, "Carlos Inativo"));
+        when(service.consultar(5L)).thenReturn(bloqueioDe(TipoRecurso.PROFESSOR, 5, 8));
+
+        mvc.perform(get("/manutencoes/5").with(admin()))
+                .andExpect(content().string(containsString("Professor · Carlos Inativo")));
+        mvc.perform(get("/manutencoes/5/editar").with(admin()))
+                .andExpect(content().string(containsString("Professor · Carlos Inativo")));
+    }
+
+    @Test
+    void aAgendaSoPedeNomesDosTiposQueAparecemNosBloqueios() throws Exception {
+        when(service.listar(null, null, null)).thenReturn(List.of(futuro(5)));
+
+        mvc.perform(get("/manutencoes").with(admin())).andExpect(status().isOk());
+
+        verify(professores, never()).nomesPorId(any());
+        verify(materiais, never()).nomesPorId(any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", "-1", "99999999999", "1.5"})
+    void paginaInvalidaMantemAAgendaComMensagemEmVezDeErroJson(String valor) throws Exception {
+        when(service.listar(null, null, null)).thenReturn(List.of(futuro(5)));
+
+        mvc.perform(get("/manutencoes").param("page", valor).with(admin()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("manutencoes/lista"))
+                .andExpect(content().contentTypeCompatibleWith("text/html"))
+                .andExpect(content().string(containsString("A página informada não é válida")))
+                .andExpect(content().string(containsString("Troca do projetor")));
     }
 
     // ---------- encerramento ----------
