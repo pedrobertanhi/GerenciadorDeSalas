@@ -21,7 +21,7 @@
 | R16 | Vulnerabilidade detectável somente em execução | Média | Crítico | Crítica | DAST com OWASP ZAP | #97 | Não atribuído | Aberto |
 | R17 | Release aprovada sem todas as verificações | Média | Crítico | Crítica | Gate e parecer final de segurança | #98 | Não atribuído | Aberto |
 | R18 | Capacidade planejada acima da velocidade real | Alta | Alto | Alta | Medir velocidade, limitar WIP e usar buffer da semana 46 | #58 | Não atribuído | Aberto |
-| R19 | Regressão visual ou de interação não detectada, porque o projeto não tem teste em navegador real | Média | Médio | Média | Roteiro manual versionado nas evidências, testes de renderização com MockMvc e avaliar teste em navegador no pipeline | #15 | Não atribuído | Aberto |
+| R19 | Regressão visual ou de interação não detectada nas telas | Baixa | Médio | Baixa | Testes E2E em navegador (Selenium e Chrome) no pipeline, mais o roteiro manual versionado nas evidências | #15 | Não atribuído | Mitigado |
 | R20 | Telas sem layout compartilhado e sem navegação por perfil (UI-01) gerarem fluxo inconsistente ou inacessível | Média | Médio | Média | Entregar o layout compartilhado e revisar os links entre as telas | #15 | Não atribuído | Aberto |
 
 ## Escalas
