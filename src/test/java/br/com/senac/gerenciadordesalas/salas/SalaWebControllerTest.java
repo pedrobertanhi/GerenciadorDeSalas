@@ -92,16 +92,27 @@ class SalaWebControllerTest {
 
     // ---------- listagem ----------
 
-    @ParameterizedTest
-    @ValueSource(strings = {"SOLICITANTE", "RESPONSAVEL", "ADMINISTRADOR"})
-    void todosOsPerfisConsultamALista(String perfil) throws Exception {
+    @Test
+    void administradorConsultaALista() throws Exception {
         listaCom(dto("Sala 101"));
 
-        mvc.perform(get("/salas").with(user("leitor").roles(perfil)))
+        mvc.perform(get("/salas").with(admin()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("salas/lista"))
                 .andExpect(content().string(containsString("Sala 101")))
                 .andExpect(content().string(containsString("Detalhes")));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"SOLICITANTE", "RESPONSAVEL"})
+    void outrosPerfisNaoAcessamNenhumaTelaDeSalas(String perfil) throws Exception {
+        mvc.perform(get("/salas").with(user("outro").roles(perfil))).andExpect(status().isForbidden());
+        mvc.perform(get("/salas/1").with(user("outro").roles(perfil))).andExpect(status().isForbidden());
+        mvc.perform(get("/salas/novo").with(user("outro").roles(perfil))).andExpect(status().isForbidden());
+        mvc.perform(get("/salas").param("page", "abc").with(user("outro").roles(perfil)))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
     }
 
     @Test
@@ -112,17 +123,6 @@ class SalaWebControllerTest {
                 .andExpect(content().string(containsString("Cadastrar sala")))
                 .andExpect(content().string(containsString("/salas/1/editar")))
                 .andExpect(content().string(containsString("/salas/1/inativar")));
-    }
-
-    @Test
-    void quemNaoEAdministradorNaoVeAsAcoesDeEscrita() throws Exception {
-        listaCom(dto("Sala 101"));
-
-        mvc.perform(get("/salas").with(solicitante()))
-                .andExpect(status().isOk())
-                .andExpect(content().string(not(containsString("Cadastrar sala"))))
-                .andExpect(content().string(not(containsString("/editar"))))
-                .andExpect(content().string(not(containsString("/inativar"))));
     }
 
     @Test
@@ -138,7 +138,7 @@ class SalaWebControllerTest {
     void listaSemSalasMostraMensagemVazia() throws Exception {
         listaCom();
 
-        mvc.perform(get("/salas").with(solicitante()))
+        mvc.perform(get("/salas").with(admin()))
                 .andExpect(content().string(containsString("Nenhuma sala encontrada.")));
     }
 
@@ -147,7 +147,7 @@ class SalaWebControllerTest {
         when(service.pesquisar(any(SalaFiltroDTO.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(dto("Sala 101")), PageRequest.of(0, 10), 25));
 
-        mvc.perform(get("/salas").with(solicitante()))
+        mvc.perform(get("/salas").with(admin()))
                 .andExpect(content().string(containsString("Página 1 de 3")))
                 .andExpect(content().string(containsString("page=1")));
     }
@@ -156,7 +156,7 @@ class SalaWebControllerTest {
     void semPaginacaoQuandoHaApenasUmaPagina() throws Exception {
         listaCom(dto("Sala 101"));
 
-        mvc.perform(get("/salas").with(solicitante()))
+        mvc.perform(get("/salas").with(admin()))
                 .andExpect(content().string(not(containsString("Paginação das salas"))));
     }
 
@@ -165,7 +165,7 @@ class SalaWebControllerTest {
         listaCom(dto("Sala 101"));
 
         mvc.perform(get("/salas").param("capacidadeMinima", "20").param("localizacao", " Bloco ")
-                        .param("page", "2").with(solicitante()))
+                        .param("page", "2").with(admin()))
                 .andExpect(status().isOk());
 
         ArgumentCaptor<SalaFiltroDTO> filtro = ArgumentCaptor.forClass(SalaFiltroDTO.class);
@@ -182,7 +182,7 @@ class SalaWebControllerTest {
     void capacidadeMinimaInvalidaMostraMensagemEIgnoraOFiltro(String valor) throws Exception {
         listaCom(dto("Sala 101"));
 
-        mvc.perform(get("/salas").param("capacidadeMinima", valor).with(solicitante()))
+        mvc.perform(get("/salas").param("capacidadeMinima", valor).with(admin()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("maior que zero")));
 
@@ -195,9 +195,9 @@ class SalaWebControllerTest {
     void avisoDeSalaNaoEncontradaSoAceitaOValorConhecido() throws Exception {
         listaCom();
 
-        mvc.perform(get("/salas").param("aviso", "nao-encontrada").with(solicitante()))
+        mvc.perform(get("/salas").param("aviso", "nao-encontrada").with(admin()))
                 .andExpect(content().string(containsString("Sala não encontrada ou já inativada.")));
-        mvc.perform(get("/salas").param("aviso", "<script>alert(1)</script>").with(solicitante()))
+        mvc.perform(get("/salas").param("aviso", "<script>alert(1)</script>").with(admin()))
                 .andExpect(content().string(not(containsString("alert(1)"))));
     }
 
@@ -205,7 +205,7 @@ class SalaWebControllerTest {
     void nomeComHtmlEExibidoComEscape() throws Exception {
         listaCom(dto("<script>alert(1)</script>"));
 
-        mvc.perform(get("/salas").with(solicitante()))
+        mvc.perform(get("/salas").with(admin()))
                 .andExpect(content().string(not(containsString("<script>alert(1)</script>"))))
                 .andExpect(content().string(containsString("&lt;script&gt;")));
     }
@@ -216,20 +216,21 @@ class SalaWebControllerTest {
     void detalheMostraOsDadosDaSala() throws Exception {
         when(service.buscarPorId(1L)).thenReturn(sala());
 
-        mvc.perform(get("/salas/1").with(solicitante()))
+        mvc.perform(get("/salas/1").with(admin()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("salas/detalhe"))
                 .andExpect(content().string(containsString("Sala 101")))
                 .andExpect(content().string(containsString("30 pessoas")))
                 .andExpect(content().string(containsString("Bloco A")))
-                .andExpect(content().string(not(containsString("/editar"))));
+                .andExpect(content().string(containsString("/salas/1/editar")))
+                .andExpect(content().string(containsString("/salas/1/inativar")));
     }
 
     @Test
     void salaInexistenteOuInativaVoltaParaAListaComAviso() throws Exception {
         when(service.buscarPorId(99L)).thenThrow(new EntityNotFoundException("nao existe"));
 
-        mvc.perform(get("/salas/99").with(solicitante()))
+        mvc.perform(get("/salas/99").with(admin()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/salas?aviso=nao-encontrada"));
     }
@@ -303,12 +304,45 @@ class SalaWebControllerTest {
                 arguments("Sala X", "-5", "Bloco A", "A capacidade deve ser um número inteiro positivo."),
                 arguments("Sala X", "abc", "Bloco A", "A capacidade deve ser um número inteiro positivo."),
                 arguments("Sala X", "1.5", "Bloco A", "A capacidade deve ser um número inteiro positivo."),
-                arguments("Sala X", "1000000", "Bloco A", "A capacidade deve ser um número inteiro positivo."),
+                arguments("Sala X", "2147483648", "Bloco A", "grande demais"),
+                arguments("Sala X", "99999999999999999999", "Bloco A", "grande demais"),
                 arguments("Sala X", "30", "", "A localização é obrigatória."),
                 arguments("Sala X", "30", "   ", "A localização é obrigatória."),
                 arguments("a".repeat(101), "30", "Bloco A", "no máximo 100 caracteres"),
                 arguments("Sala X", "30", "b".repeat(256), "no máximo 255 caracteres")
         );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"1000000", "2147483647", "0012"})
+    void capacidadeInteiraPositivaAteOLimiteDoIntegerEAceita(String valor) throws Exception {
+        mvc.perform(post("/salas").with(admin()).with(csrf())
+                        .param("nome", "Sala Grande").param("capacidade", valor).param("localizacao", "Bloco G"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/salas"));
+
+        ArgumentCaptor<Sala> gravada = ArgumentCaptor.forClass(Sala.class);
+        verify(service).criar(gravada.capture());
+        assertThat(gravada.getValue().getCapacidade()).isEqualTo(Integer.parseInt(valor));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", "-1", "1.5", "99999999999", " "})
+    void paginaInvalidaMantemATelaDeSalasComMensagemEmVezDeErroJson(String valor) throws Exception {
+        listaCom(dto("Sala 101"));
+
+        mvc.perform(get("/salas").param("page", valor).with(admin()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("salas/lista"))
+                .andExpect(content().contentTypeCompatibleWith("text/html"))
+                .andExpect(content().string(valor.isBlank()
+                        ? not(containsString("A página informada não é válida"))
+                        : containsString("A página informada não é válida")))
+                .andExpect(content().string(containsString("Sala 101")));
+
+        ArgumentCaptor<Pageable> pagina = ArgumentCaptor.forClass(Pageable.class);
+        verify(service).pesquisar(any(SalaFiltroDTO.class), pagina.capture());
+        assertThat(pagina.getValue().getPageNumber()).isZero();
     }
 
     @ParameterizedTest
