@@ -56,6 +56,19 @@ public class ProfessorService {
         return professores.buscarAtivos(filtro).stream().map(ProfessorDto.Saida::de).toList();
     }
     private Professor obter(Long id) {
-        return professores.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Professor nao encontrado"));
+                return professores.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Professor nao encontrado"));
+    }
+
+    /**
+     * Nomes de professores por identificador, inclusive os inativados. O histórico precisa continuar
+     * mostrando quem era o professor depois que ele deixa de ser listado.
+     */
+    @Transactional(readOnly = true)
+    public Map<Long, String> nomesPorId(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        return professores.findAllById(ids).stream()
+                .collect(Collectors.toMap(Professor::getId, Professor::getNome));
     }
 }
