@@ -99,7 +99,7 @@ public class MaintenanceBlockWebController {
     // ---------- consulta ----------
 
     @GetMapping
-    public String listar(@RequestParam(defaultValue = "0") int page,
+    public String listar(@RequestParam(required = false) String page,
                          @RequestParam(required = false) String tipo,
                          @RequestParam(required = false) String status,
                          @RequestParam(required = false) String aviso,
@@ -110,7 +110,8 @@ public class MaintenanceBlockWebController {
              model.addAttribute("erroFiltro", "O filtro informado não é válido e foi ignorado.");
         }
         List<BloqueioDto.Saida> todos = service.listar(tipoFiltro, null, statusFiltro);
-        int pagina = Math.max(page, 0);
+        int numeroDaPagina = converterPagina(page);
+        int pagina = Math.max(numeroDaPagina, 0);
         int de = Math.min(pagina * TAMANHO_PAGINA, todos.size());
         int ate = Math.min(de + TAMANHO_PAGINA, todos.size());
         List<BloqueioDto.Saida> daPagina = todos.subList(de, ate);
@@ -124,8 +125,11 @@ public class MaintenanceBlockWebController {
         model.addAttribute("status", statusFiltro == null ? "" : statusFiltro.name());
         model.addAttribute("tipos", List.of(
                 new Opcao("SALA", "Sala"), new Opcao("PROFESSOR", "Professor"), new Opcao("MATERIAL", "Material")));
-        model.addAttribute("estados", List.of(
+                model.addAttribute("estados", List.of(
                 new Opcao("ATIVO", "Ativo"), new Opcao("CONCLUIDO", "Concluído"), new Opcao("CANCELADO", "Cancelado")));
+        if (preenchido(page) && numeroDaPagina < 0) {
+            model.addAttribute("aviso", "A página informada não é válida. Exibindo a primeira página.");
+        }
         if (AVISO_NAO_ENCONTRADO.equals(aviso)) {
             model.addAttribute("aviso", "Bloqueio não encontrado.");
         }
@@ -437,6 +441,19 @@ public class MaintenanceBlockWebController {
             return Enum.valueOf(tipo, texto.trim());
         } catch (IllegalArgumentException ex) {
             return null;
+        }
+        }
+
+    /** Número da página pedido, 0 quando ausente, ou -1 quando o valor não é um inteiro maior ou igual a zero. */
+    private static int converterPagina(String texto) {
+        if (!preenchido(texto)) {
+            return 0;
+        }
+        try {
+            int valor = Integer.parseInt(texto.trim());
+            return valor >= 0 ? valor : -1;
+        } catch (NumberFormatException ex) {
+            return -1;
         }
     }
 
