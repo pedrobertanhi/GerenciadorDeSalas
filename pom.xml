@@ -108,6 +108,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Testes E2E em navegador (Issue #15) -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
