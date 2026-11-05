@@ -30,8 +30,9 @@ class ProfessorNomesPorIdTest {
 
     @Test
     void devolveONomeDeCadaProfessorPeloIdentificador() {
-        when(professores.findAllById(Set.of(1L, 2L)))
-                .thenReturn(List.of(professor(1L, "Ana Souza"), professor(2L, "Bruno Lima")));
+        Professor ana = professor(1L, "Ana Souza");
+        Professor bruno = professor(2L, "Bruno Lima");
+        when(professores.findAllById(Set.of(1L, 2L))).thenReturn(List.of(ana, bruno));
 
         assertThat(service.nomesPorId(Set.of(1L, 2L)))
                 .containsExactlyInAnyOrderEntriesOf(Map.of(1L, "Ana Souza", 2L, "Bruno Lima"));
