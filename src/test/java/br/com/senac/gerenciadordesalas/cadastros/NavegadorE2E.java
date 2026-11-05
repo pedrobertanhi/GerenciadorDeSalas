@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -88,8 +89,31 @@ final class NavegadorE2E {
         return driver.findElement(By.tagName("body")).getText();
     }
 
+        /**
+     * Espera o texto aparecer na página. Enquanto a página troca, o Chrome pode responder com erro ao
+     * ler o corpo antigo ("Node with given id does not belong to the document"). Esse erro vale como
+     * "ainda não" e a leitura é repetida, em vez de derrubar o teste.
+     */
     void esperarTexto(String texto) {
-        espera.until(ExpectedConditions.textToBePresentInElementLocated(By.tagName("body"), texto));
+        new WebDriverWait(driver, ESPERA)
+                .withMessage(() -> "texto \"" + texto + "\" não apareceu; texto da página: " + textoParaDiagnostico())
+                .until(atual -> contemTexto(texto));
+    }
+
+    private boolean contemTexto(String texto) {
+        try {
+            return textoDaPagina().contains(texto);
+        } catch (WebDriverException ex) {
+            return false;
+        }
+    }
+
+    private String textoParaDiagnostico() {
+        try {
+            return textoDaPagina();
+        } catch (WebDriverException ex) {
+            return "(indisponível: " + ex.getClass().getSimpleName() + ")";
+        }
     }
 
     void esperarCaminho(String trecho) {
