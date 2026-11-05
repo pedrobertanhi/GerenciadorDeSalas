@@ -25,12 +25,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Telas de salas (RES-01, #15): listagem paginada, detalhe, cadastro, edição e inativação.
- * Qualquer perfil autenticado consulta; somente o administrador escreve. A inativação não
- * apaga a sala, e o histórico de reservas é preservado.
+ * O CRUD de salas é exclusivo do administrador, como pede a Issue. Os demais perfis consultam salas
+ * pela pesquisa de recursos. A inativação não apaga a sala, e o histórico de reservas é preservado.
  */
 @Controller
 @RequestMapping("/salas")
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class SalaWebController {
 
     static final int TAMANHO_PAGINA = 10;
