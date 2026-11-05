@@ -47,7 +47,7 @@ public class SalaWebController {
             @Size(max = 100, message = "O nome deve ter no máximo 100 caracteres.")
             String nome,
             @NotBlank(message = "A capacidade é obrigatória.")
-            @Pattern(regexp = "^$|^\\s*[1-9][0-9]{0,5}\\s*$",
+            @Pattern(regexp = "^$|^\\s*[0-9]+\\s*$",
                     message = "A capacidade deve ser um número inteiro positivo.")
             String capacidade,
             @NotBlank(message = "A localização é obrigatória.")
@@ -153,9 +153,9 @@ public class SalaWebController {
     }
 
     private String salvar(Form form, BindingResult erros, Model model,
-                          RedirectAttributes redirect, Long id) {
+                           RedirectAttributes redirect, Long id) {
         prepararFormulario(model, id);
-        if (erros.hasErrors()) {
+        if (erros.hasErrors() || !capacidadeNoIntervalo(form.capacidade(), erros)) {
             return "salas/formulario";
         }
         try {
@@ -177,6 +177,19 @@ public class SalaWebController {
     private void prepararFormulario(Model model, Long id) {
         model.addAttribute("titulo", id == null ? "Cadastrar sala" : "Editar sala");
         model.addAttribute("acao", id == null ? "/salas" : "/salas/" + id);
+    }
+
+    private static boolean capacidadeNoIntervalo(String texto, BindingResult erros) {
+        try {
+            if (Integer.parseInt(texto.trim()) >= 1) {
+                return true;
+            }
+            erros.rejectValue("capacidade", "positiva", "A capacidade deve ser um número inteiro positivo.");
+        } catch (NumberFormatException ex) {
+            erros.rejectValue("capacidade", "grande",
+                    "A capacidade informada é grande demais. O máximo é " + Integer.MAX_VALUE + ".");
+        }
+        return false;
     }
 
     private static Integer converterCapacidadeMinima(String texto) {
