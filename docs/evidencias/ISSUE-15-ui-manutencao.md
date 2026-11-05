@@ -69,6 +69,8 @@ Roteiro de validação manual, com o perfil administrador e depois com o solicit
 - os testes em navegador usam Selenium com o Chrome sem interface gráfica. No CI o Chrome já vem instalado no `ubuntu-24.04`. Em um computador sem Docker ou sem Chrome eles ficam ignorados, e fora do CI não são obrigatórios; o roteiro manual continua como complemento;
 - ainda não existe layout compartilhado com navegação por perfil (UI-01).
 
+## Resultado
+
 Execução do **Maven Verify** do commit `75d2e12`: <https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42065036726>.
 
 Resultado: `Tests run: 582, Failures: 0, Errors: 0, Skipped: 0`. O último commit de código é o `fc93ff8`; o `75d2e12` e os commits anteriores a ele só alteraram a documentação. Nessa execução rodaram `MaintenanceBlockWebControllerTest` (61 casos) e, em navegador Chrome com PostgreSQL em container, `ManutencaoNavegadorTest` (3 casos), `ManutencaoValidacaoAutorizacaoResponsividadeNavegadorTest` (6 casos) e os 7 casos de salas.	
