@@ -6,6 +6,8 @@ import br.com.senac.gerenciadordesalas.reservas.ReservationManagementService;
 
 import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.professor.ProfessorService;
+import br.com.senac.gerenciadordesalas.professor.ProfessorRepository;
+import br.com.senac.gerenciadordesalas.salas.SalaRepository;
 import br.com.senac.gerenciadordesalas.salas.SalaService;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -60,6 +62,11 @@ class MaterialOpenApiTest {
 
     @MockitoBean
     MaintenanceBlockService bloqueios;
+
+    // Dependências diretas da tela de reservas; esta suíte publica o OpenAPI sem JPA.
+    @MockitoBean MaterialRepository repositorioMateriais;
+    @MockitoBean ProfessorRepository repositorioProfessores;
+    @MockitoBean SalaRepository repositorioSalas;
 
     @Test
     void publicaOsCincoEndpointsESeusContratos() throws Exception {

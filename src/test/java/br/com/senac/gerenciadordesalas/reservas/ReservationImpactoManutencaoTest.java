@@ -1,6 +1,7 @@
 package br.com.senac.gerenciadordesalas.reservas;
 
 import br.com.senac.gerenciadordesalas.manutencao.TipoRecurso;
+import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.professor.ProfessorRepository;
 import br.com.senac.gerenciadordesalas.salas.SalaRepository;
@@ -33,7 +34,8 @@ class ReservationImpactoManutencaoTest {
     private final ReservationService service = new ReservationService(
             reservas, usuarios, mock(SalaRepository.class), mock(ProfessorRepository.class),
             mock(MaterialRepository.class),
-            new ReservationTimePolicy(Clock.fixed(Instant.parse("2026-11-01T00:00:00Z"), ZoneOffset.UTC)));
+            new ReservationTimePolicy(Clock.fixed(Instant.parse("2026-11-01T00:00:00Z"), ZoneOffset.UTC)),
+            mock(MaintenanceBlockService.class));
 
     @Test
     void contaAsReservasAtivasDaSalaNoPeriodo() {

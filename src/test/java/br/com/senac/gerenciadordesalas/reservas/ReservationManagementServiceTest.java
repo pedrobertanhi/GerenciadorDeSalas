@@ -3,6 +3,7 @@ package br.com.senac.gerenciadordesalas.reservas;
 import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.salas.Sala;
 import br.com.senac.gerenciadordesalas.salas.SalaRepository;
+import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.usuario.Role;
 import br.com.senac.gerenciadordesalas.usuario.User;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
@@ -30,7 +31,9 @@ class ReservationManagementServiceTest {
     private final ReservationManagementService service = new ReservationManagementService(
             reservas, usuarios, salas,
             Mockito.mock(br.com.senac.gerenciadordesalas.professor.ProfessorRepository.class),
-            Mockito.mock(br.com.senac.gerenciadordesalas.material.MaterialRepository.class));
+            Mockito.mock(br.com.senac.gerenciadordesalas.material.MaterialRepository.class),
+            new ReservationTimePolicy(java.time.Clock.fixed(Instant.parse("2026-11-01T00:00:00Z"), ZoneOffset.UTC)),
+            Mockito.mock(MaintenanceBlockService.class));
 
     private User dono;
     private Sala sala;
