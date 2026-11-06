@@ -9,6 +9,7 @@ import br.com.senac.gerenciadordesalas.professor.ProfessorRepository;
 import br.com.senac.gerenciadordesalas.salas.Sala;
 import br.com.senac.gerenciadordesalas.salas.SalaRepository;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -77,6 +78,7 @@ public class ReservationWebController {
     }
 
     @GetMapping("/nova")
+    @PreAuthorize("hasRole('SOLICITANTE')")
     public String nova(Model model) {
         model.addAttribute("form", new Form());
         prepararFormulario(model, false, null);
@@ -84,7 +86,8 @@ public class ReservationWebController {
     }
 
     @PostMapping
-    public String criar(@ModelAttribute("form") Form form, BindingResult erros, Model model,
+    @PreAuthorize("hasRole('SOLICITANTE')")
+    public String criar(@Valid @ModelAttribute("form") Form form, BindingResult erros, Model model,
                         Authentication autenticacao, RedirectAttributes redirecionamento) {
         ReservationDto.Entrada entrada = entrada(form, erros);
         if (entrada == null) {
@@ -123,7 +126,7 @@ public class ReservationWebController {
     }
 
     @PostMapping("/{id}")
-    public String alterar(@PathVariable Long id, @ModelAttribute("form") Form form, BindingResult erros,
+    public String alterar(@PathVariable Long id, @Valid @ModelAttribute("form") Form form, BindingResult erros,
                           Model model, Authentication autenticacao, RedirectAttributes redirecionamento) {
         ReservationDto.Alteracao entrada = alteracao(form, erros);
         if (entrada == null) {
