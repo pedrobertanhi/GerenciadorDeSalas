@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Comparator;
 
 /**
  * Alteracao e cancelamento preservando o historico da reserva (RSV-03, #25).
@@ -68,6 +69,21 @@ public class ReservationManagementService {
         return ReservationDto.Saida.de(reservas.save(reserva));
     }
 
+    /** Histórico visível ao dono e aos perfis operacionais, sem expor reserva de outro solicitante. */
+    @Transactional(readOnly = true)
+    public List<ReservationDto.Saida> listarPara(String emailAtor) {
+        User ator = obterAtor(emailAtor);
+        List<Reservation> resultado = ator.getProfile() == Role.SOLICITANTE
+                ? reservas.findBySolicitanteIdOrderByInicioDesc(ator.getId())
+                : reservas.findAllByOrderByInicioDesc();
+        return resultado.stream().map(ReservationDto.Saida::de).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationDto.Saida consultarPara(Long reservaId, String emailAtor) {
+        return ReservationDto.Saida.de(buscarAutorizada(reservaId, emailAtor));
+    }
+
     @Transactional
     public ReservationDto.Saida cancelar(Long reservaId, String emailAtor) {
         Reservation reserva = buscarAutorizada(reservaId, emailAtor);
@@ -76,9 +92,7 @@ public class ReservationManagementService {
     }
 
     private Reservation buscarAutorizada(Long reservaId, String emailAtor) {
-        User ator = usuarios.findByEmailIgnoreCase(emailAtor)
-                .filter(User::isActive)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario autenticado nao encontrado"));
+        User ator = obterAtor(emailAtor);
 
         Reservation reserva = reservas.findById(reservaId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Reserva nao encontrada"));
@@ -91,6 +105,12 @@ public class ReservationManagementService {
                     "Somente o dono ou perfil autorizado pode alterar a reserva");
         }
         return reserva;
+    }
+
+    private User obterAtor(String emailAtor) {
+        return usuarios.findByEmailIgnoreCase(emailAtor)
+                .filter(User::isActive)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario autenticado nao encontrado"));
     }
 
     private Sala buscarSalaAtiva(Long salaId) {
