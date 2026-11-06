@@ -4,6 +4,7 @@ import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
 import br.com.senac.gerenciadordesalas.material.Material;
 import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
+import br.com.senac.gerenciadordesalas.manutencao.TipoRecurso;
 import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.professor.Professor;
 import br.com.senac.gerenciadordesalas.professor.ProfessorRepository;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 /**
  * Regras do {@link ReservationService#criar} (RSV-02, #24):
@@ -95,6 +97,17 @@ class ReservationServiceTest {
         assertThat(saida.status()).isEqualTo(StatusReserva.CRIADA);
         assertThat(saida.materiais()).hasSize(1);
         assertThat(saida.materiais().get(0).quantidade()).isEqualTo(2);
+    }
+
+    @Test
+    void criar_recusaRecursoEmManutencao() {
+        when(manutencoes.recursoEmManutencao(TipoRecurso.SALA, 10L, inicio.toInstant(), termino.toInstant()))
+                .thenReturn(true);
+
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(() -> service.criar(entradaValida(), EMAIL))
+                .withMessageContaining("manutencao");
+        verify(manutencoes).recursoEmManutencao(TipoRecurso.SALA, 10L, inicio.toInstant(), termino.toInstant());
     }
 
     @Test
