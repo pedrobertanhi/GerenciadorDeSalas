@@ -3,6 +3,7 @@ package br.com.senac.gerenciadordesalas.reservas;
 import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
 import br.com.senac.gerenciadordesalas.material.Material;
+import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.professor.Professor;
 import br.com.senac.gerenciadordesalas.professor.ProfessorRepository;
@@ -38,10 +39,12 @@ class ReservationServiceTest {
     private final SalaRepository salas = Mockito.mock(SalaRepository.class);
     private final ProfessorRepository professores = Mockito.mock(ProfessorRepository.class);
     private final MaterialRepository materiais = Mockito.mock(MaterialRepository.class);
+    private final MaintenanceBlockService manutencoes = Mockito.mock(MaintenanceBlockService.class);
 
     private final ReservationService service = new ReservationService(
             reservas, usuarios, salas, professores, materiais,
-            new ReservationTimePolicy(Clock.fixed(Instant.parse("2026-11-01T00:00:00Z"), ZoneOffset.UTC)));
+            new ReservationTimePolicy(Clock.fixed(Instant.parse("2026-11-01T00:00:00Z"), ZoneOffset.UTC)),
+            manutencoes);
 
     private User solicitante;
     private Sala sala;
