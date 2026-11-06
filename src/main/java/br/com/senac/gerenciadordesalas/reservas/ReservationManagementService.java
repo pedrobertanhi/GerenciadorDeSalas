@@ -3,6 +3,8 @@ package br.com.senac.gerenciadordesalas.reservas;
 import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
 import br.com.senac.gerenciadordesalas.material.Material;
+import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
+import br.com.senac.gerenciadordesalas.manutencao.TipoRecurso;
 import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.professor.Professor;
 import br.com.senac.gerenciadordesalas.professor.ProfessorRepository;
@@ -32,22 +34,32 @@ public class ReservationManagementService {
     private final SalaRepository salas;
     private final ProfessorRepository professores;
     private final MaterialRepository materiais;
+    private final ReservationTimePolicy politicaTemporal;
+    private final MaintenanceBlockService manutencoes;
 
     public ReservationManagementService(ReservationRepository reservas, UserRepository usuarios,
                                         SalaRepository salas, ProfessorRepository professores,
-                                        MaterialRepository materiais) {
+                                        MaterialRepository materiais, ReservationTimePolicy politicaTemporal,
+                                        MaintenanceBlockService manutencoes) {
         this.reservas = reservas;
         this.usuarios = usuarios;
         this.salas = salas;
         this.professores = professores;
         this.materiais = materiais;
+        this.politicaTemporal = politicaTemporal;
+        this.manutencoes = manutencoes;
     }
 
     @Transactional
     public ReservationDto.Saida alterar(Long reservaId, ReservationDto.Alteracao entrada, String emailAtor) {
         Reservation reserva = buscarAutorizada(reservaId, emailAtor);
+        politicaTemporal.validarParaReserva(entrada.inicioInstant(), entrada.terminoInstant());
         Sala sala = buscarSalaAtiva(entrada.salaId());
         Professor professor = buscarProfessorAtivo(entrada.professorId());
+        validarManutencao(TipoRecurso.SALA, sala.getId(), entrada.inicioInstant(), entrada.terminoInstant());
+        if (professor != null) {
+            validarManutencao(TipoRecurso.PROFESSOR, professor.getId(), entrada.inicioInstant(), entrada.terminoInstant());
+        }
         validarConflitos(sala, professor, entrada.inicioInstant(), entrada.terminoInstant(), reserva.getId());
 
         reserva.alterar(sala, professor, entrada.inicioInstant(), entrada.terminoInstant(), entrada.finalidade());
@@ -112,12 +124,20 @@ public class ReservationManagementService {
                     .filter(Material::isAtivo)
                     .orElseThrow(() -> new RecursoNaoEncontradoException(
                             "Material " + pedido.materialId() + " nao encontrado ou inativo"));
+            validarManutencao(TipoRecurso.MATERIAL, material.getId(), inicio, termino);
             if (pedido.quantidade() > material.getQuantidadeTotal()) {
                 throw new ConflitoDeEstadoException(
                         "Quantidade pedida de " + material.getNome() + " excede o saldo disponivel");
             }
             validarDisponibilidadeMaterial(material, pedido.quantidade(), inicio, termino, reserva.getId());
             reserva.adicionarMaterial(material, pedido.quantidade());
+        }
+    }
+
+    private void validarManutencao(TipoRecurso tipo, Long recursoId, java.time.Instant inicio,
+                                   java.time.Instant termino) {
+        if (manutencoes.recursoEmManutencao(tipo, recursoId, inicio, termino)) {
+            throw new ConflitoDeEstadoException("Recurso em manutencao no periodo informado");
         }
     }
 
