@@ -14,6 +14,7 @@
 - `ReservationStatusServiceTest` e `StatusReservaTest`: matriz de transições válidas e inválidas, incluindo estados finais;
 - `ReservationServiceTest`: criação, disponibilidade de material e recusa de recurso em manutenção;
 - `ReservationCriacaoIntegrationTest` e `ReservationConstraintsTest`: persistência, constraints e regressão com PostgreSQL.
+- `ReservasNavegadorTest`: fluxo completo no navegador, com criação pelo solicitante, alteração e cancelamento sem exclusão do histórico.
 
 ## Roteiro manual
 
@@ -25,9 +26,11 @@
 6. Entrar com outro solicitante e confirmar que a reserva de terceiro não é acessível.
 7. Conferir em 390 px, 768 px e 1280 px que os formulários e a tabela continuam utilizáveis.
 
-## Resultado esperado da CI
+## Resultado da CI
 
-Executar `./mvnw --batch-mode --no-transfer-progress verify`. A execução do PR deve anexar o link verde do **Maven Verify** e não pode ter testes ignorados.
+`./mvnw --batch-mode --no-transfer-progress verify` concluído com sucesso no
+[Maven Verify da PR #171](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42241853258).
+O resultado inclui os testes unitários, integração com PostgreSQL, OpenAPI e navegador.
 
 ## Decisões
 
