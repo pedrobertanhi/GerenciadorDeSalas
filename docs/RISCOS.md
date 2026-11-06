@@ -10,7 +10,7 @@
 | R04 | Pipeline ausente ou instável | Média | Crítico | Crítica | GitHub Actions obrigatório em PR e proteção da main | #4, #52 | Não atribuído | Aberto |
 | R05 | Cobertura abaixo das metas | Média | Alto | Alta | JaCoCo com 80% linhas e 70% branches | #31, #53 | Não atribuído | Aberto |
 | R06 | Vulnerabilidade crítica | Média | Crítico | Crítica | SonarCloud, revisão de hotspots e testes de segurança | #14, #53 | Não atribuído | Aberto |
-| R07 | Recurso em manutenção ser reservado | Média | Crítico | Crítica | Validação central e teste de integração | #21, #22 | Não atribuído | Aberto |
+| R07 | Recurso em manutenção ser reservado | Média | Crítico | Crítica | Validação central na criação e alteração de reserva, com teste de regressão | #21, #22, #25 | Pedro | Em tratamento |
 | R08 | Falha externa afetar reserva | Média | Alto | Alta | Gateway isolado, timeout seguro e WireMock | #41, #42 | Não atribuído | Aberto |
 | R09 | Desempenho insuficiente sob carga | Média | Alto | Alta | Baseline e cenários JMeter | #54 | Não atribuído | Aberto || R10 | Falta de autoria de integrante | Média | Alto | Alta | Distribuição de código/teste, PRs próprios e revisão cruzada | #60 | Não atribuído | Aberto |
 | R11 | Evidência incompleta ou sem versão | Média | Alto | Alta | Índice versionado e auditoria dos links | #55, #78, #81 | Não atribuído | Aberto |
