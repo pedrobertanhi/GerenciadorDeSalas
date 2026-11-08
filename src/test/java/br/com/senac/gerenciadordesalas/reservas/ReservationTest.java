@@ -172,4 +172,72 @@ class ReservationTest {
                 .isThrownBy(() -> r.adicionarMaterial(material, 1));
         assertThat(r.getMateriais()).hasSize(1);
     }
+
+    // APR-01 (#34): regra de pendencias e aprovacao automatica.
+
+    @Test
+    void reavaliarPendencias_semMaterialRestritoNemProfessor_aprovaAutomaticamente() {
+        Reservation r = new Reservation(solicitante, sala, null, inicio, termino, "Reserva de teste");
+        r.adicionarMaterial(material, 1);
+
+        r.reavaliarPendencias();
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.APROVADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.NAO_EXIGIDA);
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.NAO_EXIGIDA);
+        assertThat(r.possuiPendencia()).isFalse();
+    }
+
+    @Test
+    void reavaliarPendencias_comMaterialRestrito_ficaCriadaComAprovacaoPendente() {
+        Mockito.when(material.isRestrito()).thenReturn(true);
+        Reservation r = new Reservation(solicitante, sala, null, inicio, termino, "Reserva de teste");
+        r.adicionarMaterial(material, 1);
+
+        r.reavaliarPendencias();
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.PENDENTE);
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.NAO_EXIGIDA);
+        assertThat(r.possuiPendencia()).isTrue();
+    }
+
+    @Test
+    void reavaliarPendencias_comProfessor_exigeValidacaoDocente() {
+        Reservation r = novaReserva();
+
+        r.reavaliarPendencias();
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.NAO_EXIGIDA);
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.PENDENTE);
+    }
+
+    @Test
+    void reavaliarPendencias_reservaAprovadaQuePassaAExigirDecisao_voltaParaCriada() {
+        Reservation r = new Reservation(solicitante, sala, null, inicio, termino, "Reserva de teste");
+        r.reavaliarPendencias();
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.APROVADA);
+
+        r.alterar(sala, professor, inicio, termino, "Agora com professor");
+        r.reavaliarPendencias();
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.PENDENTE);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"EM_ANDAMENTO", "CANCELADA"})
+    void reavaliarPendencias_foraDeCriadaOuAprovada_lancaConflito(String estado) {
+        Reservation r = novaReserva();
+        if ("EM_ANDAMENTO".equals(estado)) {
+            r.transicionarPara(StatusReserva.APROVADA);
+            r.transicionarPara(StatusReserva.EM_ANDAMENTO);
+        } else {
+            r.cancelar();
+        }
+
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(r::reavaliarPendencias);
+    }
 }
