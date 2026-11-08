@@ -18,8 +18,8 @@
 | RF-02 | cadastro inválido/duplicado | CRUD positivos, negativos e constraints (SalaIntegracaoTest, ProfessorIntegracaoTest, MaterialIntegracaoTest, ConstraintsDoBancoTest, ProvaDeIsolamentoTest) | #15–#18 | PENDENTE | planejado |
 | RF-03 | disponibilidade incorreta | filtros combinados e limites (SalaPesquisaIntegracaoTest, PesquisaRecursosWebControllerTest) | #19, #20 | PENDENTE | planejado |
 | RF-04 | reserva em estado inválido | CT-TEMPO-01, estados, propriedade, alteração, cancelamento e manutenção (`StatusReservaTest`, `ReservationTest`, `ReservationManagementServiceTest`, `ReservationServiceTest`, `ReservationCriacaoIntegrationTest`) | #23–#27, #87 | Automatizado | PR #25 |
-| RF-05 | sobreposição não detectada | CT-TEMPO-02, CT-PROF-01, CT-MAT-01 | #28–#31 | PENDENTE | planejado |
-| RF-06 | duas reservas aceitas | CT-CONC-01 | #32, #33, #54, #106 | PENDENTE | planejado |
+| RF-05 | sobreposição não detectada | CT-TEMPO-02, CT-PROF-01, CT-MAT-01 (`ReservationConflitosIntegrationTest`: 11 intervalos × sala, professor e material, estados, alteração, 409 e quantidades; `ReservationTimePolicyTest`) | #27 (consolida #28–#31) | CI run 42523486135 · commit 8e13af9 · `./mvnw -B verify` · Java 21/PostgreSQL container · 655 testes, 0 falhas | PR #173 |
+| RF-06 | duas reservas aceitas | CT-CONC-01 (`ReservationConcorrenciaIntegrationTest`: mesma sala, mesmo professor, mesmo patrimônio e recurso inativado durante a espera; `ReservationServiceTest` e `ReservationManagementServiceTest` verificam a ordem das travas) | #27 (consolida #32, #33); carga em #54, #106 | CI run 42525991845 · commit 81f325e · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas | PR #174 |
 | RF-07 | restrito aprovado por perfil errado | CT-APR-01 | #34, #35, #105 | PENDENTE | planejado |
 | RF-08 | reserva durante manutenção | CT-MNT-01 | #21, #22, #105 | PENDENTE | planejado |
 | RF-09 | saldo/movimentação incorretos | retirada, parcial, total e atraso | #36–#38 | PENDENTE | planejado |
@@ -33,12 +33,12 @@
 
 | Regra | Risco/ATAM | Caso | Automação | Execução | Status |
 |---|---|---|---|---|---|
-| RC-01 término > início | tempo inválido | CT-TEMPO-01 | PENDENTE | PENDENTE | planejado |
-| RC-02 adjacência permitida | falso conflito | CT-TEMPO-02 | PENDENTE | PENDENTE | planejado |
-| RC-03 sala sem sobreposição | conflito de sala | CT-CONC-01 | PENDENTE | PENDENTE | planejado |
-| RC-04 professor sem sobreposição | conflito docente | CT-PROF-01 | PENDENTE | PENDENTE | planejado |
-| RC-05 material dentro do saldo | quantidade negativa | CT-MAT-01 | PENDENTE | PENDENTE | planejado |
-| RC-06 uma aceitação concorrente | QA-CON-01 | CT-CONC-01 | PENDENTE | PENDENTE | planejado |
+| RC-01 término > início | tempo inválido | CT-TEMPO-01 | `ReservationTimePolicyTest`, `ReservationCriacaoIntegrationTest` (400 para período invertido ou zerado) | CI run 42523486135 · commit 8e13af9 · `./mvnw -B verify` · Java 21/PostgreSQL container · 655 testes, 0 falhas | automatizado |
+| RC-02 adjacência permitida | falso conflito | CT-TEMPO-02 | `ReservationConflitosIntegrationTest` (adjacente antes e depois, para sala, professor e material), `ReservationTimePolicyTest` | CI run 42523486135 · commit 8e13af9 · `./mvnw -B verify` · Java 21/PostgreSQL container · 655 testes, 0 falhas | automatizado |
+| RC-03 sala sem sobreposição | conflito de sala | CT-CONC-01 | `ReservationConflitosIntegrationTest` (SALA), `ReservationConcorrenciaIntegrationTest` (mesma sala) | CI run 42525991845 · commit 81f325e · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas | automatizado |
+| RC-04 professor sem sobreposição | conflito docente | CT-PROF-01 | `ReservationConflitosIntegrationTest` (PROFESSOR, em outra sala), `ReservationConcorrenciaIntegrationTest` (mesmo professor) | CI run 42525991845 · commit 81f325e · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas | automatizado |
+| RC-05 material dentro do saldo | quantidade negativa | CT-MAT-01 | `ReservationConflitosIntegrationTest` (MATERIAL e quantidades), `ReservationServiceTest`, `ReservationConcorrenciaIntegrationTest` (mesmo patrimônio) | CI run 42525991845 · commit 81f325e · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas | automatizado |
+| RC-06 uma aceitação concorrente | QA-CON-01 | CT-CONC-01 | `ReservationConcorrenciaIntegrationTest` | CI run 42525991845 · commit 81f325e · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas | automatizado |
 | RC-07 manutenção bloqueia | recurso indisponível | CT-MNT-01 | PENDENTE | PENDENTE | planejado |
 | RC-08 fluxo principal | estado inválido | CT-STATE-01 | PENDENTE | PENDENTE | planejado |
 | RC-09 estados alternativos | transição perdida | CT-STATE-01 | PENDENTE | PENDENTE | planejado |
@@ -54,7 +54,7 @@
 | RNF-TRACE-01 100% críticas | órfão/fantasma/vencido | auditoria navegável | #55, #107 | PENDENTE |
 | RNF-SEC-01 zero crítico | falha/vulnerabilidade aberta | gates segurança e parecer | #92–#98, #110 | PENDENTE |
 | RNF-CI-01 merge protegido | CI decorativa | vermelho→verde + branch protection | #52, #103 | PENDENTE |
-| RNF-CONC-01 integridade sob disputa | dupla reserva | Testcontainers + JMeter | #33, #54, #106 | PENDENTE |
+| RNF-CONC-01 integridade sob disputa | dupla reserva | Testcontainers + JMeter | #27 (Testcontainers: `ReservationConcorrenciaIntegrationTest`, PR #174), #54, #106 (JMeter) | Testcontainers: CI run 42525991845 · commit 81f325e · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas; JMeter: PENDENTE |
 | RNF-PERF-01 carga mensurável | lentidão/corrupção | JMX/JTL/HTML + invariante | #54, #106 | PENDENTE |
 | RNF-ERR-01 erro neutro | vazamento | API/log/artifact negativos | #9, #104, #110 | PENDENTE |
 | RNF-REP-01 clone limpo | entrega não executa | instalação por outro integrante | #80, #109 | PENDENTE |
