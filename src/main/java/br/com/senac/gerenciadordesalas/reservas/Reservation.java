@@ -70,6 +70,14 @@ public class Reservation {
     @Column(name = "status", nullable = false, length = 20)
     private StatusReserva status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "aprovacao_recurso", nullable = false, length = 20)
+    private SituacaoPendencia aprovacaoRecurso = SituacaoPendencia.NAO_EXIGIDA;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "validacao_docente", nullable = false, length = 20)
+    private SituacaoPendencia validacaoDocente = SituacaoPendencia.NAO_EXIGIDA;
+
     @OneToMany(mappedBy = "reserva",
             cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ReservationMaterial> materiais = new ArrayList<>();
@@ -157,6 +165,38 @@ public class Reservation {
         this.status = novo;
     }
 
+    /**
+     * Regra de aprovacao (APR-01, #34). Chamada pelo sistema depois de criar ou
+     * alterar a reserva, quando sala, professor e materiais ja estao definidos:
+     * <ul>
+     *   <li>material restrito exige aprovacao de recurso pelo Responsavel;</li>
+     *   <li>professor exige validacao docente pelo Responsavel (APR-03);</li>
+     *   <li>sem nenhuma pendencia, a reserva e aprovada automaticamente;</li>
+     *   <li>com pendencia, fica CRIADA (o SOLICITADA do modelo) na fila.</li>
+     * </ul>
+     * Uma reserva APROVADA que passa a exigir decisao volta para CRIADA, como
+     * preve a transicao APROVADA para SOLICITADA feita pelo sistema.
+     */
+    public void reavaliarPendencias() {
+        if (!permiteAlteracao()) {
+            throw new ConflitoDeEstadoException(
+                    "Pendencias so podem ser reavaliadas em reserva CRIADA ou APROVADA");
+        }
+        boolean temMaterialRestrito = this.materiais.stream()
+                .anyMatch(item -> item.getMaterial().isRestrito());
+        this.aprovacaoRecurso = temMaterialRestrito
+                ? SituacaoPendencia.PENDENTE : SituacaoPendencia.NAO_EXIGIDA;
+        this.validacaoDocente = this.professor != null
+                ? SituacaoPendencia.PENDENTE : SituacaoPendencia.NAO_EXIGIDA;
+        this.status = possuiPendencia() ? StatusReserva.CRIADA : StatusReserva.APROVADA;
+        marcarAtualizado();
+    }
+
+    /** {@code true} se alguma decisao do Responsavel ainda impede a aprovacao. */
+    public boolean possuiPendencia() {
+        return aprovacaoRecurso.bloqueiaAprovacao() || validacaoDocente.bloqueiaAprovacao();
+    }
+
     public ReservationMaterial adicionarMaterial(Material material, int quantidade) {
         Objects.requireNonNull(material, "material e obrigatorio");
         boolean jaExiste = this.materiais.stream()
@@ -208,6 +248,8 @@ public class Reservation {
     public Instant getTermino() { return termino; }
     public String getFinalidade() { return finalidade; }
     public StatusReserva getStatus() { return status; }
+    public SituacaoPendencia getAprovacaoRecurso() { return aprovacaoRecurso; }
+    public SituacaoPendencia getValidacaoDocente() { return validacaoDocente; }
     public List<ReservationMaterial> getMateriais() { return Collections.unmodifiableList(materiais); }
     public Instant getCriadoEm() { return criadoEm; }
     public Instant getAtualizadoEm() { return atualizadoEm; }
