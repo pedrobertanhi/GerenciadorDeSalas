@@ -108,6 +108,8 @@ public class SecurityConfig {
                                 .authenticated()
                         .requestMatchers(HttpMethod.POST, "/manutencoes", "/manutencoes/**")
                                 .hasRole("ADMINISTRADOR")
+                        .requestMatchers("/aprovacoes", "/aprovacoes/**")
+                                .hasRole("RESPONSAVEL")
                         .requestMatchers(HttpMethod.GET, "/reservas", "/reservas/**")
                                 .authenticated()
                         .requestMatchers(HttpMethod.POST, "/reservas", "/reservas/**")
