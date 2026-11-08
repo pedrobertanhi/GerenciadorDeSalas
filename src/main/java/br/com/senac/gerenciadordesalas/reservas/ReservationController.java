@@ -49,8 +49,9 @@ public class ReservationController {
 
     @Operation(summary = "Criar reserva",
             description = "Exige SOLICITANTE, sessao e token CSRF. O dono da reserva e o usuario autenticado. "
-                    + "Sala, professor (opcional) e materiais sao validados como ativos; recursos restritos "
-                    + "seguem o fluxo de aprovacao (status inicial CRIADA).")
+                    + "Sala, professor (opcional) e materiais sao validados como ativos. Sem material restrito "
+                    + "nem professor, a reserva nasce APROVADA; caso contrario nasce CRIADA e aguarda a "
+                    + "decisao do Responsavel na fila de aprovacao.")
     @ApiResponse(responseCode = "201", description = "Reserva criada",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ReservationDto.Saida.class)))
@@ -76,9 +77,10 @@ public class ReservationController {
         return ResponseEntity.created(location).body(criada);
     }
 
-    @Operation(summary = "Alterar reserva criada",
+    @Operation(summary = "Alterar reserva",
             description = "Exige sessao e CSRF. Somente o dono, RESPONSAVEL ou ADMINISTRADOR pode alterar; "
-                    + "a reserva precisa estar em CRIADA.")
+                    + "a reserva precisa estar em CRIADA ou APROVADA. A necessidade de aprovacao e "
+                    + "reavaliada depois da alteracao.")
     @PutMapping("/{id}")
     public ResponseEntity<ReservationDto.Saida> alterar(
             @PathVariable Long id,
