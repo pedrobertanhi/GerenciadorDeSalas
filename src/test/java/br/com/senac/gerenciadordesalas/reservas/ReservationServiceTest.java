@@ -14,6 +14,7 @@ import br.com.senac.gerenciadordesalas.usuario.User;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import java.time.Clock;
@@ -26,6 +27,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
@@ -210,5 +213,61 @@ class ReservationServiceTest {
                 Mockito.eq(30L), Mockito.any(), Mockito.any(), Mockito.isNull())).thenReturn(3L);
 
         assertThat(service.criar(entradaValida(), EMAIL).materiais()).hasSize(1);
+    }
+
+    // Exclusao mutua (RSV-10, #27): se as travas forem removidas ou vierem depois da
+    // validacao, estes testes falham.
+
+    @Test
+    void criar_travaSalaProfessorEMateriaisAntesDeValidarConflitos() {
+        service.criar(entradaValida(), EMAIL);
+
+        InOrder ordem = inOrder(reservas);
+        ordem.verify(reservas).travarSala(10L);
+        ordem.verify(reservas).travarProfessor(20L);
+        ordem.verify(reservas).travarMateriais(List.of(30L));
+        ordem.verify(reservas).buscarAtivasDaSalaSobrepondo(10L, inicio.toInstant(), termino.toInstant());
+        ordem.verify(reservas).saveAndFlush(any(Reservation.class));
+    }
+
+    @Test
+    void criar_travaMateriaisEmOrdemDeIdParaEvitarDeadlock() {
+        Material cabo = Mockito.mock(Material.class);
+        when(cabo.getId()).thenReturn(31L);
+        when(cabo.getNome()).thenReturn("Cabo HDMI");
+        when(cabo.isAtivo()).thenReturn(true);
+        when(cabo.getQuantidadeTotal()).thenReturn(5);
+        when(materiais.findById(31L)).thenReturn(Optional.of(cabo));
+        ReservationDto.Entrada entrada = new ReservationDto.Entrada(10L, null, inicio, termino,
+                "Aula com dois materiais",
+                List.of(new ReservationDto.MaterialPedido(31L, 1),
+                        new ReservationDto.MaterialPedido(30L, 1)));
+
+        service.criar(entrada, EMAIL);
+
+        verify(reservas).travarMateriais(List.of(30L, 31L));
+    }
+
+    @Test
+    void criar_semProfessorNemMateriais_travaSomenteASala() {
+        ReservationDto.Entrada entrada = new ReservationDto.Entrada(10L, null, inicio, termino,
+                "Reuniao", List.of());
+
+        service.criar(entrada, EMAIL);
+
+        verify(reservas).travarSala(10L);
+        verify(reservas, never()).travarProfessor(any());
+        verify(reservas, never()).travarMateriais(any());
+    }
+
+    @Test
+    void criar_travaRecursosAntesDeCarregarSalaEProfessor() {
+        service.criar(entradaValida(), EMAIL);
+
+        InOrder ordem = inOrder(reservas, salas, professores);
+        ordem.verify(reservas).travarSala(10L);
+        ordem.verify(reservas).travarProfessor(20L);
+        ordem.verify(salas).findById(10L);
+        ordem.verify(professores).findById(20L);
     }
 }

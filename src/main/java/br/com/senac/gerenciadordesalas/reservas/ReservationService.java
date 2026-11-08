@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -54,6 +56,7 @@ public class ReservationService {
         User solicitante = usuarios.findByEmailIgnoreCase(emailSolicitante)
                 .filter(User::isActive)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitante nao encontrado"));
+        travarRecursos(entrada.salaId(), entrada.professorId(), entrada.materiaisOuVazio());
 
         Sala sala = salas.findById(entrada.salaId())
                 .filter(s -> Boolean.TRUE.equals(s.getAtiva()))
@@ -95,6 +98,31 @@ public class ReservationService {
 
         Reservation salva = reservas.saveAndFlush(reserva);
         return ReservationDto.Saida.de(salva);
+    }
+
+    /**
+     * Exclusao mutua (RSV-10, #27): trava sala, professor e materiais no banco antes
+     * de carregar e validar. Uma reserva concorrente do mesmo recurso espera a atual
+     * terminar e so entao valida, entao nao existe janela entre validacao e gravacao.
+     * Como a trava vem antes da leitura, sala, professor e materiais sao lidos ja
+     * travados: uma inativacao feita por outra transacao e enxergada e a reserva e
+     * recusada. A ordem fixa (sala, professor, materiais por id) evita deadlock.
+     */
+    private void travarRecursos(Long salaId, Long professorId,
+                                List<ReservationDto.MaterialPedido> pedidos) {
+        reservas.travarSala(salaId);
+        if (professorId != null) {
+            reservas.travarProfessor(professorId);
+        }
+        List<Long> materialIds = pedidos.stream()
+                .map(ReservationDto.MaterialPedido::materialId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+        if (!materialIds.isEmpty()) {
+            reservas.travarMateriais(materialIds);
+        }
     }
 
     private void validarManutencao(TipoRecurso tipo, Long recursoId, java.time.Instant inicio,
