@@ -95,9 +95,9 @@ public class Reservation {
     }
 
     public void definirPeriodo(Instant inicio, Instant termino) {
-        if (this.status != null && this.status != StatusReserva.CRIADA) {
+        if (this.status != null && !permiteAlteracao()) {
             throw new IllegalStateException(
-                    "Periodo so pode ser alterado enquanto a reserva estiver CRIADA");
+                    "Periodo so pode ser alterado enquanto a reserva estiver CRIADA ou APROVADA");
         }
         if (inicio == null || termino == null || !termino.isAfter(inicio)) {
             throw new IllegalArgumentException("O termino deve ser posterior ao inicio");
@@ -114,13 +114,14 @@ public class Reservation {
     }
 
     /**
-     * Altera os dados editaveis somente antes da decisao sobre a reserva.
-     * Uma reserva que ja saiu de CRIADA preserva o contexto que foi aprovado.
+     * Altera os dados editaveis antes do uso: em CRIADA (aguardando decisao) ou
+     * APROVADA, conforme docs/arquitetura/ESTADOS_DA_RESERVA.md. Depois de alterar,
+     * a necessidade de aprovacao deve ser reavaliada.
      */
     public void alterar(Sala sala, Professor professor, Instant inicio, Instant termino, String finalidade) {
-        if (this.status != StatusReserva.CRIADA) {
+        if (!permiteAlteracao()) {
             throw new ConflitoDeEstadoException(
-                    "Reserva so pode ser alterada enquanto estiver CRIADA");
+                    "Reserva so pode ser alterada enquanto estiver CRIADA ou APROVADA");
         }
         this.sala = Objects.requireNonNull(sala, "sala e obrigatoria");
         this.professor = professor;
@@ -140,6 +141,11 @@ public class Reservation {
         }
         this.status = StatusReserva.CANCELADA;
         marcarAtualizado();
+    }
+
+    /** {@code true} enquanto a reserva ainda pode ser alterada pelo solicitante. */
+    public boolean permiteAlteracao() {
+        return this.status == StatusReserva.CRIADA || this.status == StatusReserva.APROVADA;
     }
 
     /** Transiciona para {@code novo} se a regra permitir; caso contrario lanca. */
