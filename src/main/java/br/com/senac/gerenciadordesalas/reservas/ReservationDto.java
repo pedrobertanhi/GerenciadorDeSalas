@@ -98,7 +98,10 @@ public final class ReservationDto {
             StatusReserva status,
             List<MaterialReservado> materiais,
             Instant criadoEm,
-            Instant atualizadoEm) {
+            Instant atualizadoEm,
+            SituacaoPendencia aprovacaoRecurso,
+            SituacaoPendencia validacaoDocente,
+            String motivoRejeicao) {
 
         public static Saida de(Reservation reserva) {
             List<MaterialReservado> itens = reserva.getMateriais().stream()
@@ -117,7 +120,10 @@ public final class ReservationDto {
                     reserva.getStatus(),
                     itens,
                     reserva.getCriadoEm(),
-                    reserva.getAtualizadoEm());
+                    reserva.getAtualizadoEm(),
+                    reserva.getAprovacaoRecurso(),
+                    reserva.getValidacaoDocente(),
+                    reserva.getRecursoMotivoRejeicao());
         }
     }
 
