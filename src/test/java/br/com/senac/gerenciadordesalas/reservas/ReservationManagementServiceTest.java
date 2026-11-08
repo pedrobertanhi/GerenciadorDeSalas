@@ -9,6 +9,7 @@ import br.com.senac.gerenciadordesalas.usuario.User;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -101,5 +103,22 @@ class ReservationManagementServiceTest {
         assertThatThrownBy(() -> service.cancelar(100L, "dono@exemplo.test"))
                 .isInstanceOf(ConflitoDeEstadoException.class)
                 .hasMessageContaining("nao pode ser cancelada");
+    }
+
+    @Test
+    void alteracao_travaASalaAntesDeValidarConflitos() {
+        ReservationDto.Alteracao alteracao = new ReservationDto.Alteracao(
+                10L, null,
+                OffsetDateTime.of(2026, 11, 11, 9, 0, 0, 0, ZoneOffset.UTC),
+                OffsetDateTime.of(2026, 11, 11, 11, 0, 0, 0, ZoneOffset.UTC),
+                "Aula alterada", List.of());
+
+        service.alterar(100L, alteracao, "dono@exemplo.test");
+
+        InOrder ordem = inOrder(reservas);
+        ordem.verify(reservas).travarSala(10L);
+        ordem.verify(reservas).buscarAtivasDaSalaSobrepondo(
+                Mockito.eq(10L), Mockito.any(), Mockito.any());
+        ordem.verify(reservas).save(reserva);
     }
 }
