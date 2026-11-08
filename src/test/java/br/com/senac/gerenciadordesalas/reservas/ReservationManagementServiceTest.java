@@ -71,7 +71,8 @@ class ReservationManagementServiceTest {
         ReservationDto.Saida saida = service.alterar(100L, alteracao, "dono@exemplo.test");
 
         assertThat(saida.finalidade()).isEqualTo("Aula alterada");
-        assertThat(saida.status()).isEqualTo(StatusReserva.CRIADA);
+        // Sem material restrito nem professor, a reserva alterada e aprovada automaticamente (APR-01, #34).
+        assertThat(saida.status()).isEqualTo(StatusReserva.APROVADA);
         verify(reservas).save(reserva);
     }
 
