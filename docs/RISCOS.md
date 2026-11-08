@@ -4,7 +4,7 @@
 
 | ID | Risco | Probabilidade | Impacto | Prioridade | Tratamento planejado | Issues | Responsável | Status |
 |---|---|---|---|---|---|---|---|---|
-| R01 | Dupla reserva em concorrência | Alta | Crítico | Crítica | Lock/transação e teste simultâneo com PostgreSQL real | #32, #33 | Não atribuído | Aberto |
+| R01 | Dupla reserva em concorrência | Alta | Crítico | Crítica | Trava `SELECT ... FOR UPDATE` de sala, professor e materiais antes de carregar e validar, com teste de concorrência determinístico em PostgreSQL real (`ReservationConcorrenciaIntegrationTest`, PR #174); teste de carga com JMeter segue na #54 | #27, #54 | Matheus | Mitigado |
 | R02 | Falha de autorização por perfil | Média | Crítico | Crítica | Matriz de permissões e testes positivos/negativos | #2, #13, #14 | Não atribuído | Aberto |
 | R03 | Aplicação não executar na entrega | Média | Crítico | Crítica | Build reproduzível e instalação em ambiente limpo | #5, #52, #80 | Não atribuído | Aberto |
 | R04 | Pipeline ausente ou instável | Média | Crítico | Crítica | GitHub Actions obrigatório em PR e proteção da main | #4, #52 | Não atribuído | Aberto |
