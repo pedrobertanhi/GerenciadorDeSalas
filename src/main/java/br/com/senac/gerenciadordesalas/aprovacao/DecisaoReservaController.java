@@ -80,4 +80,36 @@ public class DecisaoReservaController {
             @AuthenticationPrincipal UserDetails autenticado) {
         return ResponseEntity.ok(service.rejeitar(id, corpo.motivo(), autenticado.getUsername()));
     }
+
+    @Operation(summary = "Validar alocacao docente da reserva",
+            description = "Exige RESPONSAVEL, sessao e CSRF. Revalida a agenda do professor e os demais recursos "
+                    + "antes de validar. A reserva passa para APROVADA quando nao resta outra pendencia.")
+    @ApiResponse(responseCode = "200", description = "Alocacao docente validada",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ReservationDto.Saida.class)))
+    @SecurityRequirement(name = "csrf")
+    @PostMapping("/{id}/validar-docente")
+    public ResponseEntity<ReservationDto.Saida> validarDocente(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails autenticado) {
+        return ResponseEntity.ok(service.validarDocente(id, autenticado.getUsername()));
+    }
+
+    @Operation(summary = "Rejeitar alocacao docente da reserva",
+            description = "Exige RESPONSAVEL, sessao e CSRF. O motivo e obrigatorio e fica preservado; "
+                    + "a reserva passa para REJEITADA.")
+    @ApiResponse(responseCode = "200", description = "Reserva rejeitada pela validacao docente",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ReservationDto.Saida.class)))
+    @ApiResponse(responseCode = "400", description = "Motivo ausente, em branco ou com mais de 500 caracteres",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErroResposta.class)))
+    @SecurityRequirement(name = "csrf")
+    @PostMapping("/{id}/rejeitar-docente")
+    public ResponseEntity<ReservationDto.Saida> rejeitarDocente(
+            @PathVariable Long id,
+            @RequestBody @Valid AprovacaoDto.Rejeicao corpo,
+            @AuthenticationPrincipal UserDetails autenticado) {
+        return ResponseEntity.ok(service.rejeitarDocente(id, corpo.motivo(), autenticado.getUsername()));
+    }
 }
