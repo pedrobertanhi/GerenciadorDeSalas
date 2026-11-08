@@ -68,6 +68,7 @@ public class ReservationManagementService {
         reserva.alterar(sala, professor, entrada.inicioInstant(), entrada.terminoInstant(), entrada.finalidade());
         substituirMateriais(reserva, entrada.materiaisOuVazio(),
                 entrada.inicioInstant(), entrada.terminoInstant());
+        reserva.reavaliarPendencias();
         return ReservationDto.Saida.de(reservas.save(reserva));
     }
 
