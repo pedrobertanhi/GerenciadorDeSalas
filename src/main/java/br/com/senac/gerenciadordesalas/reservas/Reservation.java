@@ -88,6 +88,16 @@ public class Reservation {
     @Column(name = "recurso_motivo_rejeicao", length = 500)
     private String recursoMotivoRejeicao;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "docente_decidido_por_id")
+    private User docenteDecididoPor;
+
+    @Column(name = "docente_decidido_em")
+    private Instant docenteDecididoEm;
+
+    @Column(name = "docente_motivo_rejeicao", length = 500)
+    private String docenteMotivoRejeicao;
+
     @OneToMany(mappedBy = "reserva",
             cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ReservationMaterial> materiais = new ArrayList<>();
@@ -202,6 +212,9 @@ public class Reservation {
         this.recursoMotivoRejeicao = null;
         this.validacaoDocente = this.professor != null
                 ? SituacaoPendencia.PENDENTE : SituacaoPendencia.NAO_EXIGIDA;
+        this.docenteDecididoPor = null;
+        this.docenteDecididoEm = null;
+        this.docenteMotivoRejeicao = null;
         this.status = possuiPendencia() ? StatusReserva.CRIADA : StatusReserva.APROVADA;
         marcarAtualizado();
     }
@@ -243,6 +256,56 @@ public class Reservation {
         registrarDecisaoRecurso(SituacaoPendencia.REJEITADA, responsavel, decididaEm, motivoLimpo);
         transicionarPara(StatusReserva.REJEITADA);
         marcarAtualizado();
+    }
+
+    /**
+     * Garante que a validacao docente ainda aguarda decisao (APR-03, #34).
+     */
+    public void exigirValidacaoDocentePendente() {
+        if (this.status != StatusReserva.CRIADA || this.validacaoDocente != SituacaoPendencia.PENDENTE) {
+            throw new ConflitoDeEstadoException("A validacao docente desta reserva nao esta pendente");
+        }
+    }
+
+    /**
+     * Responsavel valida a alocacao do professor. A reserva so passa para APROVADA
+     * quando nao resta outra pendencia (por exemplo, a aprovacao de recurso restrito).
+     */
+    public void validarDocente(User responsavel, Instant decididaEm) {
+        exigirValidacaoDocentePendente();
+        registrarDecisaoDocente(SituacaoPendencia.APROVADA, responsavel, decididaEm, null);
+        if (!possuiPendencia()) {
+            transicionarPara(StatusReserva.APROVADA);
+        }
+        marcarAtualizado();
+    }
+
+    /** Responsavel rejeita a alocacao do professor com motivo; a reserva passa para REJEITADA. */
+    public void rejeitarDocente(User responsavel, Instant decididaEm, String motivo) {
+        exigirValidacaoDocentePendente();
+        String motivoLimpo = motivoObrigatorio(motivo);
+        registrarDecisaoDocente(SituacaoPendencia.REJEITADA, responsavel, decididaEm, motivoLimpo);
+        transicionarPara(StatusReserva.REJEITADA);
+        marcarAtualizado();
+    }
+
+    private void registrarDecisaoDocente(SituacaoPendencia decisao, User responsavel,
+                                         Instant decididaEm, String motivo) {
+        this.docenteDecididoPor = Objects.requireNonNull(responsavel, "responsavel e obrigatorio");
+        this.docenteDecididoEm = Objects.requireNonNull(decididaEm, "instante da decisao e obrigatorio");
+        this.validacaoDocente = decisao;
+        this.docenteMotivoRejeicao = motivo;
+    }
+
+    private static String motivoObrigatorio(String motivo) {
+        if (motivo == null || motivo.isBlank()) {
+            throw new IllegalArgumentException("O motivo da rejeicao e obrigatorio");
+        }
+        String motivoLimpo = motivo.trim();
+        if (motivoLimpo.length() > 500) {
+            throw new IllegalArgumentException("O motivo da rejeicao deve ter no maximo 500 caracteres");
+        }
+        return motivoLimpo;
     }
 
     private void registrarDecisaoRecurso(SituacaoPendencia decisao, User responsavel,
@@ -314,6 +377,9 @@ public class Reservation {
     public User getRecursoDecididoPor() { return recursoDecididoPor; }
     public Instant getRecursoDecididoEm() { return recursoDecididoEm; }
     public String getRecursoMotivoRejeicao() { return recursoMotivoRejeicao; }
+    public User getDocenteDecididoPor() { return docenteDecididoPor; }
+    public Instant getDocenteDecididoEm() { return docenteDecididoEm; }
+    public String getDocenteMotivoRejeicao() { return docenteMotivoRejeicao; }
     public List<ReservationMaterial> getMateriais() { return Collections.unmodifiableList(materiais); }
     public Instant getCriadoEm() { return criadoEm; }
     public Instant getAtualizadoEm() { return atualizadoEm; }
