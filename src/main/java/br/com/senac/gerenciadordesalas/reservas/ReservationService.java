@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -60,6 +62,7 @@ public class ReservationService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Sala nao encontrada ou inativa"));
 
         Professor professor = resolverProfessor(entrada.professorId());
+        travarRecursos(sala.getId(), professor, entrada.materiaisOuVazio());
         validarManutencao(TipoRecurso.SALA, sala.getId(), entrada.inicioInstant(), entrada.terminoInstant());
         if (professor != null) {
             validarManutencao(TipoRecurso.PROFESSOR, professor.getId(), entrada.inicioInstant(), entrada.terminoInstant());
@@ -95,6 +98,29 @@ public class ReservationService {
 
         Reservation salva = reservas.saveAndFlush(reserva);
         return ReservationDto.Saida.de(salva);
+    }
+
+    /**
+     * Exclusao mutua (RSV-10, #27): trava sala, professor e materiais no banco antes
+     * de validar conflitos. Uma reserva concorrente do mesmo recurso espera a atual
+     * terminar e so entao valida, entao nao existe janela entre validacao e gravacao.
+     * A ordem fixa (sala, professor, materiais por id) evita deadlock.
+     */
+    private void travarRecursos(Long salaId, Professor professor,
+                                List<ReservationDto.MaterialPedido> pedidos) {
+        reservas.travarSala(salaId);
+        if (professor != null) {
+            reservas.travarProfessor(professor.getId());
+        }
+        List<Long> materialIds = pedidos.stream()
+                .map(ReservationDto.MaterialPedido::materialId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+        if (!materialIds.isEmpty()) {
+            reservas.travarMateriais(materialIds);
+        }
     }
 
     private void validarManutencao(TipoRecurso tipo, Long recursoId, java.time.Instant inicio,
