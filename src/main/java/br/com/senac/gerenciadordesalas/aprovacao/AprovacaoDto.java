@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.aprovacao;
 
+import br.com.senac.gerenciadordesalas.professor.Competencia;
 import br.com.senac.gerenciadordesalas.professor.Professor;
 import br.com.senac.gerenciadordesalas.reservas.Reservation;
 import br.com.senac.gerenciadordesalas.reservas.ReservationMaterial;
@@ -29,6 +30,7 @@ public final class AprovacaoDto {
             String salaNome,
             Long professorId,
             String professorNome,
+            List<String> professorCompetencias,
             Instant inicio,
             Instant termino,
             String finalidade,
@@ -47,6 +49,10 @@ public final class AprovacaoDto {
                     reserva.getSala().getNome(),
                     professor == null ? null : professor.getId(),
                     professor == null ? null : professor.getNome(),
+                    professor == null ? List.of() : professor.getCompetencias().stream()
+                            .map(Competencia::getNome)
+                            .sorted()
+                            .toList(),
                     reserva.getInicio(),
                     reserva.getTermino(),
                     reserva.getFinalidade(),
