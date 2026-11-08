@@ -334,4 +334,91 @@ class ReservationTest {
         assertThat(r.getRecursoDecididoPor()).isNull();
         assertThat(r.getRecursoDecididoEm()).isNull();
     }
+
+    // APR-03 (#34): validacao docente pelo Responsavel.
+
+    private Reservation reservaComProfessor() {
+        Reservation r = novaReserva();
+        r.reavaliarPendencias();
+        return r;
+    }
+
+    @Test
+    void validarDocente_semOutraPendencia_aprovaERegistraAutorEInstante() {
+        Reservation r = reservaComProfessor();
+
+        r.validarDocente(responsavel, decididaEm);
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.APROVADA);
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.APROVADA);
+        assertThat(r.getDocenteDecididoPor()).isSameAs(responsavel);
+        assertThat(r.getDocenteDecididoEm()).isEqualTo(decididaEm);
+    }
+
+    @Test
+    void validarDocente_comRecursoRestritoPendente_permaneceCriada() {
+        Reservation r = reservaRestrita(professor);
+
+        r.validarDocente(responsavel, decididaEm);
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.PENDENTE);
+
+        r.aprovarRecurso(responsavel, decididaEm);
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.APROVADA);
+    }
+
+    @Test
+    void rejeitarDocente_preservaMotivoSemEspacosEMudaParaRejeitada() {
+        Reservation r = reservaComProfessor();
+
+        r.rejeitarDocente(responsavel, decididaEm, "  Professor sem a competencia exigida  ");
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.REJEITADA);
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.REJEITADA);
+        assertThat(r.getDocenteMotivoRejeicao()).isEqualTo("Professor sem a competencia exigida");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    void rejeitarDocente_semMotivo_eRecusada(String motivo) {
+        Reservation r = reservaComProfessor();
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> r.rejeitarDocente(responsavel, decididaEm, motivo));
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.PENDENTE);
+    }
+
+    @Test
+    void validacaoDocenteRepetida_eRecusada() {
+        Reservation r = reservaComProfessor();
+        r.validarDocente(responsavel, decididaEm);
+
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(() -> r.validarDocente(responsavel, decididaEm));
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(() -> r.rejeitarDocente(responsavel, decididaEm, "Mudou de ideia"));
+    }
+
+    @Test
+    void validarDocente_reservaSemProfessor_eRecusado() {
+        Reservation r = reservaRestrita(null);
+
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(() -> r.validarDocente(responsavel, decididaEm));
+    }
+
+    @Test
+    void alteracaoDepoisDaValidacao_exigeNovaValidacaoELimpaORegistroAnterior() {
+        Reservation r = reservaComProfessor();
+        r.validarDocente(responsavel, decididaEm);
+
+        r.alterar(sala, professor, inicio, termino, "Finalidade revisada");
+        r.reavaliarPendencias();
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.PENDENTE);
+        assertThat(r.getDocenteDecididoPor()).isNull();
+        assertThat(r.getDocenteDecididoEm()).isNull();
+    }
 }

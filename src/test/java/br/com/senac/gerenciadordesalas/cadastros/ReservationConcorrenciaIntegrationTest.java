@@ -1,7 +1,11 @@
 package br.com.senac.gerenciadordesalas.cadastros;
 
+import br.com.senac.gerenciadordesalas.aprovacao.AprovacaoService;
 import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
+import br.com.senac.gerenciadordesalas.manutencao.BloqueioDto;
+import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
+import br.com.senac.gerenciadordesalas.manutencao.TipoRecurso;
 import br.com.senac.gerenciadordesalas.material.Material;
 import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.material.MaterialTipo;
@@ -62,6 +66,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 class ReservationConcorrenciaIntegrationTest extends IntegracaoPostgresBase {
 
     private static final String EMAIL = "solicitante.concorrencia@exemplo.test";
+    private static final String EMAIL_RESPONSAVEL = "responsavel.concorrencia@exemplo.test";
     private static final OffsetDateTime INICIO = OffsetDateTime.of(2026, 11, 20, 10, 0, 0, 0, ZoneOffset.UTC);
     private static final OffsetDateTime TERMINO = INICIO.plusHours(2);
 
@@ -71,6 +76,8 @@ class ReservationConcorrenciaIntegrationTest extends IntegracaoPostgresBase {
     @Autowired MaterialRepository materiais;
     @Autowired ReservationService reservationService;
     @Autowired PlatformTransactionManager transactionManager;
+    @Autowired AprovacaoService aprovacaoService;
+    @Autowired MaintenanceBlockService manutencoes;
 
     private Long salaA;
     private Long salaB;
@@ -91,6 +98,7 @@ class ReservationConcorrenciaIntegrationTest extends IntegracaoPostgresBase {
 
     @AfterEach
     void limpar() {
+        jdbcTemplate.update("DELETE FROM tb_bloqueios_manutencao");
         jdbcTemplate.update("DELETE FROM tb_reservas_materiais");
         jdbcTemplate.update("DELETE FROM tb_reservas");
         jdbcTemplate.update("DELETE FROM tb_materiais");
@@ -98,6 +106,7 @@ class ReservationConcorrenciaIntegrationTest extends IntegracaoPostgresBase {
         jdbcTemplate.update("DELETE FROM tb_professores");
         jdbcTemplate.update("DELETE FROM salas");
         jdbcTemplate.update("DELETE FROM tb_usuarios WHERE email = ?", EMAIL);
+        jdbcTemplate.update("DELETE FROM tb_usuarios WHERE email = ?", EMAIL_RESPONSAVEL);
     }
 
     /** Sem transacao de teste, cada operacao ja foi comitada: nao ha nada pendente no Hibernate. */
@@ -186,6 +195,63 @@ class ReservationConcorrenciaIntegrationTest extends IntegracaoPostgresBase {
                     .isZero();
         } finally {
             liberarCommitDaInativacao.countDown();
+            executor.shutdownNow();
+            executor.awaitTermination(15, SECONDS);
+        }
+    }
+
+    /**
+     * Apontamento do Sourcery no PR #178: um bloqueio de manutencao do professor criado
+     * ao mesmo tempo que a validacao docente. O bloqueio trava o professor e segura o
+     * commit; a validacao precisa esperar e, depois do commit, enxergar o bloqueio e
+     * recusar. Se a criacao do bloqueio nao travasse o professor, a validacao passaria
+     * sem ver o bloqueio e o teste falharia.
+     */
+    @Test
+    void bloqueioDoProfessorCriadoDuranteAValidacaoDocente_validacaoEsperaERecusa() throws Exception {
+        OffsetDateTime inicio = OffsetDateTime.of(2099, 3, 10, 10, 0, 0, 0, ZoneOffset.UTC);
+        OffsetDateTime termino = inicio.plusHours(2);
+        usuarios.save(new User("Rui Concorrencia", EMAIL_RESPONSAVEL, "$2a$10$hashBcryptFalso", Role.RESPONSAVEL));
+        Long reservaId = reservationService.criar(new ReservationDto.Entrada(
+                salaA, professorId, inicio, termino, "Aula com professor", List.of()), EMAIL).id();
+
+        TransactionTemplate transacao = new TransactionTemplate(transactionManager);
+        CountDownLatch bloqueioGravado = new CountDownLatch(1);
+        CountDownLatch liberarCommitDoBloqueio = new CountDownLatch(1);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<?> bloqueio = executor.submit(() -> transacao.executeWithoutResult(status -> {
+                manutencoes.criar(new BloqueioDto.Entrada(TipoRecurso.PROFESSOR, professorId,
+                        "Afastamento para capacitacao", inicio, termino));
+                bloqueioGravado.countDown();
+                aguardar(liberarCommitDoBloqueio);
+            }));
+            assertThat(bloqueioGravado.await(15, SECONDS))
+                    .as("o bloqueio devia ser gravado (ainda sem commit)")
+                    .isTrue();
+
+            Future<ReservationDto.Saida> validacao = executor.submit(
+                    () -> aprovacaoService.validarDocente(reservaId, EMAIL_RESPONSAVEL));
+
+            assertThat(catchThrowable(() -> validacao.get(3, SECONDS)))
+                    .as("a validacao devia esperar a trava do professor enquanto o bloqueio nao faz commit")
+                    .isInstanceOf(TimeoutException.class);
+
+            liberarCommitDoBloqueio.countDown();
+            bloqueio.get(15, SECONDS);
+
+            Throwable erro = catchThrowable(() -> validacao.get(15, SECONDS));
+            assertThat(erro)
+                    .as("a validacao devia ser recusada porque o professor entrou em manutencao")
+                    .isInstanceOf(ExecutionException.class);
+            assertThat(erro.getCause())
+                    .isInstanceOf(ConflitoDeEstadoException.class)
+                    .hasMessageContaining("manutencao");
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT validacao_docente FROM tb_reservas WHERE id = ?", String.class, reservaId))
+                    .isEqualTo("PENDENTE");
+        } finally {
+            liberarCommitDoBloqueio.countDown();
             executor.shutdownNow();
             executor.awaitTermination(15, SECONDS);
         }

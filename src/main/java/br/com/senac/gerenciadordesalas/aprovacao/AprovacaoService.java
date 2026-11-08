@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Fila e decisoes do Responsavel (APR-01 e APR-02, #34).
+ * Fila e decisoes do Responsavel (APR-01, APR-02 e APR-03, #34).
  *
  * <p>Antes de decidir, a reserva e travada e depois os seus recursos, na mesma ordem
  * global usada na alteracao (reserva, sala, professor, materiais). Assim duas decisoes
@@ -89,6 +89,43 @@ public class AprovacaoService {
                 ReservaDecididaEvent.TipoDecisao.APROVACAO_RECURSO,
                 ReservaDecididaEvent.Resultado.REJEITADA,
                 responsavel.getId(), agora, salva.getRecursoMotivoRejeicao()));
+        return ReservationDto.Saida.de(salva);
+    }
+
+    /**
+     * Valida a alocacao do professor (APR-03). Revalida a agenda do professor e os
+     * demais recursos antes da decisao: um conflito surgido depois da solicitacao
+     * impede a validacao.
+     */
+    @Transactional
+    public ReservationDto.Saida validarDocente(Long reservaId, String emailResponsavel) {
+        User responsavel = obterResponsavel(emailResponsavel);
+        Reservation reserva = carregarTravada(reservaId);
+        reserva.exigirValidacaoDocentePendente();
+        revalidar(reserva);
+
+        Instant agora = relogio.instant();
+        reserva.validarDocente(responsavel, agora);
+        Reservation salva = salvar(reserva);
+        eventos.publishEvent(new ReservaDecididaEvent(salva.getId(),
+                ReservaDecididaEvent.TipoDecisao.VALIDACAO_DOCENTE,
+                ReservaDecididaEvent.Resultado.APROVADA,
+                responsavel.getId(), agora, null));
+        return ReservationDto.Saida.de(salva);
+    }
+
+    @Transactional
+    public ReservationDto.Saida rejeitarDocente(Long reservaId, String motivo, String emailResponsavel) {
+        User responsavel = obterResponsavel(emailResponsavel);
+        Reservation reserva = carregarTravada(reservaId);
+
+        Instant agora = relogio.instant();
+        reserva.rejeitarDocente(responsavel, agora, motivo);
+        Reservation salva = salvar(reserva);
+        eventos.publishEvent(new ReservaDecididaEvent(salva.getId(),
+                ReservaDecididaEvent.TipoDecisao.VALIDACAO_DOCENTE,
+                ReservaDecididaEvent.Resultado.REJEITADA,
+                responsavel.getId(), agora, salva.getDocenteMotivoRejeicao()));
         return ReservationDto.Saida.de(salva);
     }
 

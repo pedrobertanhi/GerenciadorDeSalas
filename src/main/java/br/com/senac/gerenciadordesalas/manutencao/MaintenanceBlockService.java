@@ -40,6 +40,7 @@ public class MaintenanceBlockService {
 
     @Transactional
     public BloqueioDto.Saida criar(BloqueioDto.Entrada entrada) {
+        travarRecurso(entrada.recursoTipo(), entrada.recursoId());
         verificarRecursoExistente(entrada.recursoTipo(), entrada.recursoId());
         MaintenanceBlock bloqueio = new MaintenanceBlock(
                 entrada.recursoTipo(),
@@ -58,6 +59,7 @@ public class MaintenanceBlockService {
                 || !bloqueio.getRecursoId().equals(entrada.recursoId())) {
             throw new ConflitoDeEstadoException("O recurso de um bloqueio nao pode ser alterado");
         }
+        travarRecurso(bloqueio.getRecursoTipo(), bloqueio.getRecursoId());
         bloqueio.atualizar(
                 entrada.motivo().trim(),
                 entrada.inicio().toInstant(),
@@ -106,6 +108,19 @@ public class MaintenanceBlockService {
     private MaintenanceBlock obter(Long id) {
         return bloqueios.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Bloqueio nao encontrado"));
+    }
+
+    /**
+     * Trava a linha do recurso antes de gravar o bloqueio (#34). Criacao e alteracao de
+     * reserva e as decisoes do Responsavel travam o mesmo recurso antes de checar
+     * manutencao, entao um bloqueio concorrente nunca passa despercebido.
+     */
+    private void travarRecurso(TipoRecurso tipo, Long id) {
+        switch (tipo) {
+            case SALA -> bloqueios.travarSala(id);
+            case PROFESSOR -> bloqueios.travarProfessor(id);
+            case MATERIAL -> bloqueios.travarMaterial(id);
+        }
     }
 
     private void verificarRecursoExistente(TipoRecurso tipo, Long id) {

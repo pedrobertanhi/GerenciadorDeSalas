@@ -63,6 +63,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/reservas/*/aprovar",
                                 "/api/reservas/*/rejeitar",
+                                "/api/reservas/*/validar-docente",
+                                "/api/reservas/*/rejeitar-docente",
                                 "/api/reservas/*/iniciar",
                                 "/api/reservas/*/concluir",
                                 "/api/reservas/*/nao-comparecimento")
