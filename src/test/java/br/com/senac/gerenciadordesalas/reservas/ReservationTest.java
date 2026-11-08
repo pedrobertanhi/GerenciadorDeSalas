@@ -145,9 +145,19 @@ class ReservationTest {
     }
 
     @Test
-    void definirPeriodo_rejeitadoAposTransicaoDeStatus() {
+    void definirPeriodo_permitidoEnquantoAPROVADA() {
         Reservation r = novaReserva();
         r.transicionarPara(StatusReserva.APROVADA);
+        Instant novoInicio = inicio.plus(1, ChronoUnit.DAYS);
+        r.definirPeriodo(novoInicio, termino.plus(1, ChronoUnit.DAYS));
+        assertThat(r.getInicio()).isEqualTo(novoInicio);
+    }
+
+    @Test
+    void definirPeriodo_rejeitadoDepoisDoInicioDoUso() {
+        Reservation r = novaReserva();
+        r.transicionarPara(StatusReserva.APROVADA);
+        r.transicionarPara(StatusReserva.EM_ANDAMENTO);
         assertThatIllegalStateException()
                 .isThrownBy(() -> r.definirPeriodo(
                         inicio.plus(1, ChronoUnit.DAYS),
