@@ -96,7 +96,9 @@ public class ReservationWebController {
         }
         try {
             ReservationDto.Saida criada = reservas.criar(entrada, autenticacao.getName());
-            redirecionamento.addFlashAttribute("sucesso", "Reserva criada e aguardando o fluxo de aprovação.");
+            redirecionamento.addFlashAttribute("sucesso", criada.status() == StatusReserva.APROVADA
+                    ? "Reserva criada e aprovada automaticamente."
+                    : "Reserva criada e aguardando a decisão do Responsável.");
             return "redirect:/reservas/" + criada.id();
         } catch (ConflitoDeEstadoException | RecursoNaoEncontradoException ex) {
             erros.reject("reserva", mensagemSegura(ex));
@@ -116,8 +118,8 @@ public class ReservationWebController {
     public String editar(@PathVariable Long id, Model model, Authentication autenticacao,
                          RedirectAttributes redirecionamento) {
         ReservationDto.Saida reserva = gestao.consultarPara(id, autenticacao.getName());
-        if (reserva.status() != StatusReserva.CRIADA) {
-            redirecionamento.addFlashAttribute("erro", "Somente reservas criadas podem ser alteradas.");
+        if (!podeAlterar(reserva.status())) {
+            redirecionamento.addFlashAttribute("erro", "Somente reservas criadas ou aprovadas podem ser alteradas.");
             return "redirect:/reservas/" + id;
         }
         model.addAttribute("form", de(reserva));
@@ -233,7 +235,7 @@ public class ReservationWebController {
 
     private Linha linha(ReservationDto.Saida reserva) {
         return new Linha(reserva.id(), "Sala #" + reserva.salaId(), periodo(reserva), reserva.finalidade(),
-                rotulo(reserva.status()), reserva.status() == StatusReserva.CRIADA, podeCancelar(reserva.status()));
+                rotulo(reserva.status()), podeAlterar(reserva.status()), podeCancelar(reserva.status()));
     }
 
     private Detalhe detalhe(ReservationDto.Saida reserva) {
@@ -241,7 +243,7 @@ public class ReservationWebController {
                 reserva.professorId() == null ? "Não informado" : "Professor #" + reserva.professorId(),
                 periodo(reserva), reserva.finalidade(), rotulo(reserva.status()),
                 reserva.materiais().stream().map(m -> m.nome() + " — " + m.quantidade()).toList(),
-                reserva.status() == StatusReserva.CRIADA, podeCancelar(reserva.status()));
+                podeAlterar(reserva.status()), podeCancelar(reserva.status()));
     }
 
     private Form de(ReservationDto.Saida r) {
@@ -255,6 +257,7 @@ public class ReservationWebController {
     private static Integer quantidade(List<ReservationDto.MaterialReservado> m, int i) { return m.size() > i ? m.get(i).quantidade() : null; }
     private static String periodo(ReservationDto.Saida r) { return r.inicio().atZone(FUSO).format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + " a " + r.termino().atZone(FUSO).format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")); }
     private static String rotulo(StatusReserva s) { return s.name().replace('_', ' '); }
+    private static boolean podeAlterar(StatusReserva s) { return s == StatusReserva.CRIADA || s == StatusReserva.APROVADA; }
     private static boolean podeCancelar(StatusReserva s) { return s == StatusReserva.CRIADA || s == StatusReserva.APROVADA; }
     private static boolean operacional(Authentication a) { return a.getAuthorities().stream().anyMatch(x -> !x.getAuthority().equals("ROLE_SOLICITANTE")); }
     private static String mensagemSegura(Exception ex) { return ex.getMessage() == null ? "Não foi possível concluir a operação." : ex.getMessage(); }

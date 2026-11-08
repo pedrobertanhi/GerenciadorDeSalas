@@ -270,4 +270,41 @@ class ReservationServiceTest {
         ordem.verify(salas).findById(10L);
         ordem.verify(professores).findById(20L);
     }
+
+    // APR-01 (#34): regra de nascimento da reserva.
+
+    @Test
+    void criar_semMaterialRestritoNemProfessor_nasceAprovada() {
+        ReservationDto.Entrada entrada = new ReservationDto.Entrada(10L, null, inicio, termino,
+                "Aula sem pendencias", List.of(new ReservationDto.MaterialPedido(30L, 1)));
+
+        ReservationDto.Saida saida = service.criar(entrada, EMAIL);
+
+        assertThat(saida.status()).isEqualTo(StatusReserva.APROVADA);
+    }
+
+    @Test
+    void criar_comMaterialRestrito_nasceCriadaComAprovacaoPendente() {
+        when(projetor.isRestrito()).thenReturn(true);
+        ReservationDto.Entrada entrada = new ReservationDto.Entrada(10L, null, inicio, termino,
+                "Aula com recurso restrito", List.of(new ReservationDto.MaterialPedido(30L, 1)));
+
+        service.criar(entrada, EMAIL);
+
+        org.mockito.ArgumentCaptor<Reservation> salva = org.mockito.ArgumentCaptor.forClass(Reservation.class);
+        verify(reservas).saveAndFlush(salva.capture());
+        assertThat(salva.getValue().getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(salva.getValue().getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.PENDENTE);
+        assertThat(salva.getValue().getValidacaoDocente()).isEqualTo(SituacaoPendencia.NAO_EXIGIDA);
+    }
+
+    @Test
+    void criar_comProfessor_nasceCriadaComValidacaoDocentePendente() {
+        service.criar(entradaValida(), EMAIL);
+
+        org.mockito.ArgumentCaptor<Reservation> salva = org.mockito.ArgumentCaptor.forClass(Reservation.class);
+        verify(reservas).saveAndFlush(salva.capture());
+        assertThat(salva.getValue().getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(salva.getValue().getValidacaoDocente()).isEqualTo(SituacaoPendencia.PENDENTE);
+    }
 }

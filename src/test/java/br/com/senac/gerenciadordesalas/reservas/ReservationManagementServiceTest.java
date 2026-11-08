@@ -30,9 +30,11 @@ class ReservationManagementServiceTest {
     private final ReservationRepository reservas = Mockito.mock(ReservationRepository.class);
     private final UserRepository usuarios = Mockito.mock(UserRepository.class);
     private final SalaRepository salas = Mockito.mock(SalaRepository.class);
+    private final br.com.senac.gerenciadordesalas.professor.ProfessorRepository professores =
+            Mockito.mock(br.com.senac.gerenciadordesalas.professor.ProfessorRepository.class);
     private final ReservationManagementService service = new ReservationManagementService(
             reservas, usuarios, salas,
-            Mockito.mock(br.com.senac.gerenciadordesalas.professor.ProfessorRepository.class),
+            professores,
             Mockito.mock(br.com.senac.gerenciadordesalas.material.MaterialRepository.class),
             new ReservationTimePolicy(java.time.Clock.fixed(Instant.parse("2026-11-01T00:00:00Z"), ZoneOffset.UTC)),
             Mockito.mock(MaintenanceBlockService.class));
@@ -71,7 +73,8 @@ class ReservationManagementServiceTest {
         ReservationDto.Saida saida = service.alterar(100L, alteracao, "dono@exemplo.test");
 
         assertThat(saida.finalidade()).isEqualTo("Aula alterada");
-        assertThat(saida.status()).isEqualTo(StatusReserva.CRIADA);
+        // Sem material restrito nem professor, a reserva alterada e aprovada automaticamente (APR-01, #34).
+        assertThat(saida.status()).isEqualTo(StatusReserva.APROVADA);
         verify(reservas).save(reserva);
     }
 
@@ -136,5 +139,26 @@ class ReservationManagementServiceTest {
         ordem.verify(reservas).travarSala(10L);
         ordem.verify(reservas).findById(100L);
         ordem.verify(salas).findById(10L);
+    }
+
+    @Test
+    void reservaAprovada_podeSerAlterada_eReavaliaAsPendencias() {
+        reserva.reavaliarPendencias();
+        assertThat(reserva.getStatus()).isEqualTo(StatusReserva.APROVADA);
+        br.com.senac.gerenciadordesalas.professor.Professor professor =
+                Mockito.mock(br.com.senac.gerenciadordesalas.professor.Professor.class);
+        when(professor.getId()).thenReturn(20L);
+        when(professor.isAtivo()).thenReturn(true);
+        when(professores.findById(20L)).thenReturn(Optional.of(professor));
+        ReservationDto.Alteracao alteracao = new ReservationDto.Alteracao(
+                10L, 20L,
+                OffsetDateTime.of(2026, 11, 11, 9, 0, 0, 0, ZoneOffset.UTC),
+                OffsetDateTime.of(2026, 11, 11, 11, 0, 0, 0, ZoneOffset.UTC),
+                "Aula com professor", List.of());
+
+        ReservationDto.Saida saida = service.alterar(100L, alteracao, "dono@exemplo.test");
+
+        assertThat(saida.status()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(reserva.getValidacaoDocente()).isEqualTo(SituacaoPendencia.PENDENTE);
     }
 }

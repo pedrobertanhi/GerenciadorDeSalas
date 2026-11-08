@@ -67,6 +67,8 @@ public class SecurityConfig {
                                 "/api/reservas/*/concluir",
                                 "/api/reservas/*/nao-comparecimento")
                                 .hasRole("RESPONSAVEL")
+                        .requestMatchers(HttpMethod.GET, "/api/aprovacoes", "/api/aprovacoes/**")
+                                .hasRole("RESPONSAVEL")
                         .requestMatchers(HttpMethod.POST, "/api/movimentacoes/**")
                                 .hasRole("RESPONSAVEL")
                         .requestMatchers(HttpMethod.GET, "/api/movimentacoes/minhas/**")

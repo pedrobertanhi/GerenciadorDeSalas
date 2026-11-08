@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.material;
 
+import br.com.senac.gerenciadordesalas.aprovacao.AprovacaoService;
 import br.com.senac.gerenciadordesalas.disponibilidade.ConsultaDisponibilidadeService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationManagementService;
@@ -41,6 +42,10 @@ class MaterialOpenApiTest {
 
     @MockitoBean
     ReservationManagementService gerenciamentoReservas;
+
+    // Fila de aprovacao (APR-01, #34): depende do repositorio de reservas, ausente sem JPA.
+    @MockitoBean
+    AprovacaoService aprovacoes;
 
     @Autowired
     MockMvc mvc;

@@ -86,7 +86,7 @@ class ReservationCriacaoIntegrationTest extends IntegracaoPostgresBase {
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.salaId").value(salaId))
                 .andExpect(jsonPath("$.finalidade").value("Aula de POO"))
-                .andExpect(jsonPath("$.status").value(StatusReserva.CRIADA.name()))
+                .andExpect(jsonPath("$.status").value(StatusReserva.APROVADA.name()))
                 .andExpect(jsonPath("$.materiais[0].quantidade").value(2));
 
         assertThat(contar("tb_reservas")).isEqualTo(1);

@@ -23,8 +23,9 @@ import java.util.Set;
 /**
  * Casos de uso de reserva (RSV-02, #24): criacao com validacao de recursos
  * ativos, dono vindo do usuario autenticado e materiais com quantidade coerente
- * com o saldo total. Reserva recem-criada entra em {@link StatusReserva#CRIADA}
- * para seguir o fluxo de aprovacao (RSV-04 e APR-01).
+ * com o saldo total. Sem material restrito nem professor, a reserva e aprovada
+ * automaticamente; caso contrario fica em {@link StatusReserva#CRIADA} aguardando
+ * a decisao do Responsavel (APR-01, #34).
  */
 @Service
 public class ReservationService {
@@ -95,6 +96,8 @@ public class ReservationService {
                     entrada.inicioInstant(), entrada.terminoInstant(), null);
             reserva.adicionarMaterial(material, pedido.quantidade());
         }
+
+        reserva.reavaliarPendencias();
 
         Reservation salva = reservas.saveAndFlush(reserva);
         return ReservationDto.Saida.de(salva);
