@@ -161,4 +161,20 @@ class ReservationManagementServiceTest {
         assertThat(saida.status()).isEqualTo(StatusReserva.CRIADA);
         assertThat(reserva.getValidacaoDocente()).isEqualTo(SituacaoPendencia.PENDENTE);
     }
+
+    @Test
+    void alteracao_travaAReservaAntesDosRecursos() {
+        ReservationDto.Alteracao alteracao = new ReservationDto.Alteracao(
+                10L, null,
+                OffsetDateTime.of(2026, 11, 11, 9, 0, 0, 0, ZoneOffset.UTC),
+                OffsetDateTime.of(2026, 11, 11, 11, 0, 0, 0, ZoneOffset.UTC),
+                "Aula alterada", List.of());
+
+        service.alterar(100L, alteracao, "dono@exemplo.test");
+
+        InOrder ordem = inOrder(reservas);
+        ordem.verify(reservas).travarReserva(100L);
+        ordem.verify(reservas).travarSala(10L);
+        ordem.verify(reservas).findById(100L);
+    }
 }

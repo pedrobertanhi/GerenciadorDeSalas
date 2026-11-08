@@ -111,6 +111,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("termino") Instant termino);
 
     /**
+     * Trava a linha da propria reserva (APR-02, #34) antes dos recursos. Ordem global
+     * das travas: reserva, sala, professor, materiais por id. Decisoes simultaneas
+     * sobre a mesma reserva passam a acontecer uma de cada vez.
+     */
+    @Query(value = "SELECT id FROM tb_reservas WHERE id = :reservaId FOR UPDATE", nativeQuery = true)
+    Optional<Long> travarReserva(@Param("reservaId") Long reservaId);
+
+    /**
      * Exclusao mutua (RSV-10, #27): trava a linha da sala ate o fim da transacao.
      * Uma segunda reserva concorrente da mesma sala espera aqui e so valida
      * conflitos depois que a primeira terminar, enxergando o que ela gravou.

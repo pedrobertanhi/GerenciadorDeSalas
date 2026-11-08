@@ -78,6 +78,16 @@ public class Reservation {
     @Column(name = "validacao_docente", nullable = false, length = 20)
     private SituacaoPendencia validacaoDocente = SituacaoPendencia.NAO_EXIGIDA;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recurso_decidido_por_id")
+    private User recursoDecididoPor;
+
+    @Column(name = "recurso_decidido_em")
+    private Instant recursoDecididoEm;
+
+    @Column(name = "recurso_motivo_rejeicao", length = 500)
+    private String recursoMotivoRejeicao;
+
     @OneToMany(mappedBy = "reserva",
             cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ReservationMaterial> materiais = new ArrayList<>();
@@ -186,10 +196,61 @@ public class Reservation {
                 .anyMatch(item -> item.getMaterial().isRestrito());
         this.aprovacaoRecurso = temMaterialRestrito
                 ? SituacaoPendencia.PENDENTE : SituacaoPendencia.NAO_EXIGIDA;
+        // Toda alteracao exige nova decisao: a aprovacao anterior nao vale para o novo pedido.
+        this.recursoDecididoPor = null;
+        this.recursoDecididoEm = null;
+        this.recursoMotivoRejeicao = null;
         this.validacaoDocente = this.professor != null
                 ? SituacaoPendencia.PENDENTE : SituacaoPendencia.NAO_EXIGIDA;
         this.status = possuiPendencia() ? StatusReserva.CRIADA : StatusReserva.APROVADA;
         marcarAtualizado();
+    }
+
+    /**
+     * Garante que a aprovacao de recurso restrito ainda aguarda decisao (APR-02, #34).
+     * Impede decidir duas vezes, decidir reserva que nao exige aprovacao ou que ja
+     * saiu de CRIADA.
+     */
+    public void exigirAprovacaoRecursoPendente() {
+        if (this.status != StatusReserva.CRIADA || this.aprovacaoRecurso != SituacaoPendencia.PENDENTE) {
+            throw new ConflitoDeEstadoException("A aprovacao de recurso desta reserva nao esta pendente");
+        }
+    }
+
+    /**
+     * Responsavel aprova o recurso restrito. A reserva so passa para APROVADA quando
+     * nao resta nenhuma outra pendencia (por exemplo, a validacao docente).
+     */
+    public void aprovarRecurso(User responsavel, Instant decididaEm) {
+        exigirAprovacaoRecursoPendente();
+        registrarDecisaoRecurso(SituacaoPendencia.APROVADA, responsavel, decididaEm, null);
+        if (!possuiPendencia()) {
+            transicionarPara(StatusReserva.APROVADA);
+        }
+        marcarAtualizado();
+    }
+
+    /** Responsavel rejeita o recurso restrito com motivo; a reserva passa para REJEITADA. */
+    public void rejeitarRecurso(User responsavel, Instant decididaEm, String motivo) {
+        exigirAprovacaoRecursoPendente();
+        if (motivo == null || motivo.isBlank()) {
+            throw new IllegalArgumentException("O motivo da rejeicao e obrigatorio");
+        }
+        String motivoLimpo = motivo.trim();
+        if (motivoLimpo.length() > 500) {
+            throw new IllegalArgumentException("O motivo da rejeicao deve ter no maximo 500 caracteres");
+        }
+        registrarDecisaoRecurso(SituacaoPendencia.REJEITADA, responsavel, decididaEm, motivoLimpo);
+        transicionarPara(StatusReserva.REJEITADA);
+        marcarAtualizado();
+    }
+
+    private void registrarDecisaoRecurso(SituacaoPendencia decisao, User responsavel,
+                                         Instant decididaEm, String motivo) {
+        this.recursoDecididoPor = Objects.requireNonNull(responsavel, "responsavel e obrigatorio");
+        this.recursoDecididoEm = Objects.requireNonNull(decididaEm, "instante da decisao e obrigatorio");
+        this.aprovacaoRecurso = decisao;
+        this.recursoMotivoRejeicao = motivo;
     }
 
     /** {@code true} se alguma decisao do Responsavel ainda impede a aprovacao. */
@@ -250,6 +311,9 @@ public class Reservation {
     public StatusReserva getStatus() { return status; }
     public SituacaoPendencia getAprovacaoRecurso() { return aprovacaoRecurso; }
     public SituacaoPendencia getValidacaoDocente() { return validacaoDocente; }
+    public User getRecursoDecididoPor() { return recursoDecididoPor; }
+    public Instant getRecursoDecididoEm() { return recursoDecididoEm; }
+    public String getRecursoMotivoRejeicao() { return recursoMotivoRejeicao; }
     public List<ReservationMaterial> getMateriais() { return Collections.unmodifiableList(materiais); }
     public Instant getCriadoEm() { return criadoEm; }
     public Instant getAtualizadoEm() { return atualizadoEm; }

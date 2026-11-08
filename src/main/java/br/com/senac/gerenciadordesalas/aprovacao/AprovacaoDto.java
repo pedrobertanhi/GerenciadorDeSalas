@@ -5,6 +5,9 @@ import br.com.senac.gerenciadordesalas.reservas.Reservation;
 import br.com.senac.gerenciadordesalas.reservas.ReservationMaterial;
 import br.com.senac.gerenciadordesalas.reservas.SituacaoPendencia;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -62,5 +65,11 @@ public final class AprovacaoDto {
                     item.getQuantidade(),
                     item.getMaterial().isRestrito());
         }
+    }
+
+    /** Corpo da rejeicao (APR-02, #34): o motivo e obrigatorio e fica preservado na reserva. */
+    public record Rejeicao(
+            @NotBlank(message = "motivo e obrigatorio")
+            @Size(max = 500, message = "motivo deve ter no maximo 500 caracteres") String motivo) {
     }
 }

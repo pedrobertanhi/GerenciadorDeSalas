@@ -54,6 +54,9 @@ public class ReservationManagementService {
 
     @Transactional
     public ReservationDto.Saida alterar(Long reservaId, ReservationDto.Alteracao entrada, String emailAtor) {
+        // Ordem global das travas (APR-02, #34): reserva, sala, professor, materiais.
+        // Mesma ordem da decisao do Responsavel, o que evita deadlock entre as duas.
+        reservas.travarReserva(reservaId);
         travarRecursos(entrada.salaId(), entrada.professorId(), entrada.materiaisOuVazio());
         Reservation reserva = buscarAutorizada(reservaId, emailAtor);
         politicaTemporal.validarParaReserva(entrada.inicioInstant(), entrada.terminoInstant());
