@@ -208,4 +208,117 @@ class AprovacaoServiceTest {
         assertThatThrownBy(() -> service.aprovar(999L, EMAIL_RESPONSAVEL))
                 .isInstanceOf(RecursoNaoEncontradoException.class);
     }
+
+    // APR-03 (#34): validacao docente.
+
+    private Professor professorAtivo() {
+        Professor professor = Mockito.mock(Professor.class);
+        when(professor.getId()).thenReturn(20L);
+        when(professor.isAtivo()).thenReturn(true);
+        return professor;
+    }
+
+    private Reservation reservaSoComProfessor(Professor professor) {
+        User dono = Mockito.mock(User.class);
+        when(dono.getId()).thenReturn(1L);
+        Reservation comProfessor = new Reservation(dono, sala, professor, INICIO, TERMINO, "Aula com professor");
+        comProfessor.reavaliarPendencias();
+        when(reservas.findById(200L)).thenReturn(Optional.of(comProfessor));
+        return comProfessor;
+    }
+
+    @Test
+    void validarDocente_aprovaRegistraDecisaoEPublicaEvento() {
+        Reservation comProfessor = reservaSoComProfessor(professorAtivo());
+
+        ReservationDto.Saida saida = service.validarDocente(200L, EMAIL_RESPONSAVEL);
+
+        assertThat(saida.status()).isEqualTo(StatusReserva.APROVADA);
+        assertThat(saida.validacaoDocente()).isEqualTo(SituacaoPendencia.APROVADA);
+        assertThat(comProfessor.getDocenteDecididoPor()).isSameAs(responsavel);
+        assertThat(comProfessor.getDocenteDecididoEm()).isEqualTo(AGORA);
+        verify(reservas).travarProfessor(20L);
+
+        ArgumentCaptor<ReservaDecididaEvent> evento = ArgumentCaptor.forClass(ReservaDecididaEvent.class);
+        verify(eventos).publishEvent(evento.capture());
+        assertThat(evento.getValue().tipo()).isEqualTo(ReservaDecididaEvent.TipoDecisao.VALIDACAO_DOCENTE);
+        assertThat(evento.getValue().resultado()).isEqualTo(ReservaDecididaEvent.Resultado.APROVADA);
+    }
+
+    @Test
+    void validarDocente_conflitoNaAgendaDoProfessor_eRecusado() {
+        reservaSoComProfessor(professorAtivo());
+        Reservation outra = Mockito.mock(Reservation.class);
+        when(outra.getId()).thenReturn(99L);
+        when(reservas.buscarAtivasDoProfessorSobrepondo(eq(20L), any(), any())).thenReturn(List.of(outra));
+
+        assertThatThrownBy(() -> service.validarDocente(200L, EMAIL_RESPONSAVEL))
+                .isInstanceOf(ConflitoDeEstadoException.class)
+                .hasMessageContaining("Professor ja possui outra reserva");
+        verify(reservas, never()).saveAndFlush(any());
+    }
+
+    @Test
+    void validarDocente_professorEmManutencao_eRecusado() {
+        reservaSoComProfessor(professorAtivo());
+        when(manutencoes.recursoEmManutencao(TipoRecurso.PROFESSOR, 20L, INICIO, TERMINO)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.validarDocente(200L, EMAIL_RESPONSAVEL))
+                .isInstanceOf(ConflitoDeEstadoException.class)
+                .hasMessageContaining("manutencao");
+    }
+
+    @Test
+    void validarDocente_professorInativado_eRecusado() {
+        Professor professor = professorAtivo();
+        reservaSoComProfessor(professor);
+        when(professor.isAtivo()).thenReturn(false);
+
+        assertThatThrownBy(() -> service.validarDocente(200L, EMAIL_RESPONSAVEL))
+                .isInstanceOf(ConflitoDeEstadoException.class)
+                .hasMessageContaining("professor foi inativado");
+    }
+
+    @Test
+    void rejeitarDocente_preservaMotivoEPublicaEvento() {
+        reservaSoComProfessor(professorAtivo());
+
+        ReservationDto.Saida saida = service.rejeitarDocente(200L, "Sem a competencia exigida", EMAIL_RESPONSAVEL);
+
+        assertThat(saida.status()).isEqualTo(StatusReserva.REJEITADA);
+        assertThat(saida.motivoRejeicao()).isEqualTo("Sem a competencia exigida");
+        ArgumentCaptor<ReservaDecididaEvent> evento = ArgumentCaptor.forClass(ReservaDecididaEvent.class);
+        verify(eventos).publishEvent(evento.capture());
+        assertThat(evento.getValue().tipo()).isEqualTo(ReservaDecididaEvent.TipoDecisao.VALIDACAO_DOCENTE);
+        assertThat(evento.getValue().resultado()).isEqualTo(ReservaDecididaEvent.Resultado.REJEITADA);
+    }
+
+    @Test
+    void validacaoDocenteRepetida_eRecusada() {
+        reservaSoComProfessor(professorAtivo());
+        service.validarDocente(200L, EMAIL_RESPONSAVEL);
+
+        assertThatThrownBy(() -> service.validarDocente(200L, EMAIL_RESPONSAVEL))
+                .isInstanceOf(ConflitoDeEstadoException.class)
+                .hasMessageContaining("nao esta pendente");
+    }
+
+    @Test
+    void quemNaoEhResponsavel_naoValidaDocente() {
+        reservaSoComProfessor(professorAtivo());
+        when(responsavel.getProfile()).thenReturn(Role.ADMINISTRADOR);
+
+        assertThatThrownBy(() -> service.validarDocente(200L, EMAIL_RESPONSAVEL))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void recursoAprovadoEDocenteValidado_reservaFicaAprovada() {
+        Professor professor = professorAtivo();
+        reserva.alterar(sala, professor, INICIO, TERMINO, "Aula com professor e microscopio");
+        reserva.reavaliarPendencias();
+
+        assertThat(service.aprovar(100L, EMAIL_RESPONSAVEL).status()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(service.validarDocente(100L, EMAIL_RESPONSAVEL).status()).isEqualTo(StatusReserva.APROVADA);
+    }
 }
