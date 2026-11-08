@@ -5,7 +5,9 @@ import br.com.senac.gerenciadordesalas.disponibilidade.ConsultaDisponibilidadeSe
 import br.com.senac.gerenciadordesalas.reservas.ReservationService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationManagementService;
 import br.com.senac.gerenciadordesalas.material.MaterialService;
+import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.salas.SalaService;
+import br.com.senac.gerenciadordesalas.salas.SalaRepository;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +43,10 @@ class ProfessorOpenApiTest {
     @MockitoBean MaintenanceBlockService bloqueios;
     @MockitoBean ReservationService reservas;
     @MockitoBean ReservationManagementService gerenciamentoReservas;
+    // Dependências diretas da tela de reservas; esta suíte publica o OpenAPI sem JPA.
+    @MockitoBean MaterialRepository repositorioMateriais;
+    @MockitoBean ProfessorRepository repositorioProfessores;
+    @MockitoBean SalaRepository repositorioSalas;
 
     @Test void documentacaoExigeSessao() throws Exception {
         mvc.perform(get("/v3/api-docs").accept("application/json"))
