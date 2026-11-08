@@ -33,9 +33,10 @@ class ReservasNavegadorTest extends NavegadorBase {
         navegador.preencher("finalidade", "Aula prática de qualidade");
         navegador.clicarBotao("Criar reserva");
 
-        navegador.esperarTexto("Reserva criada e aguardando o fluxo de aprovação.");
+        // Sem material restrito nem professor, a reserva e aprovada automaticamente (APR-01, #34).
+        navegador.esperarTexto("Reserva criada e aprovada automaticamente.");
         assertThat(reservas.findAll()).hasSize(1);
-        assertThat(reservas.findAll().get(0).getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(reservas.findAll().get(0).getStatus()).isEqualTo(StatusReserva.APROVADA);
 
         navegador.clicarLink("Alterar reserva");
         navegador.esperarTexto("Alterar reserva");
