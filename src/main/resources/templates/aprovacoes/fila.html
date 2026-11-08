@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aprovações pendentes | Gerenciador de Salas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<main class="container py-5">
+  <h1 class="mb-4">Aprovações pendentes</h1>
+  <div th:if="${sucesso}" class="alert alert-success" role="status" th:text="${sucesso}"></div>
+  <div th:if="${erro}" class="alert alert-danger" role="alert" th:text="${erro}"></div>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <caption>Reservas aguardando decisão do Responsável, da solicitação mais antiga para a mais recente</caption>
+      <thead>
+      <tr><th>Sala</th><th>Solicitada em</th><th>Solicitante</th><th>Período</th><th>Pendências</th><th>Ações</th></tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${itens}">
+        <td th:text="${item.sala}"></td>
+        <td th:text="${item.solicitadaEm}"></td>
+        <td th:text="${item.solicitante}"></td>
+        <td th:text="${item.periodo}"></td>
+        <td><span th:each="pendencia : ${item.pendencias}" class="badge text-bg-warning me-1"
+                  th:text="${pendencia}"></span></td>
+        <td><a class="btn btn-sm btn-primary" th:href="@{/aprovacoes/{id}(id=${item.id})}">Decidir</a></td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(itens)}">
+        <td colspan="6" class="text-center">Nenhuma reserva aguardando decisão.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>
