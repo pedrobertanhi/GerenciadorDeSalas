@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 
 import java.time.OffsetDateTime;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * entradas invalidas e autorizacao por perfil, com PostgreSQL real via
  * Testcontainers.
  */
+@Import(RelogioFixoTestConfig.class)
 class ReservationCriacaoIntegrationTest extends IntegracaoPostgresBase {
 
     @Autowired UserRepository usuarios;
