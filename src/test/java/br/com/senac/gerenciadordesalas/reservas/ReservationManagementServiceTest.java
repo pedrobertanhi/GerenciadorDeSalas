@@ -121,4 +121,20 @@ class ReservationManagementServiceTest {
                 Mockito.eq(10L), Mockito.any(), Mockito.any());
         ordem.verify(reservas).save(reserva);
     }
+
+    @Test
+    void alteracao_travaASalaAntesDeCarregarAReservaEASala() {
+        ReservationDto.Alteracao alteracao = new ReservationDto.Alteracao(
+                10L, null,
+                OffsetDateTime.of(2026, 11, 11, 9, 0, 0, 0, ZoneOffset.UTC),
+                OffsetDateTime.of(2026, 11, 11, 11, 0, 0, 0, ZoneOffset.UTC),
+                "Aula alterada", List.of());
+
+        service.alterar(100L, alteracao, "dono@exemplo.test");
+
+        InOrder ordem = inOrder(reservas, salas);
+        ordem.verify(reservas).travarSala(10L);
+        ordem.verify(reservas).findById(100L);
+        ordem.verify(salas).findById(10L);
+    }
 }
