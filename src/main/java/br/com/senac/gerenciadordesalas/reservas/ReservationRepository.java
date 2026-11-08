@@ -19,6 +19,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findAllByOrderByInicioDesc();
 
+    /**
+     * Fila de aprovacao (APR-01, #34): reservas CRIADA com alguma decisao pendente,
+     * da solicitacao mais antiga para a mais recente.
+     */
+    @Query("""
+            SELECT r FROM Reservation r
+            WHERE r.status = br.com.senac.gerenciadordesalas.reservas.StatusReserva.CRIADA
+              AND (r.aprovacaoRecurso = br.com.senac.gerenciadordesalas.reservas.SituacaoPendencia.PENDENTE
+                   OR r.validacaoDocente = br.com.senac.gerenciadordesalas.reservas.SituacaoPendencia.PENDENTE)
+            ORDER BY r.criadoEm ASC, r.id ASC
+            """)
+    List<Reservation> buscarPendentesDeDecisao();
+
     List<Reservation> findBySalaIdOrderByInicioAsc(Long salaId);
 
     /**
