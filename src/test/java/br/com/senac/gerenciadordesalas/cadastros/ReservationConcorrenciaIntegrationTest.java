@@ -1,6 +1,7 @@
 package br.com.senac.gerenciadordesalas.cadastros;
 
 import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
+import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
 import br.com.senac.gerenciadordesalas.material.Material;
 import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.material.MaterialTipo;
@@ -127,6 +128,67 @@ class ReservationConcorrenciaIntegrationTest extends IntegracaoPostgresBase {
                 entrada(salaA, null, notebook),
                 entrada(salaB, null, notebook),
                 "nao possui quantidade disponivel");
+    }
+
+    @Test
+    void salaInativadaEnquantoAReservaEspera_reservaEhRecusada() throws Exception {
+        reservaEsperaAInativacaoEDepoisEhRecusada(
+                "UPDATE salas SET ativa = false WHERE id = ?", salaA,
+                entrada(salaA, null, List.of()));
+    }
+
+    @Test
+    void professorInativadoEnquantoAReservaEspera_reservaEhRecusada() throws Exception {
+        reservaEsperaAInativacaoEDepoisEhRecusada(
+                "UPDATE tb_professores SET ativo = false WHERE id = ?", professorId,
+                entrada(salaA, professorId, List.of()));
+    }
+
+    /**
+     * Outra transacao inativa o recurso e segura o commit. A reserva precisa esperar
+     * a trava e, depois do commit, ler o recurso ja inativo e ser recusada. Se a
+     * reserva carregasse o recurso antes de travar, usaria o estado antigo (ativo)
+     * e gravaria a reserva: o teste falha nesse caso.
+     */
+    private void reservaEsperaAInativacaoEDepoisEhRecusada(String sqlInativacao, Long recursoId,
+                                                          ReservationDto.Entrada entrada) throws Exception {
+        TransactionTemplate transacao = new TransactionTemplate(transactionManager);
+        CountDownLatch inativou = new CountDownLatch(1);
+        CountDownLatch liberarCommitDaInativacao = new CountDownLatch(1);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<?> inativacao = executor.submit(() -> transacao.executeWithoutResult(status -> {
+                jdbcTemplate.update(sqlInativacao, recursoId);
+                inativou.countDown();
+                aguardar(liberarCommitDaInativacao);
+            }));
+            assertThat(inativou.await(15, SECONDS))
+                    .as("a inativacao devia ser feita (ainda sem commit)")
+                    .isTrue();
+
+            Future<ReservationDto.Saida> reserva = executor.submit(() -> reservationService.criar(entrada, EMAIL));
+
+            assertThat(catchThrowable(() -> reserva.get(3, SECONDS)))
+                    .as("a reserva devia esperar a trava enquanto a inativacao nao faz commit")
+                    .isInstanceOf(TimeoutException.class);
+
+            liberarCommitDaInativacao.countDown();
+            inativacao.get(15, SECONDS);
+
+            Throwable erro = catchThrowable(() -> reserva.get(15, SECONDS));
+            assertThat(erro)
+                    .as("a reserva devia ser recusada porque o recurso ficou inativo")
+                    .isInstanceOf(ExecutionException.class);
+            assertThat(erro.getCause()).isInstanceOf(RecursoNaoEncontradoException.class);
+
+            assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM tb_reservas", Integer.class))
+                    .as("nenhuma reserva deve ser gravada com recurso inativo")
+                    .isZero();
+        } finally {
+            liberarCommitDaInativacao.countDown();
+            executor.shutdownNow();
+            executor.awaitTermination(15, SECONDS);
+        }
     }
 
     private void segundaEsperaAPrimeiraEDepoisRecebeConflito(ReservationDto.Entrada primeira,
