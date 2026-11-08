@@ -123,7 +123,9 @@ public final class ReservationDto {
                     reserva.getAtualizadoEm(),
                     reserva.getAprovacaoRecurso(),
                     reserva.getValidacaoDocente(),
-                    reserva.getRecursoMotivoRejeicao());
+                    reserva.getRecursoMotivoRejeicao() != null
+                            ? reserva.getRecursoMotivoRejeicao()
+                            : reserva.getDocenteMotivoRejeicao());
         }
     }
 
