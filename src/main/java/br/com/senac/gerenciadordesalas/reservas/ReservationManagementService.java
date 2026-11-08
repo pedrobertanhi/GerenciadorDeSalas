@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Comparator;
 
@@ -57,6 +58,7 @@ public class ReservationManagementService {
         politicaTemporal.validarParaReserva(entrada.inicioInstant(), entrada.terminoInstant());
         Sala sala = buscarSalaAtiva(entrada.salaId());
         Professor professor = buscarProfessorAtivo(entrada.professorId());
+        travarRecursos(sala.getId(), professor, entrada.materiaisOuVazio());
         validarManutencao(TipoRecurso.SALA, sala.getId(), entrada.inicioInstant(), entrada.terminoInstant());
         if (professor != null) {
             validarManutencao(TipoRecurso.PROFESSOR, professor.getId(), entrada.inicioInstant(), entrada.terminoInstant());
@@ -151,6 +153,29 @@ public class ReservationManagementService {
             }
             validarDisponibilidadeMaterial(material, pedido.quantidade(), inicio, termino, reserva.getId());
             reserva.adicionarMaterial(material, pedido.quantidade());
+        }
+    }
+
+    /**
+     * Exclusao mutua (RSV-10, #27): trava sala, professor e materiais no banco antes
+     * de validar conflitos. Uma reserva concorrente do mesmo recurso espera a atual
+     * terminar e so entao valida, entao nao existe janela entre validacao e gravacao.
+     * A ordem fixa (sala, professor, materiais por id) evita deadlock.
+     */
+    private void travarRecursos(Long salaId, Professor professor,
+                                List<ReservationDto.MaterialPedido> pedidos) {
+        reservas.travarSala(salaId);
+        if (professor != null) {
+            reservas.travarProfessor(professor.getId());
+        }
+        List<Long> materialIds = pedidos.stream()
+                .map(ReservationDto.MaterialPedido::materialId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+        if (!materialIds.isEmpty()) {
+            reservas.travarMateriais(materialIds);
         }
     }
 
