@@ -170,6 +170,34 @@ class AprovacaoDocenteIntegrationTest extends IntegracaoPostgresBase {
                 .isEqualTo("PENDENTE");
     }
 
+    /**
+     * Apontamento do Sourcery no PR #178: o conflito na agenda precisa ser testado sem
+     * manutencao, para o teste falhar se a consulta de sobreposicao do professor quebrar.
+     * A reserva concorrente e gravada direto no banco (como um dado legado ou importado),
+     * em outra sala e sem manutencao: o unico motivo de recusa e a agenda do professor.
+     */
+    @Test
+    void reservaDoProfessorSobrepostaEmOutraSala_impedeValidacao() throws Exception {
+        Long id = criarComProfessor(List.of()).id();
+        Long outraSala = salas.save(new Sala("Sala Docente 2", 20, "Bloco P")).getId();
+        sincronizar();
+        Long solicitanteId = consultar("SELECT id FROM tb_usuarios WHERE email = ?", Long.class, SOLICITANTE);
+        jdbcTemplate.update("INSERT INTO tb_reservas (solicitante_id, sala_id, professor_id, inicio, termino, "
+                        + "finalidade, status) VALUES (?, ?, ?, ?, ?, 'Outra aula da professora', 'APROVADA')",
+                solicitanteId, outraSala, professorId,
+                Timestamp.from(INICIO.plusMinutes(30).toInstant()),
+                Timestamp.from(TERMINO.plusMinutes(30).toInstant()));
+
+        mockMvc.perform(post("/api/reservas/{id}/validar-docente", id)
+                        .with(user(RESPONSAVEL).roles("RESPONSAVEL"))
+                        .with(csrf()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.codigo").value("CONFLITO_DE_ESTADO"));
+
+        assertThat(consultar("SELECT validacao_docente FROM tb_reservas WHERE id = ?", String.class, id))
+                .isEqualTo("PENDENTE");
+    }
+
     @Test
     void recursoRestritoEDocente_soFicaAprovadaDepoisDasDuasDecisoes() throws Exception {
         Long id = criarComProfessor(List.of(new ReservationDto.MaterialPedido(microscopio, 1))).id();
