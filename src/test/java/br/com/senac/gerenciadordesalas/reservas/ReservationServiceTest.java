@@ -259,4 +259,15 @@ class ReservationServiceTest {
         verify(reservas, never()).travarProfessor(any());
         verify(reservas, never()).travarMateriais(any());
     }
+
+    @Test
+    void criar_travaRecursosAntesDeCarregarSalaEProfessor() {
+        service.criar(entradaValida(), EMAIL);
+
+        InOrder ordem = inOrder(reservas, salas, professores);
+        ordem.verify(reservas).travarSala(10L);
+        ordem.verify(reservas).travarProfessor(20L);
+        ordem.verify(salas).findById(10L);
+        ordem.verify(professores).findById(20L);
+    }
 }
