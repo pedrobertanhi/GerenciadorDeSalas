@@ -51,4 +51,20 @@ public interface MaintenanceBlockRepository extends Repository<MaintenanceBlock,
             @Param("recursoId") Long recursoId,
             @Param("inicio") java.time.Instant inicio,
             @Param("fim") java.time.Instant fim);
+
+    /*
+     * Travas do recurso bloqueado (RSV-10 e APR-03, #27 e #34). Reservas e decisoes do
+     * Responsavel travam a mesma linha antes de verificar manutencao. Assim, um bloqueio
+     * criado ao mesmo tempo que uma reserva ou decisao espera a outra transacao terminar,
+     * ou a outra transacao espera o bloqueio e passa a enxerga-lo.
+     */
+
+    @Query(value = "SELECT id FROM salas WHERE id = :id FOR UPDATE", nativeQuery = true)
+    Optional<Long> travarSala(@Param("id") Long id);
+
+    @Query(value = "SELECT id FROM tb_professores WHERE id = :id FOR UPDATE", nativeQuery = true)
+    Optional<Long> travarProfessor(@Param("id") Long id);
+
+    @Query(value = "SELECT id FROM tb_materiais WHERE id = :id FOR UPDATE", nativeQuery = true)
+    Optional<Long> travarMaterial(@Param("id") Long id);
 }
