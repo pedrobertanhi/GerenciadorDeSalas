@@ -240,4 +240,98 @@ class ReservationTest {
         assertThatExceptionOfType(ConflitoDeEstadoException.class)
                 .isThrownBy(r::reavaliarPendencias);
     }
+
+    // APR-02 (#34): decisao do Responsavel sobre recurso restrito.
+
+    private final User responsavel = Mockito.mock(User.class);
+    private final Instant decididaEm = Instant.parse("2026-11-05T12:00:00Z");
+
+    private Reservation reservaRestrita(Professor professorDaReserva) {
+        Mockito.when(material.isRestrito()).thenReturn(true);
+        Reservation r = new Reservation(solicitante, sala, professorDaReserva, inicio, termino, "Reserva de teste");
+        r.adicionarMaterial(material, 1);
+        r.reavaliarPendencias();
+        return r;
+    }
+
+    @Test
+    void aprovarRecurso_semOutraPendencia_aprovaARegistraAutorEInstante() {
+        Reservation r = reservaRestrita(null);
+
+        r.aprovarRecurso(responsavel, decididaEm);
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.APROVADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.APROVADA);
+        assertThat(r.getRecursoDecididoPor()).isSameAs(responsavel);
+        assertThat(r.getRecursoDecididoEm()).isEqualTo(decididaEm);
+        assertThat(r.getRecursoMotivoRejeicao()).isNull();
+    }
+
+    @Test
+    void aprovarRecurso_comValidacaoDocentePendente_permaneceCriada() {
+        Reservation r = reservaRestrita(professor);
+
+        r.aprovarRecurso(responsavel, decididaEm);
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.APROVADA);
+        assertThat(r.getValidacaoDocente()).isEqualTo(SituacaoPendencia.PENDENTE);
+    }
+
+    @Test
+    void rejeitarRecurso_preservaMotivoSemEspacosEMudaParaRejeitada() {
+        Reservation r = reservaRestrita(null);
+
+        r.rejeitarRecurso(responsavel, decididaEm, "  Equipamento em uso pela pesquisa  ");
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.REJEITADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.REJEITADA);
+        assertThat(r.getRecursoMotivoRejeicao()).isEqualTo("Equipamento em uso pela pesquisa");
+        assertThat(r.getRecursoDecididoPor()).isSameAs(responsavel);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    void rejeitarRecurso_semMotivo_eRecusada(String motivo) {
+        Reservation r = reservaRestrita(null);
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> r.rejeitarRecurso(responsavel, decididaEm, motivo));
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.PENDENTE);
+    }
+
+    @Test
+    void decisaoRepetida_eRecusada() {
+        Reservation r = reservaRestrita(null);
+        r.aprovarRecurso(responsavel, decididaEm);
+
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(() -> r.aprovarRecurso(responsavel, decididaEm));
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(() -> r.rejeitarRecurso(responsavel, decididaEm, "Mudou de ideia"));
+    }
+
+    @Test
+    void decidirReservaSemRecursoRestrito_eRecusado() {
+        Reservation r = novaReserva();
+        r.reavaliarPendencias();
+
+        assertThatExceptionOfType(ConflitoDeEstadoException.class)
+                .isThrownBy(() -> r.aprovarRecurso(responsavel, decididaEm));
+    }
+
+    @Test
+    void alteracaoDepoisDaAprovacao_exigeNovaDecisaoELimpaARegistroAnterior() {
+        Reservation r = reservaRestrita(null);
+        r.aprovarRecurso(responsavel, decididaEm);
+
+        r.alterar(sala, null, inicio, termino, "Finalidade revisada");
+        r.reavaliarPendencias();
+
+        assertThat(r.getStatus()).isEqualTo(StatusReserva.CRIADA);
+        assertThat(r.getAprovacaoRecurso()).isEqualTo(SituacaoPendencia.PENDENTE);
+        assertThat(r.getRecursoDecididoPor()).isNull();
+        assertThat(r.getRecursoDecididoEm()).isNull();
+    }
 }
