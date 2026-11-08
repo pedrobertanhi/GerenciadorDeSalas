@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -161,5 +163,36 @@ class MaintenanceBlockServiceTest {
 
         assertThat(lista).hasSize(1);
         assertThat(lista.get(0).motivo()).isEqualTo("Troca do projetor");
+    }
+
+    // #34: o bloqueio trava o recurso, como reservas e decisoes do Responsavel.
+
+    @ParameterizedTest
+    @EnumSource(TipoRecurso.class)
+    void criarTravaORecursoAntesDeGravar(TipoRecurso tipo) {
+        when(salas.existsById(12L)).thenReturn(true);
+        when(professores.existsById(12L)).thenReturn(true);
+        when(materiais.existsById(12L)).thenReturn(true);
+
+        servico.criar(entrada(tipo, 12L, "Revisao"));
+
+        InOrder ordem = inOrder(bloqueios);
+        switch (tipo) {
+            case SALA -> ordem.verify(bloqueios).travarSala(12L);
+            case PROFESSOR -> ordem.verify(bloqueios).travarProfessor(12L);
+            case MATERIAL -> ordem.verify(bloqueios).travarMaterial(12L);
+        }
+        ordem.verify(bloqueios).saveAndFlush(any(MaintenanceBlock.class));
+    }
+
+    @Test
+    void atualizarTravaORecursoAntesDeGravar() {
+        existente(AGORA.plusSeconds(3600));
+
+        servico.atualizar(1L, entrada(TipoRecurso.SALA, 12L, "Novo motivo"));
+
+        InOrder ordem = inOrder(bloqueios);
+        ordem.verify(bloqueios).travarSala(12L);
+        ordem.verify(bloqueios).saveAndFlush(any(MaintenanceBlock.class));
     }
 }
