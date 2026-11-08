@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Acesso a persistencia do agregado {@link Reservation} (RSV-01, #23).
@@ -94,4 +96,25 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("materialId") Long materialId,
             @Param("inicio") Instant inicio,
             @Param("termino") Instant termino);
+
+    /**
+     * Exclusao mutua (RSV-10, #27): trava a linha da sala ate o fim da transacao.
+     * Uma segunda reserva concorrente da mesma sala espera aqui e so valida
+     * conflitos depois que a primeira terminar, enxergando o que ela gravou.
+     */
+    @Query(value = "SELECT id FROM salas WHERE id = :salaId FOR UPDATE", nativeQuery = true)
+    Optional<Long> travarSala(@Param("salaId") Long salaId);
+
+    /** Mesma trava para o professor (RSV-10): impede duas reservas simultaneas do mesmo docente. */
+    @Query(value = "SELECT id FROM tb_professores WHERE id = :professorId FOR UPDATE", nativeQuery = true)
+    Optional<Long> travarProfessor(@Param("professorId") Long professorId);
+
+    /**
+     * Trava os materiais pedidos (RSV-10). A ordem por id e sempre a mesma em
+     * todas as transacoes, o que evita deadlock quando duas reservas pedem os
+     * mesmos materiais em ordens diferentes. A lista nao pode ser vazia.
+     */
+    @Query(value = "SELECT id FROM tb_materiais WHERE id IN (:materialIds) ORDER BY id FOR UPDATE",
+            nativeQuery = true)
+    List<Long> travarMateriais(@Param("materialIds") Collection<Long> materialIds);
 }
