@@ -7,6 +7,7 @@ import br.com.senac.gerenciadordesalas.reservas.Reservation;
 import br.com.senac.gerenciadordesalas.reservas.ReservationRepository;
 import br.com.senac.gerenciadordesalas.usuario.User;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import java.util.Map;
  * portanto participa da transação que publicou a decisão.
  */
 @Component
+@ConditionalOnBean({AuditService.class, NotificationService.class})
 class AprovacaoAuditNotificationListener {
 
     private final ReservationRepository reservas;
