@@ -22,6 +22,7 @@
 | R17 | Release aprovada sem todas as verificações | Média | Crítico | Crítica | Gate e parecer final de segurança | #98 | Não atribuído | Aberto |
 | R18 | Capacidade planejada acima da velocidade real | Alta | Alto | Alta | Medir velocidade, limitar WIP e usar buffer da semana 46 | #58 | Não atribuído | Aberto |
 | R19 | Regressão visual ou de interação não detectada nas telas | Baixa | Médio | Baixa | Testes E2E em navegador (Selenium e Chrome) no pipeline, mais o roteiro manual versionado nas evidências | #15 | Não atribuído | Mitigado |
+| R20 | Decisão de aprovação com dado desatualizado (conflito, manutenção ou recurso inativado depois da solicitação) | Média | Alto | Alta | Antes de cada decisão, trava reserva, sala, professor e materiais e revalida tudo; criar ou alterar bloqueio de manutenção trava o mesmo recurso; testes de concorrência determinísticos em PostgreSQL real (`ReservationConcorrenciaIntegrationTest`) | #34 | Matheus | Mitigado |
 | R20 | Telas sem layout compartilhado e sem navegação por perfil (UI-01) gerarem fluxo inconsistente ou inacessível | Média | Médio | Média | Entregar o layout compartilhado e revisar os links entre as telas | #15 | Não atribuído | Aberto |
 
 ## Escalas

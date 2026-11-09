@@ -20,7 +20,7 @@
 | RF-04 | reserva em estado inválido | CT-TEMPO-01, estados, propriedade, alteração, cancelamento e manutenção (`StatusReservaTest`, `ReservationTest`, `ReservationManagementServiceTest`, `ReservationServiceTest`, `ReservationCriacaoIntegrationTest`) | #23–#27, #87 | Automatizado | PR #25 |
 | RF-05 | sobreposição não detectada | CT-TEMPO-02, CT-PROF-01, CT-MAT-01 (`ReservationConflitosIntegrationTest`: 11 intervalos × sala, professor e material, estados, alteração, 409 e quantidades; `ReservationTimePolicyTest`) | #27 (consolida #28–#31) | CI run 42523486135 · commit 8e13af9 · `./mvnw -B verify` · Java 21/PostgreSQL container · 655 testes, 0 falhas | PR #173 |
 | RF-06 | duas reservas aceitas | CT-CONC-01 (`ReservationConcorrenciaIntegrationTest`: mesma sala, mesmo professor, mesmo patrimônio e recurso inativado durante a espera; `ReservationServiceTest` e `ReservationManagementServiceTest` verificam a ordem das travas) | #27 (consolida #32, #33); carga em #54, #106 | CI run 42525991845 · commit 81f325e · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas | PR #174 |
-| RF-07 | restrito aprovado por perfil errado | CT-APR-01 | #34, #35, #105 | PENDENTE | planejado |
+| RF-07 | restrito aprovado por perfil errado | CT-APR-01 (`AprovacaoServiceTest`, `AprovacaoFilaIntegrationTest`, `AprovacaoDecisaoIntegrationTest`, `AprovacaoDocenteIntegrationTest`, `AprovacaoWebIntegrationTest`, `AprovacoesNavegadorTest`) | #34 (consolida #35, #61, #69), #105 | CI run 42711607822 · commit 98c86e5 · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas | PR #176, #177, #178, #180 |
 | RF-08 | reserva durante manutenção | CT-MNT-01 | #21, #22, #105 | PENDENTE | planejado |
 | RF-09 | saldo/movimentação incorretos | retirada, parcial, total e atraso | #36–#38 | PENDENTE | planejado |
 | RF-10 | histórico incompleto/adulterável | CT-AUD-01 | #39, #40, #88 | PENDENTE | planejado |
@@ -42,7 +42,7 @@
 | RC-07 manutenção bloqueia | recurso indisponível | CT-MNT-01 | PENDENTE | PENDENTE | planejado |
 | RC-08 fluxo principal | estado inválido | CT-STATE-01 | PENDENTE | PENDENTE | planejado |
 | RC-09 estados alternativos | transição perdida | CT-STATE-01 | PENDENTE | PENDENTE | planejado |
-| RC-10 somente Responsável aprova | QA-SEC-01 | CT-APR-01 | PENDENTE | PENDENTE | planejado |
+| RC-10 somente Responsável aprova | QA-SEC-01 | CT-APR-01 | `AprovacaoServiceTest`, `AprovacaoFilaIntegrationTest`, `AprovacaoDecisaoIntegrationTest`, `AprovacaoDocenteIntegrationTest`, `AprovacaoWebIntegrationTest`, `AprovacoesNavegadorTest` (403 para SOLICITANTE e ADMINISTRADOR na API e na tela, AccessDenied no serviço) | CI run 42711607822 · commit 98c86e5 · `./mvnw -B verify` · Java 21/PostgreSQL container · 0 falhas | automatizado |
 | RC-11 iniciada não é apagada | perda de histórico | CT-DEL-01 | PENDENTE | PENDENTE | planejado |
 | RC-12 transição gera auditoria | QA-AUD-01 | CT-AUD-01 | PENDENTE | PENDENTE | planejado |
 
