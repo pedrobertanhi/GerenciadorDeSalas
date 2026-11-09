@@ -108,6 +108,23 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Spring Boot 4 separa as ferramentas de teste por modulo. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Testes E2E em navegador (Issue #15) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
