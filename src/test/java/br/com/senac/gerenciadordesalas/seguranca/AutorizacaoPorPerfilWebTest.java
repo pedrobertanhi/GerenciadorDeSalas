@@ -166,4 +166,22 @@ class AutorizacaoPorPerfilWebTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
     }
+    @Test
+    @WithMockUser(username = EMAIL_SOLICITANTE, roles = "SOLICITANTE")
+    void solicitante_naoPodeConsultarAuditoria() throws Exception {
+        mockMvc.perform(get("/api/auditoria"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"))
+                .andExpect(jsonPath("$.correlationId").exists());
+    }
+
+    @Test
+    @WithMockUser(username = "responsavel@exemplo.test", roles = "RESPONSAVEL")
+    void responsavel_naoPodeConsultarAuditoria() throws Exception {
+        mockMvc.perform(get("/api/auditoria"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"))
+                .andExpect(jsonPath("$.correlationId").exists());
+    }
+
 }
