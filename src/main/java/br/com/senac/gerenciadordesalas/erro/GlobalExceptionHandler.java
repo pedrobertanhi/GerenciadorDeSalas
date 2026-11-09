@@ -5,7 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ErroResposta> tratarValidacaoDeParametros(HandlerMethodValidationException ex, HttpServletRequest request) {
         String correlationId = correlationIdDaRequisicao(request);
-        List<ErroResposta.CampoErro> fieldErrors = ex.getAllValidationResults().stream()
+        List<ErroResposta.CampoErro> fieldErrors = ex.getParameterValidationResults().stream()
                 .flatMap(r -> r.getResolvableErrors().stream())
                 .map(err -> new ErroResposta.CampoErro(
                         err.getCodes() != null && err.getCodes().length > 0 ? err.getCodes()[0] : "parametro",
