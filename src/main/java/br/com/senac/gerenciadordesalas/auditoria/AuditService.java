@@ -4,7 +4,6 @@ import br.com.senac.gerenciadordesalas.usuario.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,6 @@ import static org.springframework.util.StringUtils.hasText;
  * qualquer falha na persistência faz a operação de negócio ser revertida.
  */
 @Service
-@ConditionalOnBean(AuditEventRepository.class)
 public class AuditService {
 
     private static final Set<String> CAMPOS_SENSIVEIS = Set.of(
