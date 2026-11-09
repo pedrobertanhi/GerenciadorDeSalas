@@ -34,3 +34,16 @@ Este registro distingue **configuração**, **execução** e **aprovação**. Um
 - **Trivy filesystem:** job `129286263050` falhou antes do scan com `Unable to resolve action aquasecurity/trivy-action@0.33.1`. A referência foi alterada para `0.33.0`; confirmar que a nova execução consegue resolver a action e realizar o scan antes de marcar como aprovado.
 
 **Não ignorar, pular nem remover gates com falha para liberar o merge.**
+
+
+## Resultado Trivy Image — bloqueio real (2026-11-09)
+
+- Commit: `e757dde708e8c9293df8874bc06e984fa6670d1c`
+- Job: https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42678008414/job/129364549402
+- Resultado: **failure**; scan executado, **7 ocorrências CRITICAL** na imagem candidata.
+- `tomcat-embed-core:10.1.55`: `CVE-2026-55276`, `CVE-2026-65182`, `CVE-2026-65637`, `CVE-2026-65905`, `CVE-2026-68525`. A versão 10.1.59 consta entre as versões corrigidas indicadas pelo scanner.
+- `spring-webmvc:6.2.19`: `CVE-2026-47884` e `CVE-2026-47890`; o scanner indica `7.0.9` como versão corrigida. **Não atualizar diretamente de Spring 6 para 7 sem analisar compatibilidade com Spring Boot 3.5**.
+- `pom.xml` utiliza Spring Boot parent `3.5.16`; investigar atualização compatível do BOM e/ou overrides suportados, repetir Maven Verify e Trivy Image, e avaliar aplicabilidade dos achados.
+- Os checks Maven Verify, CodeQL, Dependency Review, Trivy filesystem e Gitleaks passaram nesse commit, mas **não compensam o gate de imagem reprovado**.
+
+**Decisão:** PR permanece bloqueada para aprovação e merge até remediação/triagem documentada das sete ocorrências e novo scan satisfatório.
