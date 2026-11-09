@@ -116,7 +116,7 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
                 .andExpect(redirectedUrl("/aprovacoes"))
                 .andExpect(flash().attribute("sucesso", "Recurso restrito aprovado."));
 
-        assertThat(status(id)).isEqualTo("APROVADA");
+        assertThat(statusDaReserva(id)).isEqualTo("APROVADA");
     }
 
     @Test
@@ -131,7 +131,7 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
                 .andExpect(redirectedUrl("/aprovacoes/" + id))
                 .andExpect(flash().attribute("erro", "Informe o motivo da rejeição."));
 
-        assertThat(status(id)).isEqualTo("CRIADA");
+        assertThat(statusDaReserva(id)).isEqualTo("CRIADA");
     }
 
     @Test
@@ -145,7 +145,7 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
                 .andExpect(redirectedUrl("/aprovacoes"))
                 .andExpect(flash().attribute("sucesso", "Reserva rejeitada e motivo registrado."));
 
-        assertThat(status(id)).isEqualTo("REJEITADA");
+        assertThat(statusDaReserva(id)).isEqualTo("REJEITADA");
         assertThat(consultar("SELECT recurso_motivo_rejeicao FROM tb_reservas WHERE id = ?", String.class, id))
                 .isEqualTo("Microscopio reservado para pesquisa");
     }
@@ -166,8 +166,8 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
                         .param("motivo", "Agenda da professora mudou"))
                 .andExpect(flash().attribute("sucesso", "Alocação docente rejeitada e motivo registrado."));
 
-        assertThat(status(validada)).isEqualTo("APROVADA");
-        assertThat(status(rejeitada)).isEqualTo("REJEITADA");
+        assertThat(statusDaReserva(validada)).isEqualTo("APROVADA");
+        assertThat(statusDaReserva(rejeitada)).isEqualTo("REJEITADA");
     }
 
     @Test
@@ -183,7 +183,7 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
                 .andExpect(redirectedUrl("/aprovacoes"))
                 .andExpect(flash().attribute("erro", containsString("nao esta pendente")));
 
-        assertThat(status(id)).isEqualTo("APROVADA");
+        assertThat(statusDaReserva(id)).isEqualTo("APROVADA");
     }
 
     @Test
@@ -199,7 +199,7 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
                 .andExpect(redirectedUrl("/aprovacoes"))
                 .andExpect(flash().attribute("erro", containsString("manutencao")));
 
-        assertThat(status(id)).isEqualTo("CRIADA");
+        assertThat(statusDaReserva(id)).isEqualTo("CRIADA");
     }
 
     @Test
@@ -223,7 +223,7 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
         mockMvc.perform(post("/aprovacoes/{id}/aprovar", id).with(user(SOLICITANTE).roles(perfil)).with(csrf()))
                 .andExpect(status().isForbidden());
 
-        assertThat(status(id)).isEqualTo("CRIADA");
+        assertThat(statusDaReserva(id)).isEqualTo("CRIADA");
     }
 
     @Test
@@ -233,7 +233,7 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
                 .andExpect(redirectedUrlPattern("**/login"));
     }
 
-    private String status(Long id) {
+    private String statusDaReserva(Long id) {
         return consultar("SELECT status FROM tb_reservas WHERE id = ?", String.class, id);
     }
 
