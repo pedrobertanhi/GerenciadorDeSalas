@@ -3,6 +3,7 @@ package br.com.senac.gerenciadordesalas.aprovacao;
 import br.com.senac.gerenciadordesalas.erro.ConflitoDeEstadoException;
 import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
 import br.com.senac.gerenciadordesalas.reservas.SituacaoPendencia;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -54,14 +55,15 @@ public class AprovacaoWebController {
     }
 
     @GetMapping
-    public String fila(Model model) {
-        model.addAttribute("itens", service.listarPendentes().stream().map(AprovacaoWebController::item).toList());
+    public String fila(Model model, Authentication autenticacao) {
+        model.addAttribute("itens", service.listarPendentes(autenticacao.getName()).stream().map(AprovacaoWebController::item).toList());
         return "aprovacoes/fila";
     }
 
     @GetMapping("/{id}")
-    public String detalhe(@PathVariable Long id, Model model, RedirectAttributes redirecionamento) {
-        Optional<AprovacaoDto.ItemFila> pendente = service.listarPendentes().stream()
+    public String detalhe(@PathVariable Long id, Model model, Authentication autenticacao,
+                          RedirectAttributes redirecionamento) {
+        Optional<AprovacaoDto.ItemFila> pendente = service.listarPendentes(autenticacao.getName()).stream()
                 .filter(item -> item.reservaId().equals(id))
                 .findFirst();
         if (pendente.isEmpty()) {
@@ -117,6 +119,8 @@ public class AprovacaoWebController {
             redirecionamento.addFlashAttribute("sucesso", sucesso);
         } catch (ConflitoDeEstadoException ex) {
             redirecionamento.addFlashAttribute("erro", "Não foi possível concluir a decisão: " + ex.getMessage());
+        } catch (AccessDeniedException ex) {
+            redirecionamento.addFlashAttribute("erro", "Sua conta não está ativa ou não possui permissão para decidir.");
         } catch (RecursoNaoEncontradoException ex) {
             redirecionamento.addFlashAttribute("erro", "Reserva não encontrada.");
         }
