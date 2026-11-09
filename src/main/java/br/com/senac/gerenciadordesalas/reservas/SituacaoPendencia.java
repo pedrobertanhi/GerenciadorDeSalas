@@ -16,7 +16,10 @@ public enum SituacaoPendencia {
     APROVADA,
 
     /** O Responsavel rejeitou, com motivo. */
-    REJEITADA;
+    REJEITADA,
+
+    /** A decisao deixou de ser aplicavel porque a outra pendencia rejeitou a reserva. */
+    CANCELADA;
 
     /** {@code true} se esta decisao ainda impede a aprovacao da reserva. */
     public boolean bloqueiaAprovacao() {
