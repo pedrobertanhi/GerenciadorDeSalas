@@ -61,3 +61,13 @@ Fontes oficiais:
 - https://enterprise.spring.io/projects/spring-framework/6.2.20/
 
 **Status:** bloqueado até confirmação do scan e decisão fundamentada para Spring WebMVC.
+
+
+## Validação após atualização do Tomcat — commit `ac56a33b744eae35ed15eed245095d8bb96c2c06`
+
+- **Maven Verify, CodeQL, CodeQL Java, Dependency Review, Trivy filesystem e Gitleaks:** `success`.
+- **Trivy Image:** `failure` com **2 CRITICAL**, ambas em `spring-webmvc:6.2.19`, `CVE-2026-47884` e `CVE-2026-47890`. Job: https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42708695966/job/129472210012
+- **Tomcat:** nenhuma das cinco ocorrências anteriores apareceu no novo relatório da imagem; atualização `tomcat.version=10.1.60` validada para essas ocorrências.
+- **Spring:** a aplicação ainda contém biblioteca afetada; não afirmar correção. `CVE-2026-47884` depende de `XsltView` e mapeamento abrangente que renderiza view sem nome explícito. `CVE-2026-47890` depende de envio de fragmentos de views por SSE com conteúdo controlável por atacante. A ausência dessas condições precisa ser demonstrada por revisão de código e testes; não substitui a atualização corrigida.
+
+**Gate permanece vermelho.** Não suprimir as duas CVEs do Trivy nem aprovar release sem correção suportada ou decisão formal de aceitação de risco por responsável.
