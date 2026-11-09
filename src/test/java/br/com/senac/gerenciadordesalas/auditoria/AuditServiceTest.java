@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -55,7 +56,7 @@ class AuditServiceTest {
 
     @Test
     void consultar_retornaPaginaDoRepositorio() {
-        when(eventos.findAll(any(), eq(PageRequest.of(0, 20))))
+        when(eventos.findAll(org.mockito.ArgumentMatchers.<Specification<AuditEvent>>any(), eq(PageRequest.of(0, 20))))
                 .thenReturn(Page.empty());
 
         Page<AuditEventDto.Item> pagina = service.consultar("RESERVA", 12L, null,
