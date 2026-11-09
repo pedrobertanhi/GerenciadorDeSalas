@@ -10,6 +10,9 @@ import br.com.senac.gerenciadordesalas.material.MaterialRepository;
 import br.com.senac.gerenciadordesalas.salas.SalaService;
 import br.com.senac.gerenciadordesalas.salas.SalaRepository;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
+import br.com.senac.gerenciadordesalas.auditoria.AuditEventRepository;
+import br.com.senac.gerenciadordesalas.notificacao.NotificationRecordRepository;
+import br.com.senac.gerenciadordesalas.reservas.ReservationRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -50,6 +53,9 @@ class ProfessorOpenApiTest {
     @MockitoBean MaterialRepository repositorioMateriais;
     @MockitoBean ProfessorRepository repositorioProfessores;
     @MockitoBean SalaRepository repositorioSalas;
+    @MockitoBean AuditEventRepository repositorioAuditoria;
+    @MockitoBean NotificationRecordRepository registrosNotificacao;
+    @MockitoBean ReservationRepository repositorioReservas;
 
     @Test void documentacaoExigeSessao() throws Exception {
         mvc.perform(get("/v3/api-docs").accept("application/json"))
