@@ -184,4 +184,24 @@ class AutorizacaoPorPerfilWebTest {
                 .andExpect(jsonPath("$.correlationId").exists());
     }
 
+    @Test
+    @WithMockUser(username = "responsavel@exemplo.test", roles = "RESPONSAVEL")
+    void responsavel_naoPodeAdministrarUsuarios() throws Exception {
+        int antes = controller.totalDeAlteracoesAdministrativas();
+
+        mockMvc.perform(post("/api/admin/usuarios").with(csrf()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
+
+        assertThat(controller.totalDeAlteracoesAdministrativas()).isEqualTo(antes);
+    }
+
+    @Test
+    @WithMockUser(username = "admin@exemplo.test", roles = "ADMINISTRADOR")
+    void administrador_naoPodeCriarReservaComoSolicitante() throws Exception {
+        mockMvc.perform(post("/api/reservas").with(csrf()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
+    }
+
 }
