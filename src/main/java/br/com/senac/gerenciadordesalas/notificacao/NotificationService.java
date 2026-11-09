@@ -1,6 +1,5 @@
 package br.com.senac.gerenciadordesalas.notificacao;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,7 +10,6 @@ import java.time.Instant;
  * Registra toda tentativa e converte o retorno do gateway em estado interno.
  */
 @Service
-@ConditionalOnBean(NotificationRecordRepository.class)
 public class NotificationService {
 
     private final NotificationRecordRepository records;
