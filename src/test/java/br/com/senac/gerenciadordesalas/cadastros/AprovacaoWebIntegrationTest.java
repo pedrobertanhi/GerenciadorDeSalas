@@ -20,6 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
@@ -228,7 +229,8 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
 
     @Test
     void visitante_eLevadoParaOLogin() throws Exception {
-        mockMvc.perform(get("/aprovacoes"))
+        // A seguranca so redireciona para o login quem pede HTML (navegador); API recebe 401.
+        mockMvc.perform(get("/aprovacoes").accept(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
     }
