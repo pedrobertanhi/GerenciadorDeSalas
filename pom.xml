@@ -38,6 +38,12 @@
             <version>3.2.0</version>
         </dependency>
 
+        <!-- Compatibilidade com componentes que utilizam Jackson 2. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-jackson2</artifactId>
+        </dependency>
+
         <!-- Web / REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
