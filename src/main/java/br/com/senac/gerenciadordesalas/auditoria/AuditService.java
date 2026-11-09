@@ -1,6 +1,9 @@
 package br.com.senac.gerenciadordesalas.auditoria;
 
 import br.com.senac.gerenciadordesalas.usuario.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +12,8 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * Ponto único de gravação de auditoria. Por participar da transação chamadora,
@@ -34,6 +39,26 @@ public class AuditService {
                                 Map<String, Object> detalhes) {
         return eventos.save(new AuditEvent(entidade, entidadeId, acao, ator, Instant.now(clock),
                 estadoAnterior, estadoNovo, mascararDetalhes(detalhes)));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AuditEventDto.Item> consultar(String entidade, Long entidadeId, Long atorId,
+                                              Instant de, Instant ate, Pageable paginacao) {
+        if (de != null && ate != null && de.isAfter(ate)) {
+            throw new IllegalArgumentException("O início do período deve ser anterior ao fim.");
+        }
+        Specification<AuditEvent> filtros = Specification.allOf(
+                entidade == null || !hasText(entidade) ? null
+                        : (root, query, builder) -> builder.equal(root.get("entity"), entidade.trim()),
+                entidadeId == null ? null
+                        : (root, query, builder) -> builder.equal(root.get("entityId"), entidadeId),
+                atorId == null ? null
+                        : (root, query, builder) -> builder.equal(root.get("actor").get("id"), atorId),
+                de == null ? null
+                        : (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("occurredAt"), de),
+                ate == null ? null
+                        : (root, query, builder) -> builder.lessThanOrEqualTo(root.get("occurredAt"), ate));
+        return eventos.findAll(filtros, paginacao).map(AuditEventDto.Item::de);
     }
 
     private Map<String, Object> mascararDetalhes(Map<String, Object> detalhes) {
