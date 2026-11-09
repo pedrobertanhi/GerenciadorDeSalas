@@ -47,17 +47,27 @@ public class AuditService {
         if (de != null && ate != null && de.isAfter(ate)) {
             throw new IllegalArgumentException("O início do período deve ser anterior ao fim.");
         }
-        Specification<AuditEvent> filtros = Specification.allOf(
-                entidade == null || !hasText(entidade) ? null
-                        : (root, query, builder) -> builder.equal(root.get("entity"), entidade.trim()),
-                entidadeId == null ? null
-                        : (root, query, builder) -> builder.equal(root.get("entityId"), entidadeId),
-                atorId == null ? null
-                        : (root, query, builder) -> builder.equal(root.get("actor").get("id"), atorId),
-                de == null ? null
-                        : (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("occurredAt"), de),
-                ate == null ? null
-                        : (root, query, builder) -> builder.lessThanOrEqualTo(root.get("occurredAt"), ate));
+        Specification<AuditEvent> filtros = Specification.unrestricted();
+        if (hasText(entidade)) {
+            filtros = filtros.and((root, query, builder) ->
+                    builder.equal(root.get("entity"), entidade.trim()));
+        }
+        if (entidadeId != null) {
+            filtros = filtros.and((root, query, builder) ->
+                    builder.equal(root.get("entityId"), entidadeId));
+        }
+        if (atorId != null) {
+            filtros = filtros.and((root, query, builder) ->
+                    builder.equal(root.get("actor").get("id"), atorId));
+        }
+        if (de != null) {
+            filtros = filtros.and((root, query, builder) ->
+                    builder.greaterThanOrEqualTo(root.get("occurredAt"), de));
+        }
+        if (ate != null) {
+            filtros = filtros.and((root, query, builder) ->
+                    builder.lessThanOrEqualTo(root.get("occurredAt"), ate));
+        }
         return eventos.findAll(filtros, paginacao).map(AuditEventDto.Item::de);
     }
 
