@@ -54,7 +54,8 @@ public class AprovacaoService {
     }
 
     @Transactional(readOnly = true)
-    public List<AprovacaoDto.ItemFila> listarPendentes() {
+    public List<AprovacaoDto.ItemFila> listarPendentes(String emailResponsavel) {
+        obterResponsavel(emailResponsavel);
         return reservas.buscarPendentesDeDecisao().stream()
                 .map(AprovacaoDto.ItemFila::de)
                 .toList();
@@ -131,8 +132,10 @@ public class AprovacaoService {
 
     private User obterResponsavel(String email) {
         User usuario = usuarios.findByEmailIgnoreCase(email)
-                .filter(User::isActive)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario autenticado nao encontrado"));
+                .orElseThrow(() -> new AccessDeniedException("Conta autenticada nao esta disponivel"));
+        if (!usuario.isActive()) {
+            throw new AccessDeniedException("Conta autenticada esta inativa");
+        }
         if (usuario.getProfile() != Role.RESPONSAVEL) {
             throw new AccessDeniedException("Somente o Responsavel decide reservas");
         }

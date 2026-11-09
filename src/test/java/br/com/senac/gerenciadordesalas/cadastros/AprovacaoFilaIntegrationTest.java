@@ -43,6 +43,7 @@ class AprovacaoFilaIntegrationTest extends IntegracaoPostgresBase {
 
     private static final String EMAIL = "solicitante.fila@exemplo.test";
     private static final String URL = "/api/aprovacoes";
+    private static final String EMAIL_RESPONSAVEL = "responsavel.fila@exemplo.test";
     private static final OffsetDateTime INICIO = OffsetDateTime.of(2026, 11, 20, 10, 0, 0, 0, ZoneOffset.UTC);
     private static final OffsetDateTime TERMINO = INICIO.plusHours(2);
 
@@ -63,6 +64,7 @@ class AprovacaoFilaIntegrationTest extends IntegracaoPostgresBase {
     @BeforeEach
     void preparar() {
         usuarios.save(new User("Ana Fila", EMAIL, "$2a$10$hashBcryptFalso", Role.SOLICITANTE));
+        usuarios.save(new User("Responsavel Fila", EMAIL_RESPONSAVEL, "$2a$10$hashBcryptFalso", Role.RESPONSAVEL));
         salaA = salas.save(new Sala("Sala Fila A", 30, "Bloco F")).getId();
         salaB = salas.save(new Sala("Sala Fila B", 30, "Bloco F")).getId();
         salaC = salas.save(new Sala("Sala Fila C", 30, "Bloco F")).getId();

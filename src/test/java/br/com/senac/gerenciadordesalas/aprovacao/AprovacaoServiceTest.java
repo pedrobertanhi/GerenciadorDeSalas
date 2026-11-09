@@ -321,4 +321,38 @@ class AprovacaoServiceTest {
         assertThat(service.aprovar(100L, EMAIL_RESPONSAVEL).status()).isEqualTo(StatusReserva.CRIADA);
         assertThat(service.validarDocente(100L, EMAIL_RESPONSAVEL).status()).isEqualTo(StatusReserva.APROVADA);
     }
+
+    @Test
+    void rejeitarRecurso_cancelaValidacaoDocenteAindaPendente() {
+        reserva.alterar(sala, professorAtivo(), INICIO, TERMINO, "Aula com professor e microscopio");
+        reserva.reavaliarPendencias();
+
+        ReservationDto.Saida saida = service.rejeitar(100L, "Material indisponivel", EMAIL_RESPONSAVEL);
+
+        assertThat(saida.status()).isEqualTo(StatusReserva.REJEITADA);
+        assertThat(saida.aprovacaoRecurso()).isEqualTo(SituacaoPendencia.REJEITADA);
+        assertThat(saida.validacaoDocente()).isEqualTo(SituacaoPendencia.CANCELADA);
+    }
+
+    @Test
+    void rejeitarDocente_cancelaAprovacaoDeRecursoAindaPendente() {
+        reserva.alterar(sala, professorAtivo(), INICIO, TERMINO, "Aula com professor e microscopio");
+        reserva.reavaliarPendencias();
+
+        ReservationDto.Saida saida = service.rejeitarDocente(100L, "Docente sem competencia", EMAIL_RESPONSAVEL);
+
+        assertThat(saida.status()).isEqualTo(StatusReserva.REJEITADA);
+        assertThat(saida.validacaoDocente()).isEqualTo(SituacaoPendencia.REJEITADA);
+        assertThat(saida.aprovacaoRecurso()).isEqualTo(SituacaoPendencia.CANCELADA);
+    }
+
+    @Test
+    void filaDePendencias_rejeitaContaResponsavelDesativada() {
+        when(responsavel.isActive()).thenReturn(false);
+
+        assertThatThrownBy(() -> service.listarPendentes(EMAIL_RESPONSAVEL))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("inativa");
+        verify(reservas, never()).buscarPendentesDeDecisao();
+    }
 }
