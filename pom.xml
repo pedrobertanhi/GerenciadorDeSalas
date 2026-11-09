@@ -21,6 +21,8 @@
 
     <properties>
         <java.version>21</java.version>
+        <!-- SEC-11: manter Tomcat na linha 10.1 compativel com Spring Boot 3.5. -->
+        <tomcat.version>10.1.60</tomcat.version>
     </properties>
 
     <dependencies>
