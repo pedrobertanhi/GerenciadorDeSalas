@@ -1,0 +1,55 @@
+name: Trivy Container Image
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: Trivy image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Compilar artefato sem repetir testes do Maven Verify
+        run: |
+          chmod +x mvnw
+          ./mvnw --batch-mode --no-transfer-progress -DskipTests package
+
+      - name: Montar imagem candidata da aplicacao
+        run: |
+          cat > Dockerfile.security-scan <<'EOF'
+          FROM eclipse-temurin:21-jre
+          WORKDIR /app
+          COPY target/*.jar /app/application.jar
+          USER 10001
+          EXPOSE 8080
+          ENTRYPOINT ["java", "-jar", "/app/application.jar"]
+          EOF
+          docker build -f Dockerfile.security-scan -t gerenciadordesalas:security-scan .
+
+      - name: Bloquear vulnerabilidades criticas na imagem candidata
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: gerenciadordesalas:security-scan
+          scan-type: image
+          scanners: vuln
+          severity: CRITICAL
+          ignore-unfixed: false
+          exit-code: '1'
+          format: table
