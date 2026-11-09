@@ -26,3 +26,11 @@ Este registro distingue **configuração**, **execução** e **aprovação**. Um
 2. Reexecutar CI para o último SHA e registrar os resultados.
 3. Completar SCA, secret scanning, Trivy image, ZAP e testes de autorização/entrada malformada.
 4. Atualizar `docs/testes/RELATORIO_TESTES_SEGURANCA.md` com números e links reais antes de solicitar revisão final.
+
+
+## Diagnóstico de falhas (logs GitHub Actions)
+
+- **Dependency Review:** job `129286262622` reportou `Dependency review is not supported on this repository` e orientou ativar o Dependency Graph nas configurações de segurança. **Bloqueio de configuração**, não evidência de CVE. Requer intervenção de mantenedor com acesso às configurações: `Settings → Security → Code security and analysis` e habilitar o Dependency Graph / recurso de dependency review, conforme disponibilidade do plano e visibilidade do repositório.
+- **Trivy filesystem:** job `129286263050` falhou antes do scan com `Unable to resolve action aquasecurity/trivy-action@0.33.1`. A referência foi alterada para `0.33.0`; confirmar que a nova execução consegue resolver a action e realizar o scan antes de marcar como aprovado.
+
+**Não ignorar, pular nem remover gates com falha para liberar o merge.**
