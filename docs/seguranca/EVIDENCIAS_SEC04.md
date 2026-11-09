@@ -71,3 +71,12 @@ Fontes oficiais:
 - **Spring:** a aplicação ainda contém biblioteca afetada; não afirmar correção. `CVE-2026-47884` depende de `XsltView` e mapeamento abrangente que renderiza view sem nome explícito. `CVE-2026-47890` depende de envio de fragmentos de views por SSE com conteúdo controlável por atacante. A ausência dessas condições precisa ser demonstrada por revisão de código e testes; não substitui a atualização corrigida.
 
 **Gate permanece vermelho.** Não suprimir as duas CVEs do Trivy nem aprovar release sem correção suportada ou decisão formal de aceitação de risco por responsável.
+
+
+## Controle preventivo de funcionalidades Spring MVC (2026-11-09)
+
+- Adicionado `RegressaoRecursosSpringMvcTest` para impedir introducao inadvertida de `XsltView`, `XsltViewResolver`, `SseEmitter` e identificadores de SSE em fontes Java da aplicacao sem revisao.
+- O teste verifica apenas fontes `src/main/java`; **nao** comprova ausencia de configuracao externa, bibliotecas de terceiros ou todas as formas de usar SSE/XSLT.
+- Os avisos oficiais classificam `CVE-2026-47884` como **MEDIUM** e `CVE-2026-47890` como **LOW**; o Trivy da imagem classifica ambas como **CRITICAL**. Registrar a divergencia para triagem, sem alterar arbitrariamente a severidade do scanner.
+- A versao `spring-webmvc:6.2.19` **continua afetada**. Os testes preventivos nao corrigem o binario, nao tornam o Trivy verde e nao autorizam o merge. A remediacao definitiva requer uma versao corrigida e suportada do Spring Framework.
+- Links dos avisos: https://spring.io/security/cve-2026-47884/ e https://spring.io/security/cve-2026-47890/
