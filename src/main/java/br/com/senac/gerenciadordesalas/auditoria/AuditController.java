@@ -1,6 +1,5 @@
 package br.com.senac.gerenciadordesalas.auditoria;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,7 +17,6 @@ import java.time.Instant;
  */
 @RestController
 @RequestMapping("/api/auditoria")
-@ConditionalOnBean(AuditService.class)
 public class AuditController {
 
     private final AuditService service;
