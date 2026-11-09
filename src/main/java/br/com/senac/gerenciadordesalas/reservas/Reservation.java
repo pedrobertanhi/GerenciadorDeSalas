@@ -254,6 +254,7 @@ public class Reservation {
             throw new IllegalArgumentException("O motivo da rejeicao deve ter no maximo 500 caracteres");
         }
         registrarDecisaoRecurso(SituacaoPendencia.REJEITADA, responsavel, decididaEm, motivoLimpo);
+        cancelarValidacaoDocenteSePendente(responsavel, decididaEm);
         transicionarPara(StatusReserva.REJEITADA);
         marcarAtualizado();
     }
@@ -285,8 +286,25 @@ public class Reservation {
         exigirValidacaoDocentePendente();
         String motivoLimpo = motivoObrigatorio(motivo);
         registrarDecisaoDocente(SituacaoPendencia.REJEITADA, responsavel, decididaEm, motivoLimpo);
+        cancelarAprovacaoRecursoSePendente(responsavel, decididaEm);
         transicionarPara(StatusReserva.REJEITADA);
         marcarAtualizado();
+    }
+
+    /** Cancela a outra pendencia ao encerrar a reserva por rejeicao, sem deixa-la acionavel. */
+    private void cancelarValidacaoDocenteSePendente(User responsavel, Instant decididaEm) {
+        if (this.validacaoDocente == SituacaoPendencia.PENDENTE) {
+            registrarDecisaoDocente(SituacaoPendencia.CANCELADA, responsavel, decididaEm,
+                    "Cancelada pela rejeicao do recurso restrito.");
+        }
+    }
+
+    /** Cancela a outra pendencia ao encerrar a reserva por rejeicao, sem deixa-la acionavel. */
+    private void cancelarAprovacaoRecursoSePendente(User responsavel, Instant decididaEm) {
+        if (this.aprovacaoRecurso == SituacaoPendencia.PENDENTE) {
+            registrarDecisaoRecurso(SituacaoPendencia.CANCELADA, responsavel, decididaEm,
+                    "Cancelada pela rejeicao da validacao docente.");
+        }
     }
 
     private void registrarDecisaoDocente(SituacaoPendencia decisao, User responsavel,
