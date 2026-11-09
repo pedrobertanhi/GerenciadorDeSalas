@@ -47,3 +47,17 @@ Este registro distingue **configuração**, **execução** e **aprovação**. Um
 - Os checks Maven Verify, CodeQL, Dependency Review, Trivy filesystem e Gitleaks passaram nesse commit, mas **não compensam o gate de imagem reprovado**.
 
 **Decisão:** PR permanece bloqueada para aprovação e merge até remediação/triagem documentada das sete ocorrências e novo scan satisfatório.
+
+
+## Plano de remediação das 7 ocorrências (2026-11-09)
+
+**Tomcat — 5 CVEs:** alterada a propriedade Maven `tomcat.version` para `10.1.60`, preservando a linha 10.1 do Spring Boot 3.5. Validar resolução efetiva no JAR e nova execução do Trivy Image. Não presumir sucesso antes dos resultados.
+
+**Spring WebMVC — 2 CVEs:** os boletins oficiais de `CVE-2026-47884` e `CVE-2026-47890` indicam correção na linha 6.2 em `6.2.20`, **Enterprise Support Only**, e correção OSS em `7.0.9`. O projeto usa Spring Boot `3.5.16`, portanto não substituir `spring-webmvc` isoladamente por 7.0.9. Alternativas: obter acesso legítimo ao Spring Enterprise e atualizar a linha 6.2 compatível; ou planejar migração testada para Spring Boot 4 / Spring Framework 7. Antes disso, avaliar a presença das condições específicas de exploração e documentar eventuais mitigações compensatórias, sem desabilitar o gate ou tratar como corrigido.
+
+Fontes oficiais:
+- https://spring.io/security/cve-2026-47884/
+- https://spring.io/security/cve-2026-47890/
+- https://enterprise.spring.io/projects/spring-framework/6.2.20/
+
+**Status:** bloqueado até confirmação do scan e decisão fundamentada para Spring WebMVC.
