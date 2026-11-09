@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +47,7 @@ public class AprovacaoController {
             content = @Content(mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = AprovacaoDto.ItemFila.class))))
     @GetMapping
-    public List<AprovacaoDto.ItemFila> listarPendentes() {
-        return service.listarPendentes();
+    public List<AprovacaoDto.ItemFila> listarPendentes(Authentication autenticacao) {
+        return service.listarPendentes(autenticacao.getName());
     }
 }
