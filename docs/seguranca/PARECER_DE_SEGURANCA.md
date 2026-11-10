@@ -1,8 +1,21 @@
 # Parecer Final de Segurança
 
-> Status: candidata bloqueada por evidências obrigatórias pendentes. Registro da ENT-02 (#184) para revisão de outro integrante. Responsável pela entrega: @davisalves38-lab. Revisor: pendente.
+> Status: evidências da candidata atualizadas. A decisão de liberação da ENT-02 (#184) aguarda revisão de outro integrante. Responsável pela entrega: @davisalves38-lab.
 
-## Candidata após o merge do ZAP
+## Candidata após as atualizações de dependências
+
+SHA analisado: [`a5b38c7e06278dc5db51188195364808bdbd5f4c`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/a5b38c7e06278dc5db51188195364808bdbd5f4c). As quatro execuções abaixo foram disparadas na `main` e apontam para esse SHA.
+
+| Controle | Evidência | Resultado |
+|---|---|---|
+| Maven Verify | [CI](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507363) | 835 testes, incluindo os cinco de navegador, sem falhas, erros ou testes ignorados |
+| CodeQL | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507704) | Job concluído com sucesso |
+| Trivy filesystem | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507503) | Job concluído com sucesso no filtro de severidade crítica |
+| OWASP ZAP Baseline | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507387) e [relatório e SHA](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507387/artifacts/13729252842) | 0 falhas, 6 avisos e 62 regras aprovadas |
+
+Os seis avisos do ZAP coincidem com a triagem histórica abaixo. A análise passiva foi limitada à superfície pública de login. O painel de Secret scanning registra o estado do repositório na consulta documentada. Dependency Review roda nos PRs de atualização, em seus respectivos SHAs. Os resultados desta candidata aguardam revisão.
+
+## Candidata anterior após o merge do ZAP
 
 SHA analisado: [`f3b3d44d08c9f79b3db9593bc86f864866f4f248`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/f3b3d44d08c9f79b3db9593bc86f864866f4f248), merge do PR #200 em `main`. As quatro execuções abaixo apontam para esse SHA.
 
@@ -104,6 +117,8 @@ O [Maven Verify do PR #192](https://github.com/pedrobertanhi/GerenciadorDeSalas/
 ## Parecer
 
 - [ ] APROVADA
-- [x] REPROVADA por falta de evidências obrigatórias
+- [ ] REPROVADA
+
+Decisão pendente de revisão dos resultados e riscos residuais.
 
 Se qualquer etapa obrigatória estiver ausente ou houver vulnerabilidade crítica confirmada, o parecer deve ser **REPROVADA**.
