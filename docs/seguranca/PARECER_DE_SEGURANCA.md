@@ -16,7 +16,13 @@ O merge do [PR #193](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/19
 | Dependency Review | [Execução #42736529766](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42736529766) | Aprovado no PR #193 em `e75003aa09a2a71f2782fbef9eea630a835acaa7`. O workflow é disparado por pull request. |
 | Secret scanning e push protection | Capturas de Settings e [Secret scanning](https://github.com/pedrobertanhi/GerenciadorDeSalas/security/secret-scanning) fornecidas pelo mantenedor em 09/11/2026 | Secret Protection e Push protection habilitados. O painel mostrava 0 alertas abertos na consulta. |
 | Trivy image | Candidata sem Dockerfile versionado | Sem evidência de imagem publicada |
-| OWASP ZAP Baseline | [Workflow ZAP Baseline](../../.github/workflows/zap-baseline.yml) | Resultado pendente. A execução usa banco descartável e cobre a superfície pública de login. |
+| OWASP ZAP Baseline | [Workflow ZAP Baseline](../../.github/workflows/zap-baseline.yml) | Primeira execução validada no PR #200. Evidência no SHA final da release pendente. |
+
+### Primeira execução do ZAP Baseline
+
+A [execução #42739754196](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42739754196) analisou a superfície pública de login em um banco descartável. O [artefato HTML/JSON e commit.txt](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42739754196/artifacts/13729255221) corresponde ao merge de teste do PR, `e138693cffca5b1bf0ca5d2d6a9dfdd61ec41916`.
+
+O resumo do ZAP registrou 0 falhas, 6 avisos e 62 regras aprovadas. Os avisos foram ausência de CSP, Permissions Policy, SRI e COEP, conteúdo não armazenável e identificação de resposta de sessão. A execução foi configurada para publicar avisos sem falhar o job. Esses avisos ficam para triagem e a análise deve ser repetida no SHA final da release.
 
 As capturas de Secret scanning registram o estado do repositório na data da consulta. O relatório do ZAP identifica separadamente o SHA analisado.
 
