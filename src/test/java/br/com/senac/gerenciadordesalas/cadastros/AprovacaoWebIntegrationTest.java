@@ -218,9 +218,15 @@ class AprovacaoWebIntegrationTest extends IntegracaoPostgresBase {
     void outrosPerfis_naoAcessamNemDecidem(String perfil) throws Exception {
         Long id = criarRestrita(salaA);
 
-        mockMvc.perform(get("/aprovacoes").with(user(SOLICITANTE).roles(perfil)))
+        String email = SOLICITANTE;
+        if ("ADMINISTRADOR".equals(perfil)) {
+            email = "admin.negado@exemplo.test";
+            usuarios.save(new User("Admin Negado", email, "$2a$10$hashBcryptFalso", Role.ADMINISTRADOR));
+        }
+
+        mockMvc.perform(get("/aprovacoes").with(user(email).roles(perfil)))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(post("/aprovacoes/{id}/aprovar", id).with(user(SOLICITANTE).roles(perfil)).with(csrf()))
+        mockMvc.perform(post("/aprovacoes/{id}/aprovar", id).with(user(email).roles(perfil)).with(csrf()))
                 .andExpect(status().isForbidden());
 
         assertThat(statusDaReserva(id)).isEqualTo("CRIADA");
