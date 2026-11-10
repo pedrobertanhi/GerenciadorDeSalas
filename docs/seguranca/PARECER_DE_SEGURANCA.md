@@ -1,6 +1,6 @@
 # Parecer Final de Segurança
 
-> Status: não emitido. Preencher para a release candidata da Issue #98.
+> Status: não emitido. Preencher para o commit candidato da ENT-02 (#184). A matriz de rotas e o CI do PR da API são evidências parciais registradas na RTM.
 
 ## Identificação
 
