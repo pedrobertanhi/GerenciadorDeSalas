@@ -1,8 +1,34 @@
 # Parecer Final de Segurança
 
-> Status: candidata bloqueada por evidências obrigatórias pendentes. Registro da ENT-02 (#184) para revisão de outro integrante.
+> Status: candidata bloqueada por evidências obrigatórias pendentes. Registro da ENT-02 (#184) para revisão de outro integrante. Responsável pela entrega: @davisalves38-lab. Revisor: pendente.
 
-## Candidata após a integração dos controles
+## Candidata após o merge do ZAP
+
+SHA analisado: [`f3b3d44d08c9f79b3db9593bc86f864866f4f248`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/f3b3d44d08c9f79b3db9593bc86f864866f4f248), merge do PR #200 em `main`. As quatro execuções abaixo apontam para esse SHA.
+
+| Controle | Evidência | Resultado |
+|---|---|---|
+| Maven Verify | [CI](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527307) | Aprovado — 835 testes, 0 falhas, 0 erros e 0 ignorados. Cinco casos de navegador executados. |
+| CodeQL | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527440) | Job concluído com sucesso |
+| Trivy filesystem | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527276) | Job concluído com sucesso na configuração de severidade crítica |
+| OWASP ZAP Baseline | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527332) e [relatório HTML/JSON e SHA](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527332/artifacts/13728453064) | 0 falhas, 6 avisos, 62 regras aprovadas |
+
+### Triagem dos avisos do ZAP
+
+Análise passiva da superfície pública de login em runner isolado com PostgreSQL descartável. O workflow publica os avisos sem falhar o job. A avaliação cobre o que o scanner observou nesse ambiente.
+
+| Aviso | Avaliação | Acompanhamento |
+|---|---|---|
+| CSP ausente (10038) | O login respondeu sem política de conteúdo. Falta uma camada de contenção para conteúdo injetado. | Definir uma CSP compatível com os recursos da aplicação e validar o login em navegador. |
+| Conteúdo não armazenável (10049) | Observado também em respostas 401. Em login e respostas protegidas, restringir cache é desejável. | Preservar os cabeçalhos de não armazenamento. |
+| Permissions Policy ausente (10063) | Cabeçalho de defesa adicional ausente no login. | Avaliar restrição de funcionalidades do navegador que a aplicação dispensa. |
+| Resposta de sessão identificada (10112) | O scanner reconheceu o mecanismo de sessão. O aviso descreve a presença desse mecanismo. | Usar os testes de autenticação, logout e revogação de sessão como evidência funcional. |
+| SRI ausente (90003) | O login referencia o CSS do Bootstrap via CDN sem atributo de integridade. | Fixar a integridade do recurso ou servir o arquivo localmente. |
+| COEP ausente (90004) | O login não aplica isolamento de incorporação entre origens. | Avaliar se o isolamento é necessário e testar compatibilidade com o CSS externo antes de alterar. |
+
+A triagem não confirmou falha crítica nesses seis avisos. A superfície autenticada fica coberta pelos testes funcionais de autorização, com a análise passiva do ZAP limitada ao fluxo público. Secret scanning e Push protection foram verificados pelas capturas de configuração e do painel. A revisão de dependências permanece vinculada ao SHA do PR #193. Os itens de endurecimento e o risco residual aguardam revisão por outro integrante. O artefato do ZAP tem retenção de 14 dias.
+
+## Candidata anterior após a integração dos controles
 
 O merge do [PR #193](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/193) em `main` gerou a candidata [`59fa404c2981955143032a8bf876665a9138e681`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/59fa404c2981955143032a8bf876665a9138e681). Os links abaixo foram conferidos pelo campo `head_sha` das execuções do GitHub Actions.
 
