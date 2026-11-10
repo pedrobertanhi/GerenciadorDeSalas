@@ -14,9 +14,11 @@ O merge do [PR #193](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/19
 | Trivy filesystem | [Execução #42737088435](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088435) | Aprovado. O relatório do POM registrou 0 vulnerabilidades críticas. A configuração filtra pela severidade crítica. |
 | Dependabot | [Execução #42737093875](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737093875) (Maven), [Execução #42737095367](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737095367) (Actions) | Execuções de atualização identificadas. Não representam uma contagem de alertas. |
 | Dependency Review | [Execução #42736529766](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42736529766) | Aprovado no PR #193 em `e75003aa09a2a71f2782fbef9eea630a835acaa7`. O workflow é disparado por pull request. |
-| Secret scanning e push protection | Configurações do repositório | Ativação e resultado ainda sem confirmação |
+| Secret scanning e push protection | Capturas de Settings e [Secret scanning](https://github.com/pedrobertanhi/GerenciadorDeSalas/security/secret-scanning) fornecidas pelo mantenedor em 09/11/2026 | Secret Protection e Push protection habilitados. O painel mostrava 0 alertas abertos na consulta. |
 | Trivy image | Candidata sem Dockerfile versionado | Sem evidência de imagem publicada |
-| OWASP ZAP | Ambiente controlado com dados sintéticos | Evidência pendente |
+| OWASP ZAP Baseline | [Workflow ZAP Baseline](../../.github/workflows/zap-baseline.yml) | Resultado pendente. A execução usa banco descartável e cobre a superfície pública de login. |
+
+As capturas de Secret scanning registram o estado do repositório na data da consulta. O relatório do ZAP identifica separadamente o SHA analisado.
 
 As execuções da candidata anterior permanecem abaixo para rastreabilidade. A decisão de liberação continua pendente dos controles sem evidência, da triagem de alertas e da revisão por outro integrante.
 
