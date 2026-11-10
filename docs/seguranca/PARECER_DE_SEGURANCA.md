@@ -2,7 +2,29 @@
 
 > Status: evidências da candidata atualizadas. A decisão de liberação da ENT-02 (#184) aguarda revisão de outro integrante. Responsável pela entrega: @davisalves38-lab.
 
-## Candidata após a atualização do Tomcat
+## Evidências consolidadas da candidata
+
+SHA de referência: [`1fb69f8488422702f8eee58917bdcf1730334fe6`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/1fb69f8488422702f8eee58917bdcf1730334fe6), merge do PR #206. As quatro execuções na `main` abaixo foram conferidas para esse SHA.
+
+| Controle | Evidência | Resultado e escopo |
+|---|---|---|
+| Maven Verify | [CI](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198363) | 837 testes, sem falhas, erros ou ignorados |
+| CodeQL | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198408) | Job concluído com sucesso |
+| Trivy filesystem | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198435) | Job concluído com sucesso no filtro de severidade crítica |
+| ZAP Baseline | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198436) e [relatório e inventário](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198436/artifacts/13773615495) | 0 falhas, os mesmos 6 avisos e 62 regras aprovadas no login público |
+| Dependências no JAR | [Inventário](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198436/artifacts/13773615495) | Tomcat `10.1.61` e Spring WebMVC `6.2.19` |
+| Dependency Review | [PR #205](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42819925773) e [PR #206](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825752612) | Jobs aprovados nos SHAs `a7c2982d25c6ce848a1d95554df26e0ea590dac5` e `1f3a66338fadb2ec01352d0a7333cc1917e6fe74`, respectivamente. Evidência de PR, sem execução de Dependency Review no SHA de merge da candidata |
+| Secret Scanning e Push protection | [Registro das capturas no PR #200](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/200) e [painel do repositório](https://github.com/pedrobertanhi/GerenciadorDeSalas/security/secret-scanning) | Controles habilitados e 0 alertas abertos na consulta de 09/11/2026. Evidência histórica no nível do repositório, sem resultado específico por SHA |
+| Trivy Image | [Justificativa de escopo](COBERTURA_SEC04_ENT02.md#artefato-da-aplicação-após-o-pr-203) | O artefato da aplicação é o JAR. O repositório não publica imagem dela para esta candidata |
+
+### Decisões para a revisão final
+
+- **Escopo do ZAP.** [Pedro aprovou o PR #206](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/206#pullrequestreview-5843135891) e considerou a delimitação consistente com as execuções. Os testes de autorização complementam o ZAP público. O parecer ainda precisa da decisão sobre o risco residual das respostas autenticadas e administrativas fora da análise passiva.
+- **Seis avisos do ZAP.** A triagem abaixo mantém os itens de CSP, SRI, Permissions Policy e COEP para tratamento ou aceite. O conteúdo não armazenável e a identificação do mecanismo de sessão têm o contexto funcional registrado. O revisor deve registrar a decisão sobre o conjunto.
+- **Spring WebMVC.** A [triagem de dependências](COBERTURA_SEC04_ENT02.md#atualização-do-tomcat-e-triagem-de-spring-webmvc) registra a versão afetada e os limites da revisão estática. A correção suportada ou o aceite formal do risco permanece pendente.
+- **Decisão de liberação.** A aprovação do #206 comprova a revisão daquele PR. O gate final da candidata aguarda a decisão explícita do revisor na [issue #184](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/184), com SHA, riscos aceitos ou correções exigidas.
+
+## Candidata anterior após a atualização do Tomcat
 
 SHA analisado: [`3e3ebad7f5fe04980f78a2462ce3206fd0ebba6f`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/3e3ebad7f5fe04980f78a2462ce3206fd0ebba6f), merge do PR #205 em `main`.
 
