@@ -162,16 +162,16 @@ O [Maven Verify #42734185387](https://github.com/pedrobertanhi/GerenciadorDeSala
 | Inativação sem exclusão e proteção do último administrador | `UsuarioAdminService`, `UsuarioAdminIntegracaoTest` | Suite aprovada no Maven Verify #42734185387 |
 | Sessão de conta inativada bloqueada | `FiltroUsuarioAtivoTest`, `UsuarioInativoSessaoWebTest`, `UsuarioAdminIntegracaoTest` | Suite aprovada no Maven Verify #42734185387 |
 | Registro das alterações administrativas | `UsuarioAdminService` e `AuditService`, `UsuarioAdminIntegracaoTest` | Suite aprovada no Maven Verify #42734185387 |
-| Controles e evidências da release | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Relatórios de segurança pendentes para o SHA candidato |
+| Controles e evidências da release | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Resultados vinculados à candidata abaixo; revisão pendente |
 
 ### ENT-02 — Evidências complementares
 
 | Critério | Rastreabilidade | Situação |
 |---|---|---|
 | API administrativa, revogação de sessão e auditoria | [PR #188](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/188) e [Maven Verify do PR](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42729955054) | CI verde no PR da API |
-| Interface administrativa e autorização | [PR #189](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/189), `UsuarioWebControllerTest` | Suite aprovada no Maven Verify #42734185387. [Cinco testes de navegador aprovados](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42735598179) no SHA `e62e86cc770bed2c08832da8f4eaf15fff08ce9f`; evidência do commit final da release pendente |
+| Interface administrativa e autorização | [PR #189](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/189), `UsuarioWebControllerTest` | Suite aprovada no Maven Verify #42734185387. [Cinco testes de navegador aprovados](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42735598179) no SHA `e62e86cc770bed2c08832da8f4eaf15fff08ce9f`; revalidação registrada na candidata abaixo |
 | Política HTTP e por perfil, propriedade de reservas e respostas seguras | [Matriz de segurança das rotas](seguranca/MATRIZ_DE_ROTAS.md) | Inventário e testes existentes mapeados; lacunas registradas |
-| CI e controles de segurança no mesmo commit ou tag | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Maven Verify confirmado para o SHA candidato. Relatórios de segurança e revisão pendentes |
+| CI e controles de segurança no mesmo commit ou tag | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Maven Verify, CodeQL, Trivy filesystem e ZAP vinculados ao SHA candidato. Revisão pendente |
 
 ### ENT-02 — Candidata após o PR #193
 
@@ -179,4 +179,8 @@ SHA `59fa404c2981955143032a8bf876665a9138e681`. [Maven Verify](https://github.co
 
 ### ENT-02 — Candidata após o PR #200
 
-SHA `f3b3d44d08c9f79b3db9593bc86f864866f4f248`. [Maven Verify](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527307): Aprovado — 835 testes, 0 falhas, 0 erros e 0 ignorados. Cinco casos de navegador executados.. [CodeQL](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527440) e [Trivy filesystem](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527276) concluídos com sucesso. [ZAP Baseline](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527332): 0 falhas, 6 avisos e 62 regras aprovadas. A triagem dos avisos, a evidência do Secret scanning e a revisão pendente constam no [parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md).
+SHA `f3b3d44d08c9f79b3db9593bc86f864866f4f248`. [Maven Verify](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527307): Aprovado — 835 testes, 0 falhas, 0 erros e 0 ignorados. Cinco casos de navegador executados. [CodeQL](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527440) e [Trivy filesystem](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527276) concluídos com sucesso. [ZAP Baseline](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42740527332): 0 falhas, 6 avisos e 62 regras aprovadas. A triagem dos avisos, a evidência do Secret scanning e a revisão pendente constam no [parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md).
+
+### ENT-02 — Candidata após as atualizações de dependências
+
+SHA `a5b38c7e06278dc5db51188195364808bdbd5f4c`. [Maven Verify](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507363) executou 835 testes, incluindo os cinco de navegador, sem falhas, erros ou ignorados. [CodeQL](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507704) e [Trivy filesystem](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507503) passaram. [ZAP Baseline](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507387) registrou 0 falhas, 6 avisos já triados e 62 regras aprovadas. A decisão de liberação aguarda revisão do [parecer](seguranca/PARECER_DE_SEGURANCA.md).
