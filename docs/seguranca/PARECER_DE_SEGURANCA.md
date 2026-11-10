@@ -2,7 +2,34 @@
 
 > Status: evidências da candidata atualizadas. A decisão de liberação da ENT-02 (#184) aguarda revisão de outro integrante. Responsável pela entrega: @davisalves38-lab.
 
-## Candidata após as atualizações de dependências
+## Candidata após a atualização do Tomcat
+
+SHA analisado: [`3e3ebad7f5fe04980f78a2462ce3206fd0ebba6f`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/3e3ebad7f5fe04980f78a2462ce3206fd0ebba6f), merge do PR #205 em `main`.
+
+| Controle | Execução | Resultado |
+|---|---|---|
+| Maven Verify | [CI](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196207) | Em andamento na conferência |
+| CodeQL | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196374) | Concluído com sucesso |
+| Trivy filesystem | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196164) | Concluído com sucesso |
+| ZAP Baseline | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196168) e [artefato](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196168/artifacts/13769440968) | Concluído com sucesso — 0 falhas, 6 avisos e 62 regras aprovadas |
+
+O inventário do JAR nesse SHA confirmou Tomcat `10.1.61` e Spring WebMVC `6.2.19`. A atualização do Tomcat foi confirmada no artefato. O Spring WebMVC permanece na faixa afetada descrita na [triagem de dependências](COBERTURA_SEC04_ENT02.md).
+
+### Proposta de escopo para o ZAP autenticado
+
+O [workflow](../../.github/workflows/zap-baseline.yml) analisa passivamente a superfície pública de login em instância local descartável. O scanner não abre sessão autenticada. Propõe-se manter esse recorte para a candidata e usar a suíte funcional como evidência complementar de controle de acesso nas rotas autenticadas e administrativas.
+
+| Controle | Evidência funcional |
+|---|---|
+| Acesso à administração de usuários por perfil, sessão ausente e CSRF | `UsuarioControllerSecurityTest` e `UsuarioAdminIntegracaoTest` |
+| Acesso a telas administrativas em desktop e celular | `UsuariosNavegadorTest` |
+| Conta inativa e sessão com perfil revogado | `UsuarioInativoSessaoWebTest` e `UsuarioAdminIntegracaoTest` |
+| Auditoria por perfil e respostas 401/403 | `AutorizacaoPorPerfilWebTest`, incluindo as negações para SOLICITANTE e RESPONSAVEL do #203 |
+| Propriedade da reserva | `ReservationManagementServiceTest`, no serviço |
+
+Os testes funcionais verificam autenticação, autorização e respostas esperadas. As respostas autenticadas seguem fora da análise passiva do ZAP, inclusive cabeçalhos, dependências de páginas e exposição de dados que esse scanner poderia observar. O revisor precisa decidir se aceita esse risco residual para a candidata ou exige análise passiva autenticada em ambiente controlado. Os seis avisos públicos continuam na triagem histórica abaixo, com tratamento ou aceite a registrar. A proposta não altera os gates de liberação.
+
+## Candidata anterior após as atualizações de dependências
 
 SHA analisado: [`a5b38c7e06278dc5db51188195364808bdbd5f4c`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/a5b38c7e06278dc5db51188195364808bdbd5f4c). As quatro execuções abaixo foram disparadas na `main` e apontam para esse SHA.
 
