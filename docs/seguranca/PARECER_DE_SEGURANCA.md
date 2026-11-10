@@ -28,6 +28,10 @@
 
 A execução [#42734185387](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42734185387) foi disparada por um push na `main`. O campo `head_sha` da [API do GitHub Actions](https://api.github.com/repos/pedrobertanhi/GerenciadorDeSalas/actions/runs/42734185387) confirma que o SHA testado, `8385c6aab6e7b14de964aaf90317f917f9b99397`, coincide com o da candidata. O resultado de 830 testes se aplica a esse SHA.
 
+## Evidência de navegador após a candidata acima
+
+O [Maven Verify do PR #192](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42735598179) executou `UsuariosNavegadorTest` em desktop (1280 × 800) e celular (390 × 844), incluindo paginação e acesso por perfil. Foram 5 casos aprovados, com zero falhas, erros ou ignorados no SHA `e62e86cc770bed2c08832da8f4eaf15fff08ce9f`. Revalidar no SHA que reunir os controles de segurança para a release.
+
 ## Lacunas da candidata
 
 - A árvore versionada contém apenas os workflows `ci.yml` e `docker-compose.yml`. CodeQL, revisão de dependências, Trivy, Dependabot e ZAP não têm configuração versionada nessa candidata. Verificar também alertas, secret scanning e push protection nas configurações do repositório.
