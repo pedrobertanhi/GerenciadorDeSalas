@@ -5,6 +5,8 @@ import br.com.senac.gerenciadordesalas.erro.RecursoNaoEncontradoException;
 import br.com.senac.gerenciadordesalas.auditoria.AuditService;
 import br.com.senac.gerenciadordesalas.auditoria.TipoAcaoAuditoria;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +58,11 @@ public class UsuarioAdminService {
                         .thenComparing(User::getEmail))
                 .map(UsuarioDto.Saida::de)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UsuarioDto.Saida> paginar(Pageable pagina) {
+        return usuarios.findAllBy(pagina).map(UsuarioDto.Saida::de);
     }
 
     @Transactional(readOnly = true)
