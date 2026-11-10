@@ -19,7 +19,7 @@ SHA de referência: [`1fb69f8488422702f8eee58917bdcf1730334fe6`](https://github.
 
 ## Decisão registrada de escopo e risco — 10/11/2026
 
-Decisão registrada por Pedro Bertanhi no [PR #208](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/208) para a candidata `1fb69f8488422702f8eee58917bdcf1730334fe6`. A [issue #184](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/184) permanece aberta.
+Decisão registrada neste [PR #207](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/207) para a candidata, conforme a [revisão de Pedro Bertanhi](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/207#issuecomment-6772701232), com SHA `1fb69f8488422702f8eee58917bdcf1730334fe6`. A [issue #184](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/184) permanece aberta.
 
 | Item | Decisão | Fundamentação e condição |
 |---|---|---|
