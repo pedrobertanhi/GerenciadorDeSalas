@@ -1,0 +1,75 @@
+name: ZAP Baseline
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: gerenciador_salas_zap
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: zap_ci_local
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d gerenciador_salas_zap"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Compilar a aplicação
+        run: bash mvnw --batch-mode --no-transfer-progress -DskipTests package
+      - name: Iniciar aplicação local
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+          SERVER_ADDRESS: 127.0.0.1
+          DB_URL: jdbc:postgresql://127.0.0.1:5432/gerenciador_salas_zap
+          DB_USERNAME: postgres
+          DB_PASSWORD: zap_ci_local
+        run: |
+          jar="$(find target -maxdepth 1 -type f -name '*.jar' -print -quit)"
+          test -n "$jar"
+          java -jar "$jar" > "$RUNNER_TEMP/zap-app.log" 2>&1 &
+          if ! curl --fail --silent --show-error --retry 24 --retry-connrefused --retry-delay 5 \
+            --max-time 5 http://127.0.0.1:8080/login > /dev/null; then
+            tail -n 50 "$RUNNER_TEMP/zap-app.log"
+            exit 1
+          fi
+      - name: Executar análise passiva no login local
+        run: |
+          install -d -m 0777 "$RUNNER_TEMP/zap-report"
+          git rev-parse HEAD > "$RUNNER_TEMP/zap-report/commit.txt"
+          docker run --rm --network host \
+            -v "$RUNNER_TEMP/zap-report:/zap/wrk:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t http://127.0.0.1:8080/login -m 1 -I \
+            -z "-config spider.processForm=false -config spider.postForm=false" \
+            -r zap-baseline.html -J zap-baseline.json
+          test -s "$RUNNER_TEMP/zap-report/zap-baseline.json"
+      - name: Publicar relatório e SHA analisado
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zap-baseline-${{ github.sha }}
+          path: ${{ runner.temp }}/zap-report/
+          if-no-files-found: warn
+          retention-days: 14
