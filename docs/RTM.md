@@ -184,3 +184,7 @@ SHA `f3b3d44d08c9f79b3db9593bc86f864866f4f248`. [Maven Verify](https://github.co
 ### ENT-02 — Candidata após as atualizações de dependências
 
 SHA `a5b38c7e06278dc5db51188195364808bdbd5f4c`. [Maven Verify](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507363) executou 835 testes, incluindo os cinco de navegador, sem falhas, erros ou ignorados. [CodeQL](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507704) e [Trivy filesystem](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507503) passaram. [ZAP Baseline](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507387) registrou 0 falhas, 6 avisos já triados e 62 regras aprovadas. A decisão de liberação aguarda revisão do [parecer](seguranca/PARECER_DE_SEGURANCA.md).
+
+### ENT-02 — Evidências após o PR #206
+
+SHA `1fb69f8488422702f8eee58917bdcf1730334fe6`. [Maven Verify](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198363) executou 837 testes sem falhas, erros ou ignorados. [CodeQL](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198408), [Trivy filesystem](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198435) e [ZAP Baseline](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198436) passaram. O [parecer](seguranca/PARECER_DE_SEGURANCA.md#evidências-consolidadas-da-candidata) registra o inventário do JAR, o escopo e os SHAs do Dependency Review, a evidência de Secret Scanning no repositório e as decisões ainda pendentes.
