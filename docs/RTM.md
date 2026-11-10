@@ -169,6 +169,6 @@ O [Maven Verify #42734185387](https://github.com/pedrobertanhi/GerenciadorDeSala
 | Critério | Rastreabilidade | Situação |
 |---|---|---|
 | API administrativa, revogação de sessão e auditoria | [PR #188](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/188) e [Maven Verify do PR](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42729955054) | CI verde no PR da API |
-| Interface administrativa e autorização | [PR #189](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/189), `UsuarioWebControllerTest` | Suite aprovada no Maven Verify #42734185387. Validação manual em desktop e celular pendente |
+| Interface administrativa e autorização | [PR #189](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/189), `UsuarioWebControllerTest` | Suite aprovada no Maven Verify #42734185387. [Cinco testes de navegador aprovados](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42735598179) no SHA `e62e86cc770bed2c08832da8f4eaf15fff08ce9f`; evidência do commit final da release pendente |
 | Política HTTP e por perfil, propriedade de reservas e respostas seguras | [Matriz de segurança das rotas](seguranca/MATRIZ_DE_ROTAS.md) | Inventário e testes existentes mapeados; lacunas registradas |
 | CI e controles de segurança no mesmo commit ou tag | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Maven Verify confirmado para o SHA candidato. Relatórios de segurança e revisão pendentes |
