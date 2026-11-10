@@ -1,5 +1,6 @@
 package br.com.senac.gerenciadordesalas.seguranca;
 
+import br.com.senac.gerenciadordesalas.usuario.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -43,6 +45,7 @@ public class SecurityConfig {
             HttpSecurity http,
             RespostasDeSeguranca respostas,
             FiltroLimiteTentativasLogin filtroLimite,
+            UserRepository usuarios,
             LimitadorTentativasLogin limitador) throws Exception {
         http
                 .authorizeHttpRequests(requisicoes -> requisicoes
@@ -175,7 +178,8 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler((requisicao, resposta, autenticacao) ->
                                 resposta.setStatus(HttpStatus.NO_CONTENT.value())))
-                .addFilterBefore(filtroLimite, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(filtroLimite, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new FiltroUsuarioAtivo(usuarios), AuthorizationFilter.class);
 
         return http.build();
     }
