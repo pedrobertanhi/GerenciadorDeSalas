@@ -124,6 +124,32 @@ class UsuarioAdminIntegracaoTest extends IntegracaoPostgresBase {
     }
 
     @Test
+    void alteracaoDePerfilRegistraAuditoriaERevogaPrivilegiosDaSessao() throws Exception {
+        User ator = criar("Admin Um", "ator@exemplo.test", Role.ADMINISTRADOR);
+        User alvo = criar("Admin Dois", "alvo@exemplo.test", Role.ADMINISTRADOR);
+        MockHttpSession sessaoAtor = entrar(ator.getEmail());
+        MockHttpSession sessaoAlvo = entrar(alvo.getEmail());
+
+        mockMvc.perform(put("/api/usuarios/{id}", alvo.getId()).session(sessaoAtor).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nome": "Admin Dois", "perfil": "SOLICITANTE"}
+                                """))
+                .andExpect(status().isOk());
+        sincronizar();
+        entityManager.clear();
+
+        mockMvc.perform(get("/api/usuarios").session(sessaoAlvo).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+
+        assertThat(consultar("""
+                select estado_novo from tb_eventos_auditoria
+                where entidade = 'USUARIO' and entidade_id = ? and ator_id = ?
+                  and acao = 'ALTERACAO' and estado_anterior = 'ADMINISTRADOR'
+                """, String.class, alvo.getId(), ator.getId())).isEqualTo("SOLICITANTE");
+    }
+
+    @Test
     void sessaoAbertaDeUsuarioInativadoDeixaDeValerENaoEntraDeNovo() throws Exception {
         User ana = criar("Ana", "ana@exemplo.test", Role.SOLICITANTE);
         MockHttpSession sessao = entrar("ana@exemplo.test");
