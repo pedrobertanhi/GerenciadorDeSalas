@@ -1,8 +1,37 @@
 # Parecer Final de Segurança
 
-> Status: liberação temporariamente reprovada para a candidata da ENT-02 (#184) pelo risco do Spring WebMVC. Responsável pela entrega: @davisalves38-lab.
+> Status: bloqueio técnico do Spring WebMVC corrigido na candidata após o PR #209. Parecer de liberação aguardando revisão final. Responsável pela entrega: @davisalves38-lab.
 
-## Evidências consolidadas da candidata
+## Candidata atual após o PR #209
+
+SHA de referência: [`1fde5bd4fd74cfa4ec6c4dea3789a44adc6bc4e3`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/1fde5bd4fd74cfa4ec6c4dea3789a44adc6bc4e3), merge da migração para Spring Boot `4.1.2` e Springdoc `3.2.0`. As quatro execuções abaixo correspondem ao evento `push` na `main` e ao mesmo SHA.
+
+| Controle | Evidência | Resultado e escopo |
+|---|---|---|
+| Maven Verify | [CI](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680085) | 837 testes, sem falhas, erros ou ignorados |
+| CodeQL | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920679984) | Job concluído com sucesso |
+| Trivy filesystem | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920679983) | Job concluído com sucesso no filtro de severidade crítica |
+| ZAP Baseline | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680022) e [relatório e inventário](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680022/artifacts/13810549984) | 0 falhas, os mesmos 6 avisos (10038, 10049, 10063, 10112, 90003 e 90004) e 62 regras aprovadas no login público |
+| Dependências no JAR | [Inventário](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680022/artifacts/13810549984) | `spring-webmvc-7.0.10.jar` e `tomcat-embed-core-11.0.27.jar` |
+| Dependency Review | [Execução do PR #209](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42887338718) | Concluída com sucesso no PR de migração, head `bc0d2cf1c41698e084bb1a48aa44659820c05f82`. Evidência de PR, sem execução no SHA de merge |
+| Secret Scanning e Push protection | [Registro das capturas no PR #200](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/200) e [painel do repositório](https://github.com/pedrobertanhi/GerenciadorDeSalas/security/secret-scanning) | Habilitados e 0 alertas abertos na consulta de 09/11/2026. Evidência histórica do repositório, sem resultado específico por SHA |
+| Trivy Image | [Justificativa de escopo](COBERTURA_SEC04_ENT02.md#artefato-da-aplicação-após-o-pr-203) | Entrega em JAR, sem imagem da aplicação publicada por esta candidata |
+
+O JAR analisado pelo ZAP tem SHA-256 `8ecff5fcf0f7aae7fba759b00a9bc815c2a151034a95abb555ed9e5129189e58`. O relatório e o inventário têm retenção até 24/11/2026.
+
+### Tratamento do bloqueio e decisão pendente
+
+A versão empacotada `7.0.10` supera a correção OSS `7.0.9` indicada nos boletins [CVE-2026-47884](https://spring.io/security/cve-2026-47884/) e [CVE-2026-47890](https://spring.io/security/cve-2026-47890/). O bloqueio específico registrado para WebMVC `6.2.19` foi tratado pela atualização suportada e conferido no JAR. Isso não constitui garantia de ausência de outras vulnerabilidades.
+
+A [aprovação de Pedro no PR #209](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/209#pullrequestreview-5849610124) registra a revisão da migração, dos ajustes de código e testes e da CI. A decisão histórica do PR #207 permanece válida para a candidata anterior. O aceite limitado do ZAP e dos seis avisos deve ser confirmado para este novo SHA na revisão final deste parecer.
+
+A issue [#184](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/184) permanece aberta até o registro explícito da decisão de liberação para esta candidata e a integração deste parecer. Não há liberação aprovada registrada por este documento.
+
+## Histórico das candidatas anteriores
+
+As seções abaixo preservam os resultados e as decisões dos respectivos SHAs. Pendências e reprovações históricas não descrevem o estado técnico da candidata atual.
+
+## Evidências consolidadas da candidata após o PR #206
 
 SHA de referência: [`1fb69f8488422702f8eee58917bdcf1730334fe6`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/1fb69f8488422702f8eee58917bdcf1730334fe6), merge do PR #206. As quatro execuções na `main` abaixo foram conferidas para esse SHA.
 
@@ -160,7 +189,7 @@ O [Maven Verify do PR #192](https://github.com/pedrobertanhi/GerenciadorDeSalas/
 - Para a validação visual, usar contas sintéticas e repetir em desktop e viewport móvel os fluxos de listagem e paginação, cadastro, edição, ativação e inativação em **Salas → Gerenciar usuários**. Conferir acesso negado para os outros perfis. Registrar navegador, dimensões, resultado e capturas sem credenciais.
 - Evidências dos PRs da API e das telas são rastreadas na RTM e se referem aos respectivos commits.
 
-## Gate
+## Gate histórico da candidata anterior
 
 - [ ] Zero vulnerabilidade crítica confirmada e aberta.
 - [ ] Nenhum segredo confirmado.
@@ -170,7 +199,7 @@ O [Maven Verify do PR #192](https://github.com/pedrobertanhi/GerenciadorDeSalas/
 - [ ] A release analisada é a mesma da decisão de qualidade.
 - [ ] Outro integrante revisou as evidências.
 
-## Parecer
+## Parecer histórico da candidata anterior
 
 - [ ] APROVADA
 - [x] REPROVADA temporariamente
