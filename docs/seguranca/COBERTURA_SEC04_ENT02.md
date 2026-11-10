@@ -1,5 +1,17 @@
 # Cobertura da SEC-04 na ENT-02
 
+## Situação atual após o PR #209
+
+A migração foi integrada no SHA `1fde5bd4fd74cfa4ec6c4dea3789a44adc6bc4e3`. O [inventário do JAR](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680022/artifacts/13810549984) confirma Spring WebMVC `7.0.10` e Tomcat `11.0.27`, gerenciados pelo Spring Boot `4.1.2`. O bloqueio específico de WebMVC `6.2.19` foi corrigido.
+
+O [Maven Verify](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680085) executou 837 testes sem falhas, erros ou ignorados, incluindo os dois cenários de leitura de auditoria negada adicionados no PR #203. CodeQL, Trivy filesystem e ZAP no mesmo SHA estão vinculados ao [parecer atual](PARECER_DE_SEGURANCA.md#candidata-atual-após-o-pr-209).
+
+O ZAP continua público, com 0 falhas, 6 avisos e 62 regras aprovadas. A confirmação do aceite residual e da liberação da nova candidata aguarda revisão final. Trivy Image permanece sem alvo da aplicação no formato de entrega em JAR.
+
+## Comparação histórica com o rascunho #179
+
+As pendências abaixo correspondem aos SHAs históricos indicados e devem ser lidas junto da atualização acima.
+
 Comparação entre o [rascunho #179](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/179) (`b813391`) e a candidata histórica `a5b38c7`. O [Maven Verify da candidata](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42741507363) executou 835 testes, sem falhas, erros ou ignorados. Os testes adicionados depois desse SHA exigem nova evidência de CI.
 
 | Critério do rascunho | Evidência em a5b38c7 | Encaminhamento |
