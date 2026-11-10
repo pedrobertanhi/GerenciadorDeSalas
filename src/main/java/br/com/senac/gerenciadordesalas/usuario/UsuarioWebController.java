@@ -41,13 +41,17 @@ public class UsuarioWebController {
     }
 
     @GetMapping
-    public String listar(@RequestParam(defaultValue = "0") int page, Model model) {
+    public String listar(@RequestParam(defaultValue = "0") int page,
+                         @RequestParam(required = false) String aviso, Model model) {
         int numero = Math.max(0, Math.min(page, Integer.MAX_VALUE / TAMANHO_PAGINA));
         var resultado = service.paginar(PageRequest.of(numero, TAMANHO_PAGINA, ORDEM));
         if (numero > 0 && resultado.isEmpty()) {
             return LISTA;
         }
         model.addAttribute("resultado", resultado);
+        if ("nao-encontrado".equals(aviso)) {
+            model.addAttribute("aviso", "Usuário não encontrado.");
+        }
         return "usuarios/lista";
     }
 
@@ -123,8 +127,7 @@ public class UsuarioWebController {
     }
 
     @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public String usuarioNaoEncontrado(RedirectAttributes redirect) {
-        redirect.addFlashAttribute("aviso", "Usuário não encontrado.");
-        return LISTA;
+    public String usuarioNaoEncontrado() {
+        return LISTA + "?aviso=nao-encontrado";
     }
 }
