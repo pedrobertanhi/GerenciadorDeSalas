@@ -222,12 +222,18 @@ class AprovacaoDocenteIntegrationTest extends IntegracaoPostgresBase {
     void outrosPerfis_naoValidamDocente(String perfil) throws Exception {
         Long id = criarComProfessor(List.of()).id();
 
+        String email = SOLICITANTE;
+        if ("ADMINISTRADOR".equals(perfil)) {
+            email = "admin.negado@exemplo.test";
+            usuarios.save(new User("Admin Negado", email, "$2a$10$hashBcryptFalso", Role.ADMINISTRADOR));
+        }
+
         mockMvc.perform(post("/api/reservas/{id}/validar-docente", id)
-                        .with(user(SOLICITANTE).roles(perfil))
+                        .with(user(email).roles(perfil))
                         .with(csrf()))
                 .andExpect(status().isForbidden());
         mockMvc.perform(post("/api/reservas/{id}/rejeitar-docente", id)
-                        .with(user(SOLICITANTE).roles(perfil))
+                        .with(user(email).roles(perfil))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"motivo\": \"Nao posso\"}"))
