@@ -8,7 +8,7 @@ SHA analisado: [`3e3ebad7f5fe04980f78a2462ce3206fd0ebba6f`](https://github.com/p
 
 | Controle | Execução | Resultado |
 |---|---|---|
-| Maven Verify | [CI](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196207) | Em andamento na conferência |
+| Maven Verify | [CI](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196207) | Concluído com sucesso — 837 testes, sem falhas, erros ou ignorados |
 | CodeQL | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196374) | Concluído com sucesso |
 | Trivy filesystem | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196164) | Concluído com sucesso |
 | ZAP Baseline | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196168) e [artefato](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825196168/artifacts/13769440968) | Concluído com sucesso — 0 falhas, 6 avisos e 62 regras aprovadas |
