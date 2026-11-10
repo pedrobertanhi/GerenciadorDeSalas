@@ -1,5 +1,7 @@
 # Matriz de Permissões
 
+A [matriz de segurança das rotas](MATRIZ_DE_ROTAS.md) detalha a política HTTP implementada e os testes existentes.
+
 ## Objetivo
 
 Definir as ações permitidas aos perfis Solicitante, Responsável e Administrador.
