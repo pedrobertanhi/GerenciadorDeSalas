@@ -150,3 +150,14 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 | MNT-05 | Alterar e cancelar só em bloqueio ativo, e concluir só se já começou | MaintenanceBlockTest + MaintenanceBlockServiceTest + BloqueioManutencaoIntegracaoTest | Automatizado |
 | MNT-06 | Consulta por tipo, recurso e estado, do mais recente ao mais antigo | BloqueioManutencaoIntegracaoTest | Automatizado |
 | MNT-07 | Constraints do banco barram bloqueio inválido | ConstraintsBloqueiosManutencaoTest | Automatizado |
+
+## ENT-02 — Administração de usuários
+
+| Critério | Implementação e testes | Evidência |
+|---|---|---|
+| Administração restrita a ADMINISTRADOR | `SecurityConfig`, `UsuarioController`, `UsuarioControllerSecurityTest` | Execução no CI pendente |
+| Cadastro validado, e-mail único e senha com hash | `UsuarioDto`, `UsuarioAdminServiceTest`, `UsuarioAdminIntegracaoTest` | Execução no CI pendente |
+| Inativação sem exclusão e proteção do último administrador | `UsuarioAdminService`, `UsuarioAdminIntegracaoTest` | Execução no CI pendente |
+| Sessão de conta inativada bloqueada | `FiltroUsuarioAtivoTest`, `UsuarioInativoSessaoWebTest`, `UsuarioAdminIntegracaoTest` | Execução no CI pendente |
+| Registro das alterações administrativas | `UsuarioAdminService` e `AuditService` | Execução no CI pendente |
+| Controles e evidências da release | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Pendente para o commit candidato |
