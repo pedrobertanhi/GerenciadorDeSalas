@@ -26,6 +26,8 @@
 | Maven Verify da candidata | CI iniciado na main | — | — | [Execução #42734185387](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42734185387) | Aprovado — 830 testes, 0 falhas, 0 erros e 0 ignorados |
 | Administração de usuários em desktop e celular | Não executada | — | — | A compilação local parou ao resolver o POM pai no Maven Central | Pendente |
 
+A execução [#42734185387](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42734185387) foi disparada por um push na `main`. O campo `head_sha` da [API do GitHub Actions](https://api.github.com/repos/pedrobertanhi/GerenciadorDeSalas/actions/runs/42734185387) confirma que o SHA testado, `8385c6aab6e7b14de964aaf90317f917f9b99397`, coincide com o da candidata. O resultado de 830 testes se aplica a esse SHA.
+
 ## Lacunas da candidata
 
 - A árvore versionada contém apenas os workflows `ci.yml` e `docker-compose.yml`. CodeQL, revisão de dependências, Trivy, Dependabot e ZAP não têm configuração versionada nessa candidata. Verificar também alertas, secret scanning e push protection nas configurações do repositório.
