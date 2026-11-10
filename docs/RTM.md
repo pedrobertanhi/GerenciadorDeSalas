@@ -153,20 +153,22 @@ Captura isolada não fecha a linha. O link deve continuar navegável e correspon
 
 ## ENT-02 — Administração de usuários
 
+O [Maven Verify #42734185387](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42734185387) passou na `main` para o SHA candidato `8385c6aab6e7b14de964aaf90317f917f9b99397`, com 830 testes e zero falhas, erros ou testes ignorados.
+
 | Critério | Implementação e testes | Evidência |
 |---|---|---|
-| Administração restrita a ADMINISTRADOR | `SecurityConfig`, `UsuarioController`, `UsuarioControllerSecurityTest` | Execução no CI pendente |
-| Cadastro validado, e-mail único e senha com hash | `UsuarioDto`, `UsuarioAdminServiceTest`, `UsuarioAdminIntegracaoTest` | Execução no CI pendente |
-| Inativação sem exclusão e proteção do último administrador | `UsuarioAdminService`, `UsuarioAdminIntegracaoTest` | Execução no CI pendente |
-| Sessão de conta inativada bloqueada | `FiltroUsuarioAtivoTest`, `UsuarioInativoSessaoWebTest`, `UsuarioAdminIntegracaoTest` | Execução no CI pendente |
-| Registro das alterações administrativas | `UsuarioAdminService` e `AuditService` | Execução no CI pendente |
-| Controles e evidências da release | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Pendente para o commit candidato |
+| Administração restrita a ADMINISTRADOR | `SecurityConfig`, `UsuarioController`, `UsuarioControllerSecurityTest` | Suite aprovada no Maven Verify #42734185387 |
+| Cadastro validado, e-mail único e senha com hash | `UsuarioDto`, `UsuarioAdminServiceTest`, `UsuarioAdminIntegracaoTest` | Suite aprovada no Maven Verify #42734185387 |
+| Inativação sem exclusão e proteção do último administrador | `UsuarioAdminService`, `UsuarioAdminIntegracaoTest` | Suite aprovada no Maven Verify #42734185387 |
+| Sessão de conta inativada bloqueada | `FiltroUsuarioAtivoTest`, `UsuarioInativoSessaoWebTest`, `UsuarioAdminIntegracaoTest` | Suite aprovada no Maven Verify #42734185387 |
+| Registro das alterações administrativas | `UsuarioAdminService` e `AuditService`, `UsuarioAdminIntegracaoTest` | Suite aprovada no Maven Verify #42734185387 |
+| Controles e evidências da release | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Relatórios de segurança pendentes para o SHA candidato |
 
 ### ENT-02 — Evidências complementares
 
 | Critério | Rastreabilidade | Situação |
 |---|---|---|
 | API administrativa, revogação de sessão e auditoria | [PR #188](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/188) e [Maven Verify do PR](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42729955054) | CI verde no PR da API |
-| Interface administrativa e autorização | [PR #189](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/189), `UsuarioWebControllerTest` | Código integrado; validação manual desktop/celular pendente |
+| Interface administrativa e autorização | [PR #189](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/189), `UsuarioWebControllerTest` | Suite aprovada no Maven Verify #42734185387. Validação manual em desktop e celular pendente |
 | Política HTTP e por perfil, propriedade de reservas e respostas seguras | [Matriz de segurança das rotas](seguranca/MATRIZ_DE_ROTAS.md) | Inventário e testes existentes mapeados; lacunas registradas |
-| CI e controles de segurança no mesmo commit ou tag | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Evidência e revisão da release pendentes |
+| CI e controles de segurança no mesmo commit ou tag | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Maven Verify confirmado para o SHA candidato. Relatórios de segurança e revisão pendentes |
