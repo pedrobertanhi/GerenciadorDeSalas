@@ -1,8 +1,37 @@
 # Parecer Final de Segurança
 
-> Status: evidências da candidata atualizadas. A decisão de liberação da ENT-02 (#184) aguarda revisão de outro integrante. Responsável pela entrega: @davisalves38-lab.
+> Status: liberação temporariamente reprovada para a candidata da ENT-02 (#184) pelo risco do Spring WebMVC. Responsável pela entrega: @davisalves38-lab.
 
-## Candidata após a atualização do Tomcat
+## Evidências consolidadas da candidata
+
+SHA de referência: [`1fb69f8488422702f8eee58917bdcf1730334fe6`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/1fb69f8488422702f8eee58917bdcf1730334fe6), merge do PR #206. As quatro execuções na `main` abaixo foram conferidas para esse SHA.
+
+| Controle | Evidência | Resultado e escopo |
+|---|---|---|
+| Maven Verify | [CI](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198363) | 837 testes, sem falhas, erros ou ignorados |
+| CodeQL | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198408) | Job concluído com sucesso |
+| Trivy filesystem | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198435) | Job concluído com sucesso no filtro de severidade crítica |
+| ZAP Baseline | [Execução](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198436) e [relatório e inventário](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198436/artifacts/13773615495) | 0 falhas, os mesmos 6 avisos e 62 regras aprovadas no login público |
+| Dependências no JAR | [Inventário](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42834198436/artifacts/13773615495) | Tomcat `10.1.61` e Spring WebMVC `6.2.19` |
+| Dependency Review | [PR #205](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42819925773) e [PR #206](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42825752612) | Jobs aprovados nos SHAs `a7c2982d25c6ce848a1d95554df26e0ea590dac5` e `1f3a66338fadb2ec01352d0a7333cc1917e6fe74`, respectivamente. Evidência de PR, sem execução de Dependency Review no SHA de merge da candidata |
+| Secret Scanning e Push protection | [Registro das capturas no PR #200](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/200) e [painel do repositório](https://github.com/pedrobertanhi/GerenciadorDeSalas/security/secret-scanning) | Controles habilitados e 0 alertas abertos na consulta de 09/11/2026. Evidência histórica no nível do repositório, sem resultado específico por SHA |
+| Trivy Image | [Justificativa de escopo](COBERTURA_SEC04_ENT02.md#artefato-da-aplicação-após-o-pr-203) | O artefato da aplicação é o JAR. O repositório não publica imagem dela para esta candidata |
+
+## Decisão registrada de escopo e risco — 10/11/2026
+
+Decisão registrada neste [PR #207](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/207) e na [issue #184](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/184) para a candidata `1fb69f8488422702f8eee58917bdcf1730334fe6`. A issue permanece aberta.
+
+| Item | Decisão | Fundamentação e condição |
+|---|---|---|
+| Escopo autenticado do ZAP | **Aceito de forma limitada para esta candidata** | O ZAP Baseline permanece restrito ao login público em ambiente descartável. A cobertura de autorização, sessão, CSRF, conta inativa, auditoria e propriedade é complementada pelos testes funcionais listados acima. Isso não equivale a DAST autenticado: cabeçalhos, dependências de páginas e exposição de dados das respostas autenticadas permanecem fora do scanner. |
+| Seis avisos do ZAP | **Risco residual aceito, sem criticidade confirmada** | Os avisos de conteúdo não armazenável e identificação de sessão descrevem comportamentos esperados. CSP, Permissions Policy, SRI e COEP permanecem como endurecimento pendente; não houve achado crítico confirmado no relatório. A alteração deve ser reavaliada antes de uma distribuição que exponha a aplicação fora do ambiente acadêmico controlado. |
+| Spring WebMVC 6.2.19 | **Risco não aceito para liberação** | A versão empacotada permanece na faixa afetada dos boletins registrados. A ausência de referências a XSLT e SSE reduz a aplicabilidade observada, mas não comprova que a vulnerabilidade está corrigida. A candidata não pode ser liberada até atualizar para uma versão corrigida suportada ou registrar uma justificativa técnica de não aplicabilidade revisada pelo responsável. |
+
+### Efeito no gate
+
+Os checks automatizados e os testes de autorização estão verdes, mas o risco do Spring WebMVC continua sem correção ou aceite técnico suficiente. Portanto, a decisão de liberação desta candidata é **REPROVADA temporariamente**, exclusivamente até tratar esse risco. O aceite do escopo reduzido do ZAP e dos seis avisos não remove esse bloqueio.
+
+## Candidata anterior após a atualização do Tomcat
 
 SHA analisado: [`3e3ebad7f5fe04980f78a2462ce3206fd0ebba6f`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/3e3ebad7f5fe04980f78a2462ce3206fd0ebba6f), merge do PR #205 em `main`.
 
@@ -144,8 +173,8 @@ O [Maven Verify do PR #192](https://github.com/pedrobertanhi/GerenciadorDeSalas/
 ## Parecer
 
 - [ ] APROVADA
-- [ ] REPROVADA
+- [x] REPROVADA temporariamente
 
-Decisão pendente de revisão dos resultados e riscos residuais.
+Decisão registrada acima. Reavaliar a liberação após corrigir o Spring WebMVC ou registrar uma justificativa técnica de não aplicabilidade revisada pelo responsável.
 
 Se qualquer etapa obrigatória estiver ausente ou houver vulnerabilidade crítica confirmada, o parecer deve ser **REPROVADA**.
