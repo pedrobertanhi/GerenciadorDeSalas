@@ -107,8 +107,11 @@ class ReservationCriacaoIntegrationTest extends IntegracaoPostgresBase {
     @ParameterizedTest
     @ValueSource(strings = {"RESPONSAVEL", "ADMINISTRADOR"})
     void perfilSemPermissaoDeCriacao_recebe403(String perfil) throws Exception {
+        String email = "perfil.negado@exemplo.test";
+        usuarios.save(new User("Perfil Negado", email, "$2a$10$hashBcryptFalso", Role.valueOf(perfil)));
+
         mockMvc.perform(post("/api/reservas")
-                        .with(user(EMAIL).roles(perfil))
+                        .with(user(email).roles(perfil))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(corpoValido()))
