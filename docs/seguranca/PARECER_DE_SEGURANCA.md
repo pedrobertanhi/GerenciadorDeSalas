@@ -1,6 +1,6 @@
 # Parecer Final de Segurança
 
-> Status: evidências da candidata atualizadas. A decisão de liberação da ENT-02 (#184) aguarda revisão de outro integrante. Responsável pela entrega: @davisalves38-lab.
+> Status: decisão de risco registrada para a candidata da ENT-02 (#184). A liberação permanece bloqueada pelo risco do Spring WebMVC. Responsável pela entrega: @davisalves38-lab.
 
 ## Candidata após a atualização do Tomcat
 
@@ -28,6 +28,18 @@ O [workflow](../../.github/workflows/zap-baseline.yml) analisa passivamente a su
 | Propriedade da reserva | `ReservationManagementServiceTest`, no serviço |
 
 Os testes funcionais verificam autenticação, autorização e respostas esperadas. As respostas autenticadas seguem fora da análise passiva do ZAP, inclusive cabeçalhos, dependências de páginas e exposição de dados que esse scanner poderia observar. O revisor precisa decidir se aceita esse risco residual para a candidata ou exige análise passiva autenticada em ambiente controlado. Os seis avisos públicos continuam na triagem histórica abaixo, com tratamento ou aceite a registrar. A proposta não altera os gates de liberação.
+
+## Decisão registrada de escopo e risco — 10/11/2026
+
+| Item | Decisão | Fundamentação e condição |
+|---|---|---|
+| Escopo autenticado do ZAP | **Aceito de forma limitada para esta candidata** | O ZAP Baseline permanece restrito ao login público em ambiente descartável. A cobertura de autorização, sessão, CSRF, conta inativa, auditoria e propriedade é complementada pelos testes funcionais listados acima. Isso não equivale a DAST autenticado: cabeçalhos, dependências de páginas e exposição de dados das respostas autenticadas permanecem fora do scanner. |
+| Seis avisos do ZAP | **Risco residual aceito, sem criticidade confirmada** | Os avisos de conteúdo não armazenável e identificação de sessão descrevem comportamentos esperados. CSP, Permissions Policy, SRI e COEP permanecem como endurecimento pendente; não houve achado crítico confirmado no relatório. A alteração deve ser reavaliada antes de uma distribuição que exponha a aplicação fora do ambiente acadêmico controlado. |
+| Spring WebMVC 6.2.19 | **Risco não aceito para liberação** | A versão empacotada permanece na faixa afetada dos boletins registrados. A ausência de referências a XSLT e SSE reduz a aplicabilidade observada, mas não comprova que a vulnerabilidade está corrigida. A candidata não pode ser liberada até atualizar para uma versão corrigida suportada ou registrar uma justificativa técnica de não aplicabilidade revisada pelo responsável. |
+
+### Efeito no gate
+
+Os checks automatizados e os testes de autorização estão verdes, mas o risco do Spring WebMVC continua sem correção ou aceite técnico suficiente. Portanto, a decisão de liberação desta candidata é **REPROVADA temporariamente**, exclusivamente até tratar esse risco. O aceite do escopo reduzido do ZAP e dos seis avisos não remove esse bloqueio.
 
 ## Candidata anterior após as atualizações de dependências
 
