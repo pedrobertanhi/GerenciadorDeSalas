@@ -1,6 +1,10 @@
 package br.com.senac.gerenciadordesalas.usuario;
 
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +28,12 @@ public interface UserRepository extends Repository<User, Long> {
     Optional<User> findByEmailIgnoreCase(String email);
 
     boolean existsByEmailIgnoreCase(String email);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from User u where u.profile = :perfil and u.active = true order by u.id")
+    List<User> bloquearAtivosDoPerfil(@Param("perfil") Role perfil);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from User u where u.id = :id")
+    Optional<User> bloquearPorId(@Param("id") Long id);
 }
