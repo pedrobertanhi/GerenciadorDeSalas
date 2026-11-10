@@ -16,3 +16,11 @@ Comparação entre o [rascunho #179](https://github.com/pedrobertanhi/Gerenciado
 A migração de Spring Boot 4 do rascunho #179 fica fora deste recorte. A candidata histórica usa Spring Boot 3.5.16. O teste preventivo `RegressaoRecursosSpringMvcTest` do rascunho não foi executado nessa candidata, e sua inclusão não corrigiria uma versão afetada. Antes de liberar, conferir os componentes resolvidos contra os avisos oficiais e registrar o resultado da triagem. [CVE-2026-47884](https://spring.io/security/cve-2026-47884/) e [CVE-2026-47890](https://spring.io/security/cve-2026-47890/).
 
 A decisão de liberação continua pendente na [issue #184](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/184).
+
+## Artefato da aplicação após o PR #203
+
+O inventário do [commit `67a511d`](https://github.com/pedrobertanhi/GerenciadorDeSalas/commit/67a511d31b51d981defe1a6afefa567e337f230f) encontrou um JAR executável como artefato da aplicação. O `docker-compose.yml` sobe apenas PostgreSQL. O ZAP inicia o JAR diretamente no runner e usa uma imagem do scanner. O repositório não versiona Dockerfile ou Containerfile da aplicação e os workflows desse commit não publicam uma imagem dela. Para esse formato de entrega, o Trivy Image fica sem alvo aplicável. Se a release passar a distribuir uma imagem, o scan deve ser reavaliado contra seu digest.
+
+O workflow ZAP publica o SHA do checkout, o hash do JAR e os nomes dos componentes `spring-webmvc` e `tomcat-embed-core` extraídos de `BOOT-INF/lib`. O inventário precisa ser conferido na execução da candidata antes da decisão sobre as ocorrências históricas. O build local não concluiu porque o ambiente não resolveu o Maven Central.
+
+Na revisão estática de `src/main` desse commit, não foram encontradas referências a `XsltView`, `SseEmitter`, `ServerSentEvent`, `text/event-stream` ou extensões XSL. A busca cobre os arquivos versionados nesse diretório. Os boletins do Spring descrevem condições específicas de XSLT e SSE, mas a ausência dessas referências é evidência limitada de aplicabilidade. A triagem depende também da versão resolvida no JAR.
