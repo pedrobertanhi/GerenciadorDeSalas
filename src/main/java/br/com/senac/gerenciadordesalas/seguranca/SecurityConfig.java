@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/auditoria/**").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/auditoria/**")
                                 .hasRole("ADMINISTRADOR")
-                        .requestMatchers("/api/admin/**", "/api/usuarios/**")
+                        .requestMatchers("/api/admin/**", "/api/usuarios/**", "/usuarios", "/usuarios/**")
                                 .hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.POST,
                                 "/api/reservas/*/aprovar",
