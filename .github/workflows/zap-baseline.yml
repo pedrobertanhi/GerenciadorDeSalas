@@ -38,6 +38,21 @@ jobs:
           cache: maven
       - name: Compilar a aplicação
         run: bash mvnw --batch-mode --no-transfer-progress -DskipTests package
+      - name: Registrar dependências do JAR analisado
+        shell: bash
+        run: |
+          install -d -m 0777 "$RUNNER_TEMP/zap-report"
+          mapfile -t jars < <(find target -maxdepth 1 -type f -name '*.jar')
+          test "${#jars[@]}" -eq 1
+          jar="${jars[0]}"
+          {
+            printf 'SHA: '
+            git rev-parse HEAD
+            sha256sum "$jar"
+            unzip -Z1 "$jar" | grep -E '^BOOT-INF/lib/(spring-webmvc|tomcat-embed-core)-[^/]+[.]jar$'
+          } | tee "$RUNNER_TEMP/zap-report/dependencias-jar.txt"
+          test "$(grep -c '^BOOT-INF/lib/spring-webmvc-' "$RUNNER_TEMP/zap-report/dependencias-jar.txt")" -eq 1
+          test "$(grep -c '^BOOT-INF/lib/tomcat-embed-core-' "$RUNNER_TEMP/zap-report/dependencias-jar.txt")" -eq 1
       - name: Iniciar aplicação local
         env:
           SPRING_PROFILES_ACTIVE: prod
