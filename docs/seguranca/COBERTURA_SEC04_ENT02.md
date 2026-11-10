@@ -24,3 +24,14 @@ O inventário do [commit `67a511d`](https://github.com/pedrobertanhi/Gerenciador
 O workflow ZAP publica o SHA do checkout, o hash do JAR e os nomes dos componentes `spring-webmvc` e `tomcat-embed-core` extraídos de `BOOT-INF/lib`. O inventário precisa ser conferido na execução da candidata antes da decisão sobre as ocorrências históricas. O build local não concluiu porque o ambiente não resolveu o Maven Central.
 
 Na revisão estática de `src/main` desse commit, não foram encontradas referências a `XsltView`, `SseEmitter`, `ServerSentEvent`, `text/event-stream` ou extensões XSL. A busca cobre os arquivos versionados nesse diretório. Os boletins do Spring descrevem condições específicas de XSLT e SSE, mas a ausência dessas referências é evidência limitada de aplicabilidade. A triagem depende também da versão resolvida no JAR.
+
+## Atualização do Tomcat e triagem de Spring WebMVC
+
+O [inventário do JAR](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42814289282/artifacts/13764262429) em `1c4ff1f7a4cf88a3af1b40c50cca1636f1870f03` confirmou `tomcat-embed-core:10.1.55` e `spring-webmvc:6.2.19`.
+
+| Componente | Decisão | Evidência de validação |
+|---|---|---|
+| Tomcat | Atualizar para `10.1.61` pela propriedade `tomcat.version` do Spring Boot, mantendo os módulos Tomcat na mesma versão da linha 10.1. [Boletins Apache](https://tomcat.apache.org/security-10.html) e [changelog 10.1.61](https://tomcat.apache.org/tomcat-10.1-doc/changelog.html). | Conferir Maven Verify e o inventário do JAR do novo SHA. |
+| Spring WebMVC | `6.2.19` está na faixa afetada pelos dois boletins do Spring. A revisão estática acima não encontrou as referências pesquisadas a XSLT e SSE. Essa busca reduz a evidência de aplicabilidade no código revisado, sem comprovar correção nem esgotar a análise de configuração. | Correção suportada ou decisão formal de risco segue pendente. Os boletins indicam `6.2.20` com suporte Enterprise e `7.0.9` como correção OSS na linha 7. [CVE-2026-47884](https://spring.io/security/cve-2026-47884/) e [CVE-2026-47890](https://spring.io/security/cve-2026-47890/). |
+
+O resultado deste PR cobre a atualização do Tomcat. A decisão de liberar a candidata continua sujeita às pendências da issue #184.
