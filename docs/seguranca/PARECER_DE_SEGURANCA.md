@@ -8,8 +8,8 @@ O merge do [PR #193](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/19
 
 | Controle | Evidência | Resultado |
 |---|---|---|
-| Maven Verify | [Execução #42737088444](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088444) | Em andamento na conferência |
-| Telas administrativas em Chrome, desktop e celular | [Execução #42737088444](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088444) | Resultado específico de UsuariosNavegadorTest pendente de confirmação |
+| Maven Verify | [Execução #42737088444](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088444) | Aprovado — 835 testes, 0 falhas, 0 erros e 0 ignorados |
+| Telas administrativas em Chrome, desktop e celular | [Execução #42737088444](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088444) | 5 casos executados, sem falhas, erros ou ignorados |
 | CodeQL | [Execução #42737088702](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088702) | Aprovado |
 | Trivy filesystem | [Execução #42737088435](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088435) | Aprovado. O relatório do POM registrou 0 vulnerabilidades críticas. A configuração filtra pela severidade crítica. |
 | Dependabot | [Execução #42737093875](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737093875) (Maven), [Execução #42737095367](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737095367) (Actions) | Execuções de atualização identificadas. Não representam uma contagem de alertas. |
