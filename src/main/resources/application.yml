@@ -3,8 +3,11 @@ spring:
     name: gerenciador-de-salas
   jackson:
     default-property-inclusion: non_null
-  mvc:
-    throw-exception-if-no-handler-found: true
+  jackson2:
+    default-property-inclusion: non_null
+  http:
+    converters:
+      preferred-json-mapper: jackson2
   web:
     resources:
       add-mappings: false
