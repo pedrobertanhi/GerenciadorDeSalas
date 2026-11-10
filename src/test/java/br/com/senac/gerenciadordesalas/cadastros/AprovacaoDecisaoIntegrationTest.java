@@ -184,12 +184,18 @@ class AprovacaoDecisaoIntegrationTest extends IntegracaoPostgresBase {
     void outrosPerfis_naoDecidem(String perfil) throws Exception {
         Long id = criarRestrita().id();
 
+        String email = SOLICITANTE;
+        if ("ADMINISTRADOR".equals(perfil)) {
+            email = "admin.negado@exemplo.test";
+            usuarios.save(new User("Admin Negado", email, "$2a$10$hashBcryptFalso", Role.ADMINISTRADOR));
+        }
+
         mockMvc.perform(post("/api/reservas/{id}/aprovar", id)
-                        .with(user(SOLICITANTE).roles(perfil))
+                        .with(user(email).roles(perfil))
                         .with(csrf()))
                 .andExpect(status().isForbidden());
         mockMvc.perform(post("/api/reservas/{id}/rejeitar", id)
-                        .with(user(SOLICITANTE).roles(perfil))
+                        .with(user(email).roles(perfil))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"motivo\": \"Nao posso\"}"))
