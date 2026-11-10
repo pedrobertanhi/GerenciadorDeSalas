@@ -156,6 +156,22 @@ class AutorizacaoPorPerfilWebTest {
     }
 
     @Test
+    @WithMockUser(username = "solicitante@exemplo.test", roles = "SOLICITANTE")
+    void solicitante_naoPodeConsultarAuditoria() throws Exception {
+        mockMvc.perform(get("/api/auditoria"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
+    }
+
+    @Test
+    @WithMockUser(username = "responsavel@exemplo.test", roles = "RESPONSAVEL")
+    void responsavel_naoPodeConsultarAuditoria() throws Exception {
+        mockMvc.perform(get("/api/auditoria"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.codigo").value("ACESSO_NEGADO"));
+    }
+
+    @Test
     @WithMockUser(username = "admin@exemplo.test", roles = "ADMINISTRADOR")
     void administradorConsultaAuditoriaMasNaoCriaEventoManual() throws Exception {
         mockMvc.perform(get("/api/auditoria"))
