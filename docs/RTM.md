@@ -172,3 +172,7 @@ O [Maven Verify #42734185387](https://github.com/pedrobertanhi/GerenciadorDeSala
 | Interface administrativa e autorização | [PR #189](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/189), `UsuarioWebControllerTest` | Suite aprovada no Maven Verify #42734185387. [Cinco testes de navegador aprovados](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42735598179) no SHA `e62e86cc770bed2c08832da8f4eaf15fff08ce9f`; evidência do commit final da release pendente |
 | Política HTTP e por perfil, propriedade de reservas e respostas seguras | [Matriz de segurança das rotas](seguranca/MATRIZ_DE_ROTAS.md) | Inventário e testes existentes mapeados; lacunas registradas |
 | CI e controles de segurança no mesmo commit ou tag | [Parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) | Maven Verify confirmado para o SHA candidato. Relatórios de segurança e revisão pendentes |
+
+### ENT-02 — Candidata após o PR #193
+
+SHA `59fa404c2981955143032a8bf876665a9138e681`. [Maven Verify](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088444): Aprovado — 835 testes, 0 falhas, 0 erros e 0 ignorados. [CodeQL](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088702): Aprovado. [Trivy filesystem](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42737088435): Aprovado. O [parecer de segurança](seguranca/PARECER_DE_SEGURANCA.md) distingue os checks do merge, a revisão de dependências do PR e as evidências ainda pendentes.
