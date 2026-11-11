@@ -176,8 +176,15 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((requisicao, resposta, autenticacao) ->
-                                resposta.setStatus(HttpStatus.NO_CONTENT.value())))
+                        .logoutSuccessHandler((requisicao, resposta, autenticacao) -> {
+                            // Navegador (botao Sair do menu) volta ao login; API continua com 204.
+                            if (requisicao.getHeader("Accept") != null
+                                    && requisicao.getHeader("Accept").contains("text/html")) {
+                                resposta.sendRedirect(requisicao.getContextPath() + "/login?saiu");
+                            } else {
+                                resposta.setStatus(HttpStatus.NO_CONTENT.value());
+                            }
+                        }))
                 .addFilterBefore(filtroLimite, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new FiltroUsuarioAtivo(usuarios), AuthorizationFilter.class);
 
