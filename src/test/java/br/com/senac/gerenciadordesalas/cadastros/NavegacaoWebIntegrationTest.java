@@ -17,8 +17,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 class NavegacaoWebIntegrationTest extends IntegracaoPostgresBase {
 
+    /** /salas nao depende de o usuario existir no banco; /reservas procura o solicitante e daria 404. */
     private String menuDe(String email, String perfil) throws Exception {
-        return mockMvc.perform(get("/reservas").with(user(email).roles(perfil)))
+        return mockMvc.perform(get("/salas").with(user(email).roles(perfil)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
     }
