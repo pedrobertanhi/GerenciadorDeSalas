@@ -17,9 +17,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 class NavegacaoWebIntegrationTest extends IntegracaoPostgresBase {
 
-    /** /salas nao depende de o usuario existir no banco; /reservas procura o solicitante e daria 404. */
+    /**
+     * /professores abre para qualquer perfil e nao depende de o usuario existir no banco
+     * (/reservas procura o solicitante e daria 404; /salas e so do administrador).
+     */
     private String menuDe(String email, String perfil) throws Exception {
-        return mockMvc.perform(get("/salas").with(user(email).roles(perfil)))
+        return mockMvc.perform(get("/professores").with(user(email).roles(perfil)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
     }
@@ -28,10 +31,11 @@ class NavegacaoWebIntegrationTest extends IntegracaoPostgresBase {
     void solicitante_veOsItensComunsSemAprovacoesNemUsuarios() throws Exception {
         String html = menuDe("ana@exemplo.test", "SOLICITANTE");
 
-        assertThat(html).contains("Navegação principal", "href=\"/reservas\"", "href=\"/salas\"",
+        assertThat(html).contains("Navegação principal", "href=\"/reservas\"",
                 "href=\"/recursos/pesquisa\"", "href=\"/manutencoes\"", "href=\"/professores\"",
                 "ana@exemplo.test", "Sair");
-        assertThat(html).doesNotContain("href=\"/aprovacoes\"").doesNotContain("href=\"/usuarios\"");
+        assertThat(html).doesNotContain("href=\"/aprovacoes\"").doesNotContain("href=\"/usuarios\"")
+                .doesNotContain("href=\"/salas\"");
     }
 
     @Test
@@ -39,14 +43,14 @@ class NavegacaoWebIntegrationTest extends IntegracaoPostgresBase {
         String html = menuDe("rui@exemplo.test", "RESPONSAVEL");
 
         assertThat(html).contains("href=\"/aprovacoes\"");
-        assertThat(html).doesNotContain("href=\"/usuarios\"");
+        assertThat(html).doesNotContain("href=\"/usuarios\"").doesNotContain("href=\"/salas\"");
     }
 
     @Test
     void administrador_veUsuariosMasNaoAprovacoes() throws Exception {
         String html = menuDe("adm@exemplo.test", "ADMINISTRADOR");
 
-        assertThat(html).contains("href=\"/usuarios\"");
+        assertThat(html).contains("href=\"/usuarios\"", "href=\"/salas\"");
         assertThat(html).doesNotContain("href=\"/aprovacoes\"");
     }
 
