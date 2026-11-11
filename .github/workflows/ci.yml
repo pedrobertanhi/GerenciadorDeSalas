@@ -41,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: relatorios-maven
+          name: relatorios-maven-${{ github.run_attempt }}
           path: |
             target/surefire-reports/
             target/failsafe-reports/
