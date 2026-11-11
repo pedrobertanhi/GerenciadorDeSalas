@@ -147,16 +147,27 @@ final class NavegadorE2E {
     }
 
     void clicarLink(String texto) {
-        driver.findElement(By.linkText(texto)).click();
+        clicarCentralizado(driver.findElement(By.linkText(texto)));
     }
 
     void clicarBotao(String texto) {
-        driver.findElement(By.xpath("//button[normalize-space()='" + texto + "']")).click();
+        clicarCentralizado(driver.findElement(By.xpath("//button[normalize-space()='" + texto + "']")));
     }
 
     void clicarNaLinha(String textoDaLinha, String link) {
-        driver.findElement(By.xpath("//tr[td[normalize-space()='" + textoDaLinha
-                + "']]//a[normalize-space()='" + link + "']")).click();
+        clicarCentralizado(driver.findElement(By.xpath("//tr[td[normalize-space()='" + textoDaLinha
+                + "']]//a[normalize-space()='" + link + "']")));
+    }
+
+    /**
+     * Centraliza o elemento na janela antes de clicar (ENT-03, #185). Com o cabecalho comum, botoes
+     * do fim dos formularios podem ficar na borda inferior da janela, onde o Chrome recusa o clique
+     * com ElementClickInterceptedException.
+     */
+    private void clicarCentralizado(WebElement elemento) {
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", elemento);
+        elemento.click();
     }
 
     boolean existeLink(String texto) {
