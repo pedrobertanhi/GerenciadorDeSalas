@@ -13,6 +13,8 @@
     <a class="btn btn-primary" th:if="${administrador}" th:href="@{/professores/novo}">Cadastrar professor</a>
   </div>
   <div th:if="${sucesso}" class="alert alert-success" role="status" th:text="${sucesso}"></div>
+  <div th:if="${erro}" class="alert alert-danger" role="alert" th:text="${erro}"></div>
+  <div th:if="${falha}" class="alert alert-warning" role="alert" th:text="${falha}"></div>
   <form method="get" th:action="@{/professores}" class="row g-2 mb-4">
     <div class="col-sm-8">
       <label for="competencia" class="form-label">Filtrar por competência</label>
@@ -32,16 +34,18 @@
           <td th:text="${professor.nome}"></td>
           <td th:text="${professor.email}"></td>
           <td th:text="${#strings.listJoin(professor.competencias, ', ')}"></td>
-          <td>
+          <td class="d-flex flex-wrap gap-1">
             <span th:unless="${administrador}">Somente consulta</span>
             <a th:if="${administrador}" class="btn btn-sm btn-outline-primary" th:href="@{/professores/{id}/editar(id=${professor.id})}">Editar</a>
+            <a th:if="${administrador}" class="btn btn-sm btn-outline-secondary" th:href="@{/professores/{id}/competencias(id=${professor.id})}">Competências</a>
             <form th:if="${administrador}" class="d-inline" method="post" th:action="@{/professores/{id}/desativar(id=${professor.id})}">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
               <button class="btn btn-sm btn-outline-danger" type="submit">Desativar</button>
             </form>
           </td>
         </tr>
-        <tr th:if="${#lists.isEmpty(professores)}"><td colspan="4" class="text-center">Nenhum professor encontrado.</td></tr>
+        <tr th:if="${#lists.isEmpty(professores) and falha == null}"><td colspan="4" class="text-center"
+            th:text="${filtrando} ? 'Nenhum professor com essa competência.' : 'Nenhum professor cadastrado.'">Nenhum professor cadastrado.</td></tr>
       </tbody>
     </table>
   </div>
