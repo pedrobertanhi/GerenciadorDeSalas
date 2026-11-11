@@ -163,10 +163,12 @@ final class NavegadorE2E {
      * Centraliza o elemento na janela antes de clicar (ENT-03, #185). Com o cabecalho comum, botoes
      * do fim dos formularios podem ficar na borda inferior da janela, onde o Chrome recusa o clique
      * com ElementClickInterceptedException.
+     * A rolagem e instantanea porque o Bootstrap liga scroll-behavior: smooth; com rolagem animada o
+     * clique acontece antes de o elemento chegar ao lugar.
      */
     private void clicarCentralizado(WebElement elemento) {
         ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", elemento);
+                "arguments[0].scrollIntoView({block: 'center', inline: 'nearest', behavior: 'instant'});", elemento);
         elemento.click();
     }
 
