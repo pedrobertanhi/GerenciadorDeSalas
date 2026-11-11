@@ -115,6 +115,8 @@ public class SecurityConfig {
                                 .hasRole("RESPONSAVEL")
                         .requestMatchers(HttpMethod.GET, "/reservas", "/reservas/**")
                                 .authenticated()
+                        .requestMatchers(HttpMethod.GET, "/relatorios")
+                                .authenticated()
                         .requestMatchers(HttpMethod.POST, "/reservas", "/reservas/**")
                                 .authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/professores/*/validacao")
