@@ -1,6 +1,7 @@
 package br.com.senac.gerenciadordesalas.material;
 
 import br.com.senac.gerenciadordesalas.aprovacao.AprovacaoService;
+import br.com.senac.gerenciadordesalas.relatorio.RelatorioService;
 import br.com.senac.gerenciadordesalas.disponibilidade.ConsultaDisponibilidadeService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationManagementService;
@@ -72,6 +73,7 @@ class MaterialOpenApiTest {
     MaintenanceBlockService bloqueios;
 
     // Dependências diretas da tela de reservas; esta suíte publica o OpenAPI sem JPA.
+    @MockitoBean RelatorioService relatorios;
     @MockitoBean MaterialRepository repositorioMateriais;
     @MockitoBean ProfessorRepository repositorioProfessores;
     @MockitoBean SalaRepository repositorioSalas;
