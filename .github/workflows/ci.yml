@@ -35,3 +35,13 @@ jobs:
 
       - name: Executar verificação Maven
         run: ./mvnw --batch-mode --no-transfer-progress verify
+
+      # Capturas reais das telas, geradas pelos testes E2E (ENT-03, #185).
+      - name: Publicar capturas de tela
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: capturas-de-tela
+          path: target/capturas/
+          if-no-files-found: ignore
+          retention-days: 30

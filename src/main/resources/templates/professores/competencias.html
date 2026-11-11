@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Competências | Gerenciador de Salas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<header th:replace="~{fragmentos/layout :: cabecalho}"></header>
+<main class="container py-5" style="max-width: 720px">
+  <h1 class="mb-1">Competências</h1>
+  <p class="text-body-secondary mb-4">Professor: <strong th:text="${professor.nome}"></strong></p>
+
+  <div th:if="${sucesso}" class="alert alert-success" role="status" th:text="${sucesso}"></div>
+  <div th:if="${erro}" class="alert alert-danger" role="alert" th:text="${erro}"></div>
+  <div th:unless="${professor.ativo}" class="alert alert-warning" role="status">
+    Professor inativo: as competências só podem ser consultadas.
+  </div>
+
+  <section class="card card-body shadow-sm mb-4" aria-labelledby="titulo-atuais">
+    <h2 id="titulo-atuais" class="h5">Competências atuais</h2>
+    <p th:if="${#lists.isEmpty(professor.competencias)}" class="mb-0">Nenhuma competência cadastrada.</p>
+    <ul th:unless="${#lists.isEmpty(professor.competencias)}" class="list-group list-group-flush">
+      <li th:each="item : ${professor.competencias}"
+          class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2 px-0">
+        <span class="text-break" th:text="${item}"></span>
+        <form th:if="${professor.ativo}" method="post" class="m-0"
+              th:action="@{/professores/{id}/competencias/remover(id=${professor.id})}">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <input type="hidden" name="competencia" th:value="${item}">
+          <button class="btn btn-sm btn-outline-danger" type="submit"
+                  th:attr="aria-label=${'Remover ' + item}">Remover</button>
+        </form>
+      </li>
+    </ul>
+  </section>
+
+  <form th:if="${professor.ativo}" method="post" th:action="@{/professores/{id}/competencias(id=${professor.id})}"
+        class="card card-body shadow-sm mb-4">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <label for="competencia" class="form-label">Nova competência</label>
+    <div class="d-flex flex-wrap gap-2">
+      <input id="competencia" name="competencia" class="form-control flex-grow-1" style="min-width: 12rem"
+             th:value="${competencia}" maxlength="100" placeholder="Ex.: química" required>
+      <button class="btn btn-primary" type="submit">Incluir competência</button>
+    </div>
+    <div class="form-text">Até 100 caracteres. Maiúsculas e minúsculas são tratadas como iguais.</div>
+  </form>
+
+  <a class="btn btn-outline-secondary" th:href="@{/professores}">Voltar para professores</a>
+</main>
+</body>
+</html>

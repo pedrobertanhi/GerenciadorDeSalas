@@ -48,6 +48,52 @@ public class ProfessorService {
     }
     @Transactional
     public void desativar(Long id) { obter(id).desativar(); }
+
+    /**
+     * Inclui uma competencia no professor ativo (ENT-03, #185). O nome e normalizado como no cadastro
+     * completo; competencia repetida e recusada com conflito, para a tela avisar em vez de ignorar.
+     */
+    @Transactional
+    public ProfessorDto.Saida adicionarCompetencia(Long id, String nome) {
+        Professor professor = obterAtivo(id);
+        String competencia = normalizarCompetencia(nome);
+        if (professor.getCompetencias().stream().anyMatch(c -> c.getNome().equals(competencia))) {
+            throw new ConflitoDeEstadoException("O professor já possui a competência \"" + competencia + "\".");
+        }
+        professor.getCompetencias().add(competencias.findByNome(competencia)
+                .orElseGet(() -> competencias.saveAndFlush(new Competencia(competencia))));
+        return salvar(professor);
+    }
+
+    /** Remove uma competencia do professor ativo (ENT-03, #185). A competencia continua cadastrada para os outros. */
+    @Transactional
+    public ProfessorDto.Saida removerCompetencia(Long id, String nome) {
+        Professor professor = obterAtivo(id);
+        String competencia = normalizarCompetencia(nome);
+        if (!professor.getCompetencias().removeIf(c -> c.getNome().equals(competencia))) {
+            throw new ConflitoDeEstadoException("O professor não possui a competência \"" + competencia + "\".");
+        }
+        return salvar(professor);
+    }
+
+    private static String normalizarCompetencia(String nome) {
+        String competencia = nome == null ? "" : nome.trim().toLowerCase(Locale.ROOT);
+        if (competencia.isEmpty()) {
+            throw new IllegalArgumentException("Informe a competência.");
+        }
+        if (competencia.length() > 100) {
+            throw new IllegalArgumentException("A competência pode ter no máximo 100 caracteres.");
+        }
+        return competencia;
+    }
+
+    private Professor obterAtivo(Long id) {
+        Professor professor = obter(id);
+        if (!professor.isAtivo()) {
+            throw new ConflitoDeEstadoException("Professor inativo não pode ter as competências alteradas.");
+        }
+        return professor;
+    }
     @Transactional(readOnly = true)
     public ProfessorDto.Saida consultar(Long id) { return ProfessorDto.Saida.de(obter(id)); }
     @Transactional(readOnly = true)

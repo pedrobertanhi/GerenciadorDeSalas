@@ -12,8 +12,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -210,6 +215,34 @@ final class NavegadorE2E {
         medidas.put("deviceScaleFactor", 1);
         medidas.put("mobile", tela.movel);
         driver.executeCdpCommand("Emulation.setDeviceMetricsOverride", medidas);
+    }
+
+    /**
+     * Salva a pagina inteira, inclusive o que fica abaixo da dobra, em PNG (ENT-03, #185). As capturas
+     * sao a evidencia visual da entrega e a CI publica a pasta como artefato do run.
+     */
+    @SuppressWarnings("unchecked")
+    void capturar(Path arquivo) {
+        executar("window.scrollTo(0, 0);");
+        Map<String, Object> metricas = driver.executeCdpCommand("Page.getLayoutMetrics", Map.of());
+        Map<String, Object> conteudo = (Map<String, Object>) metricas.get("cssContentSize");
+        Map<String, Object> recorte = new HashMap<>();
+        recorte.put("x", 0);
+        recorte.put("y", 0);
+        recorte.put("width", ((Number) conteudo.get("width")).doubleValue());
+        recorte.put("height", ((Number) conteudo.get("height")).doubleValue());
+        recorte.put("scale", 1);
+        Map<String, Object> pedido = new HashMap<>();
+        pedido.put("format", "png");
+        pedido.put("captureBeyondViewport", true);
+        pedido.put("clip", recorte);
+        String imagem = (String) driver.executeCdpCommand("Page.captureScreenshot", pedido).get("data");
+        try {
+            Files.createDirectories(arquivo.getParent());
+            Files.write(arquivo, Base64.getDecoder().decode(imagem));
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     /** O Bootstrap, vindo da CDN, foi aplicado? A classe bg-light pinta o fundo de cinza claro. */
