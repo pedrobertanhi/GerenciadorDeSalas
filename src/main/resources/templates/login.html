@@ -10,6 +10,7 @@
 <main class="container py-5" style="max-width: 480px">
   <h1 class="mb-4">Entrar no sistema</h1>
   <div th:if="${param.erro}" class="alert alert-danger" role="alert">E-mail ou senha inválidos.</div>
+  <div th:if="${param.saiu}" class="alert alert-success" role="status">Você saiu do sistema.</div>
   <form method="post" th:action="@{/login}" class="card card-body shadow-sm">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
     <div class="mb-3">
