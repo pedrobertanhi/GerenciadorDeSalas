@@ -25,8 +25,8 @@
 | RF-09 | saldo/movimentação incorretos | retirada, parcial, total e atraso | #36–#38 | PENDENTE | planejado |
 | RF-10 | histórico incompleto/adulterável | CT-AUD-01 | #39, #40, #88 | PENDENTE | planejado |
 | RF-11 | falha externa derruba/vaza | CT-INT-01 e matriz WireMock | #41, #42, #104 | PENDENTE | planejado |
-| RF-12 | relatório inconsistente | consultas, período e agregações | #43, #44 | PENDENTE | planejado |
-| RF-13 | fluxo inacessível/erro inseguro | E2E responsivo + assertions de ausência (SalaWebControllerTest, MaintenanceBlockWebControllerTest) | #9, #45–#47, #62–#75, #110 | PENDENTE | planejado |
+| RF-12 | relatório inconsistente | utilização de salas e materiais e reservas por período, com recorte de horas, validação do período, vazio e visão por perfil (`PeriodoRelatorioTest`, `RelatorioWebIntegrationTest`, `RelatoriosNavegadorTest`); carga docente e conflitos evitados pendentes | #185 (consolida #43), #44 | CI run 42945878207 · commit 1643d86 · `./mvnw -B verify` · Java 21/PostgreSQL container · 898 testes, 0 falhas | parcial, PR #212 |
+| RF-13 | fluxo inacessível/erro inseguro | E2E responsivo + assertions de ausência (SalaWebControllerTest, MaintenanceBlockWebControllerTest, `NavegacaoWebIntegrationTest`, `NavegacaoNavegadorTest`, `ProfessorCompetenciasWebControllerTest`, `ProfessoresNavegadorTest`, `RelatoriosNavegadorTest`, `CapturasDeTelaNavegadorTest`); capturas reais em `docs/evidencias/capturas/ISSUE-185` | #9, #185 (consolida #45, #62), #46, #47, #63–#75, #110 | CI run 42945878207 · commit 1643d86 · `./mvnw -B verify` · Java 21/PostgreSQL container · 898 testes, 0 falhas | automatizado para menu, professores, competências e relatórios (PR #211, #212, #213) |
 | RF-14 | contrato desatualizado | geração/validação OpenAPI e clone limpo (OpenApiDocumentoTest) | #10, #80 | PENDENTE | planejado |
 
 ## Regras críticas
