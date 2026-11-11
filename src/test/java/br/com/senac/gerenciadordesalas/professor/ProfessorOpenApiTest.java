@@ -1,6 +1,7 @@
 package br.com.senac.gerenciadordesalas.professor;
 
 import br.com.senac.gerenciadordesalas.aprovacao.AprovacaoService;
+import br.com.senac.gerenciadordesalas.relatorio.RelatorioService;
 import br.com.senac.gerenciadordesalas.manutencao.MaintenanceBlockService;
 import br.com.senac.gerenciadordesalas.disponibilidade.ConsultaDisponibilidadeService;
 import br.com.senac.gerenciadordesalas.reservas.ReservationService;
@@ -50,6 +51,7 @@ class ProfessorOpenApiTest {
     // Fila de aprovacao (APR-01, #34): depende do repositorio de reservas, ausente sem JPA.
     @MockitoBean AprovacaoService aprovacoes;
     // Dependências diretas da tela de reservas; esta suíte publica o OpenAPI sem JPA.
+    @MockitoBean RelatorioService relatorios;
     @MockitoBean MaterialRepository repositorioMateriais;
     @MockitoBean ProfessorRepository repositorioProfessores;
     @MockitoBean SalaRepository repositorioSalas;
