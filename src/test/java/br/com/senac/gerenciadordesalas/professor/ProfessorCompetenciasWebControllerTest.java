@@ -136,17 +136,18 @@ class ProfessorCompetenciasWebControllerTest {
         verifyNoInteractions(service);
     }
 
+    // Valores sem acento: o th:field escreve acentos como entidades HTML (F&iacute;sica).
     @Test
     void cadastroInvalido_mostraMensagensEmPortuguesEPreservaOsCampos() throws Exception {
         mvc.perform(post("/professores").with(user("admin").roles("ADMINISTRADOR")).with(csrf())
                         .param("nome", "")
                         .param("email", "invalido")
-                        .param("competencias", "Física"))
+                        .param("competencias", "Fisica"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Informe o nome.")))
                 .andExpect(content().string(containsString("Informe um e-mail válido.")))
                 .andExpect(content().string(containsString("value=\"invalido\"")))
-                .andExpect(content().string(containsString("value=\"Física\"")));
+                .andExpect(content().string(containsString("value=\"Fisica\"")));
         verifyNoInteractions(service);
     }
 
@@ -165,10 +166,10 @@ class ProfessorCompetenciasWebControllerTest {
         mvc.perform(post("/professores").with(user("admin").roles("ADMINISTRADOR")).with(csrf())
                         .param("nome", "Bruno")
                         .param("email", "bruno@exemplo.test")
-                        .param("competencias", "Física, , Química"))
+                        .param("competencias", "Fisica, , Quimica"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Informe competências válidas de até 100 caracteres.")))
-                .andExpect(content().string(containsString("value=\"Física, , Química\"")));
+                .andExpect(content().string(containsString("value=\"Fisica, , Quimica\"")));
         verifyNoInteractions(service);
     }
 
