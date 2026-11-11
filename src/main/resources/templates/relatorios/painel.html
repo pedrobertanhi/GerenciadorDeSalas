@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relatórios | Gerenciador de Salas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head><body class="bg-light">
+<header th:replace="~{fragmentos/layout :: cabecalho}"></header>
+<main class="container py-5">
+  <h1 class="mb-3">Relatórios</h1>
+  <p th:unless="${operacional}" class="text-body-secondary">Você vê apenas as suas próprias reservas.</p>
+
+  <form method="get" th:action="@{/relatorios}" class="row g-3 align-items-end mb-4" novalidate>
+    <div class="col-12 col-sm-6 col-md-4">
+      <label for="de" class="form-label">Data inicial</label>
+      <input type="date" id="de" name="de" class="form-control" th:value="${de}" required>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4">
+      <label for="ate" class="form-label">Data final</label>
+      <input type="date" id="ate" name="ate" class="form-control" th:value="${ate}" required>
+    </div>
+    <div class="col-12 col-md-4">
+      <button type="submit" class="btn btn-primary w-100">Gerar relatório</button>
+    </div>
+  </form>
+
+  <div th:unless="${#lists.isEmpty(erros)}" class="alert alert-danger" role="alert">
+    <p class="mb-1 fw-semibold">Corrija o período:</p>
+    <ul class="mb-0"><li th:each="erro : ${erros}" th:text="${erro}"></li></ul>
+  </div>
+  <div th:if="${falha}" class="alert alert-warning" role="alert" th:text="${falha}"></div>
+
+  <th:block th:if="${relatorio}">
+    <p class="lead">Período: <strong th:text="${relatorio.periodo}"></strong></p>
+
+    <section th:if="${relatorio.operacional}" class="mb-5" aria-labelledby="titulo-salas">
+      <h2 id="titulo-salas" class="h4">Utilização de salas</h2>
+      <p class="small text-body-secondary">Reservas aprovadas, em andamento ou concluídas. As horas contam só a parte dentro do período.</p>
+      <div th:if="${relatorio.semUsoDeSalas()}" class="alert alert-info" role="status">Nenhuma sala foi utilizada no período.</div>
+      <div th:unless="${relatorio.semUsoDeSalas()}" class="table-responsive">
+        <table class="table table-striped align-middle">
+          <caption>Utilização de salas no período</caption>
+          <thead><tr><th>Sala</th><th>Localização</th><th class="text-end">Reservas</th><th class="text-end">Horas reservadas</th></tr></thead>
+          <tbody><tr th:each="uso : ${relatorio.salas}">
+            <td><span th:text="${uso.sala}"></span> <span th:unless="${uso.ativa}" class="badge text-bg-secondary">inativa</span></td>
+            <td th:text="${uso.localizacao}"></td>
+            <td class="text-end" th:text="${uso.reservas}"></td>
+            <td class="text-end" th:text="${uso.horasFormatadas()}"></td>
+          </tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section th:if="${relatorio.operacional}" class="mb-5" aria-labelledby="titulo-materiais">
+      <h2 id="titulo-materiais" class="h4">Materiais reservados</h2>
+      <div th:if="${#lists.isEmpty(relatorio.materiais)}" class="alert alert-info" role="status">Nenhum material foi reservado no período.</div>
+      <div th:unless="${#lists.isEmpty(relatorio.materiais)}" class="table-responsive">
+        <table class="table table-striped align-middle">
+          <caption>Materiais pedidos em reservas efetivas do período</caption>
+          <thead><tr><th>Material</th><th>Tipo</th><th>Patrimônio</th><th class="text-end">Reservas</th><th class="text-end">Quantidade</th></tr></thead>
+          <tbody><tr th:each="uso : ${relatorio.materiais}">
+            <td><span th:text="${uso.material}"></span> <span th:if="${uso.restrito}" class="badge text-bg-warning">restrito</span></td>
+            <td th:text="${uso.tipo}"></td>
+            <td th:text="${uso.patrimonio != null ? uso.patrimonio : '-'}"></td>
+            <td class="text-end" th:text="${uso.reservas}"></td>
+            <td class="text-end" th:text="${uso.quantidade}"></td>
+          </tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="titulo-reservas">
+      <h2 id="titulo-reservas" class="h4" th:text="${relatorio.operacional} ? 'Reservas do período' : 'Minhas reservas no período'">Reservas do período</h2>
+      <div th:if="${relatorio.totalReservas == 0}" class="alert alert-info" role="status">Nenhuma reserva no período.</div>
+      <th:block th:unless="${relatorio.totalReservas == 0}">
+        <p>
+          Total: <strong th:text="${relatorio.totalReservas}"></strong>
+          <span th:each="total : ${relatorio.totaisPorStatus}" class="badge text-bg-secondary ms-1"
+                th:text="${total.status} + ': ' + ${total.total}"></span>
+        </p>
+        <p th:if="${relatorio.reservasCortadas}" class="alert alert-secondary" role="status">
+          Mostrando as primeiras <span th:text="${relatorio.limiteLinhas()}"></span>
+          reservas. Reduza o período para ver as demais.
+        </p>
+        <div class="table-responsive">
+          <table class="table table-striped align-middle">
+            <caption>Reservas que tocam o período, em qualquer status</caption>
+            <thead><tr><th>Período</th><th>Sala</th><th>Solicitante</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody><tr th:each="reserva : ${relatorio.reservas}">
+              <td th:text="${reserva.periodo}"></td>
+              <td th:text="${reserva.sala}"></td>
+              <td th:text="${reserva.solicitante}"></td>
+              <td><span class="badge text-bg-secondary" th:text="${reserva.status}"></span></td>
+              <td><a class="btn btn-sm btn-outline-secondary" th:href="@{/reservas/{id}(id=${reserva.id})}">Detalhes</a></td>
+            </tr></tbody>
+          </table>
+        </div>
+      </th:block>
+    </section>
+  </th:block>
+</main></body></html>
