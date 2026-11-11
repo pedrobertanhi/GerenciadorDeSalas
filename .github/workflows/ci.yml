@@ -36,6 +36,20 @@ jobs:
       - name: Executar verificação Maven
         run: ./mvnw --batch-mode --no-transfer-progress verify
 
+      # Relatorios brutos gerados pelo Maven; disponiveis mesmo em falha de testes.
+      - name: Publicar relatorios Surefire Failsafe e cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: relatorios-maven
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
+            target/site/jacoco/
+            target/jacoco.exec
+          if-no-files-found: warn
+          retention-days: 30
+
       # Capturas reais das telas, geradas pelos testes E2E (ENT-03, #185).
       - name: Publicar capturas de tela
         if: always()
