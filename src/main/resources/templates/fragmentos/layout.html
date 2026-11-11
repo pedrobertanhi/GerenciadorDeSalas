@@ -18,7 +18,7 @@
       <div class="collapse navbar-collapse" id="menuPrincipal">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item"><a class="nav-link" th:href="@{/reservas}">Reservas</a></li>
-          <li class="nav-item"><a class="nav-link" th:href="@{/salas}">Salas</a></li>
+          <li class="nav-item" th:if="${menu.administrador}"><a class="nav-link" th:href="@{/salas}">Salas</a></li>
           <li class="nav-item"><a class="nav-link" th:href="@{/recursos/pesquisa}">Pesquisar recursos</a></li>
           <li class="nav-item"><a class="nav-link" th:href="@{/manutencoes}">Manutenções</a></li>
           <li class="nav-item"><a class="nav-link" th:href="@{/professores}">Professores</a></li>
