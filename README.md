@@ -1,6 +1,6 @@
 # Gerenciador de Salas de Aula
 
-Sistema acadêmico em **Java 21 e Spring Boot 3.x** para alocar salas, professores, materiais e equipamentos sem conflitos de horário, com autorização, auditoria, concorrência segura e evidências reproduzíveis de qualidade.
+Sistema acadêmico em **Java 21 e Spring Boot 4.1.2** para alocar salas, professores, materiais e equipamentos sem conflitos de horário, com autorização, auditoria, concorrência segura e evidências reproduzíveis de qualidade.
 
 > Projeto semestral da disciplina **Qualidade de Software — 2026.2**. Entrega principal na semana 46.
 
@@ -10,14 +10,12 @@ Sistema acadêmico em **Java 21 e Spring Boot 3.x** para alocar salas, professor
 
 ## Estado atual
 
-**Fundação técnica e segurança inicial implementadas. O domínio funcional de recursos e reservas ainda está em desenvolvimento.**
+O projeto usa Java 21 e Spring Boot 4.1.2. A implementação funcional, segurança e interface evoluíram além da descrição inicial deste documento. A [matriz de rastreabilidade](docs/RTM.md) registra entregas por requisito e ainda contém itens que exigem atualização e evidência.
 
-- Governança inicial (GOV-01 a GOV-04) integrada.
-- Spring Boot, perfis, PostgreSQL com Docker Compose, Flyway e tratamento seguro de erros integrados (BASE-01 a BASE-05).
-- Usuários e perfis, autenticação, autorização inicial e limitação de tentativas de login integrados (SEC-01 a SEC-03 e #133).
-- O pipeline mais recente executou 63 testes sem falhas, erros ou testes ignorados.
-- OpenAPI (BASE-06), cadastros de recursos, reservas, interface e demais funcionalidades permanecem pendentes conforme o Project.
-- A autorização atual define e testa a matriz de acesso; ela deverá ser aplicada aos controllers reais conforme cada módulo funcional for implementado.
+- A candidata de segurança `1fde5bd` teve [837 testes aprovados](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680085); execuções posteriores registradas na RTM alcançaram 898 testes. **Esses resultados não comprovam automaticamente o estado de novos commits.**
+- A [decisão de segurança da #184](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/184) aprovou uma candidata específica para o ambiente acadêmico controlado, com riscos residuais documentados.
+- A [entrega de qualidade #186](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/186) permanece aberta. Consulte o [relatório de testes](docs/testes/RELATORIO_DE_TESTES.md) para evidências e lacunas atuais.
+- A PR #215 adiciona publicação de relatórios Maven e geração de cobertura JaCoCo; a cobertura medida, SonarCloud, JMeter e decisão final exigem evidências próprias.
 
 ## Produto
 
@@ -46,7 +44,7 @@ A máquina principal é `SOLICITADA → APROVADA → EM_USO → CONCLUIDA`, com 
 
 ## Stack definida
 
-Java 21 · Spring Boot 3.x · Maven Wrapper · Spring Web · Spring Security · Validation · Spring Data JPA · PostgreSQL · Flyway · Docker Compose · Thymeleaf/Bootstrap ou alternativa registrada em ADR · OpenAPI.
+Java 21 · Spring Boot 4.1.2 · Maven Wrapper · Spring Web · Spring Security · Validation · Spring Data JPA · PostgreSQL · Flyway · Docker Compose · Thymeleaf/Bootstrap ou alternativa registrada em ADR · OpenAPI.
 
 Testes e qualidade: JUnit 5, testes parametrizados, Testcontainers, WireMock, JaCoCo 0.8.15, SonarCloud, GitHub Actions, JMeter, CodeQL, análise de dependências, secret scanning, Trivy e OWASP ZAP.
 

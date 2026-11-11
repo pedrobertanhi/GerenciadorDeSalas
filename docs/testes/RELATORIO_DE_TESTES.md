@@ -1,42 +1,30 @@
-# Relatório de Testes
+# Relatório de Testes — evidências rastreáveis
 
-> Status: aguardando execução. Não preencher resultados sem evidência.
+> Situação: evidências históricas disponíveis; validação da candidata final da #186 ainda pendente. Não usar os resultados abaixo como aprovação automática de commits posteriores.
 
-## Identificação
+## Execuções verificadas e limites
 
-| Campo | Valor |
-|---|---|
-| Versão/commit testado | A definir |
-| Data e horário | A definir |
-| Ambiente | A definir |
-| Java | 21 |
-| Spring Boot | 3.x |
-| PostgreSQL | A definir |
-| Executor | A definir |
+| Candidata | Execução | Resultado | Limitação |
+|---|---|---|---|
+| `1fde5bd4fd74cfa4ec6c4dea3789a44adc6bc4e3` | [Maven Verify 42920680085](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680085) | 837 testes, zero falhas, erros ou ignorados | Evidência da candidata de segurança, não da entrega #186 |
+| `1643d86` | [Maven Verify 42945878207](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42945878207) | 898 testes, zero falhas, conforme [RTM](../RTM.md) | Evidência histórica; conferir SHA completo e artefatos |
+| PR #215, commit `2724802301d13f0689d3cc567a8d3422f08bcfab` | [GitHub Actions](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/215/checks) | CI, CodeQL, Dependency Review, Trivy e ZAP concluídos com sucesso na consulta de 11/11/2026 | PR recebeu commits posteriores; verificações precisam ser repetidas |
 
-## Resumo
+## Cobertura e métricas
 
-| Tipo | Executados | Aprovados | Reprovados | Ignorados | Evidência |
-|---|---:|---:|---:|---:|---|
-| Unitários | 0 | 0 | 0 | 0 | A definir |
-| Parametrizados | 0 | 0 | 0 | 0 | A definir |
-| Integração | 0 | 0 | 0 | 0 | A definir |
-| API caixa-preta | 0 | 0 | 0 | 0 | A definir |
-| Ponta a ponta | 0 | 0 | 0 | 0 | A definir |
-| Concorrência | 0 | 0 | 0 | 0 | A definir |
-| WireMock | 0 | 0 | 0 | 0 | A definir |
+O plugin JaCoCo 0.8.15 foi adicionado na branch da #186 para gerar `target/site/jacoco/index.html` e `target/site/jacoco/jacoco.xml` durante `mvn verify`. **Nenhuma porcentagem é afirmada antes da publicação do artefato.** As metas do projeto são 80% de linhas e 70% de branches. A implementação do gate de cobertura depende da medição real e da decisão documentada sobre exclusões justificadas.
 
-## Cobertura
+Relatórios Surefire, Failsafe (se existirem) e JaCoCo são coletados pela CI no artefato `relatorios-maven`, mesmo em falha. A ausência de relatório é explicitamente avisada pelo workflow.
 
-| Métrica | Meta | Resultado | Situação | Evidência |
-|---|---:|---:|---|---|
-| Linhas | 80% | A medir | Pendente | JaCoCo |
-| Branches | 70% | A medir | Pendente | JaCoCo |
+## Pendências para a decisão final da #186
 
-## Defeitos encontrados
+- Conferir execução verde e artefatos da cabeça final da PR #215 após todos os commits.
+- Consolidar quantidades por tipo de teste diretamente dos XMLs Surefire/Failsafe, sem atribuir totais sem contagem.
+- Medir cobertura JaCoCo e registrar percentual de linhas/branches com URL do artefato.
+- Executar JMeter em ambiente autorizado com massa sintética e guardar percentis, throughput, taxa de erros e configuração da carga.
+- Registrar análise SonarCloud quando o projeto, token e permissões estiverem disponíveis; não inventar análise.
+- Registrar decisão de qualidade e revisão cruzada associadas ao mesmo SHA/tag.
 
-Registrar cada falha em DEFEITOS.md e vincular a Issue.
+## Critério de conclusão
 
-## Conclusão
-
-A definir após execução completa. Informar claramente se a versão atende, atende com ressalvas ou não atende.
+Somente declarar a entrega pronta após confirmar evidências do mesmo commit, ausência de falhas bloqueantes, revisão cruzada e aceite explícito dos riscos residuais.
