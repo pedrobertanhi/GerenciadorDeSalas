@@ -13,7 +13,8 @@
 
 - Commit de restauração: `b9a0453b6e146ac19011cfbd7a54e18631b99802`.
 - Limites oficiais restaurados: **80% LINE** e **70% BRANCH**.
-- **Execução verde pendente de confirmação**: registrar aqui a URL do run do commit restaurado quando concluído.
+- Execução verde confirmada no commit de documentação `decad664f11a42bef6fe26595ca2bbdfdd9129f3`: https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43223927880 — workflow CI concluído com `success`; ZAP Baseline, Dependency Review, Trivy filesystem e CodeQL também concluídos com `success`.
+- A execução verde foi observada no SHA da PR já com os limites oficiais restaurados; a próxima alteração documental requer nova execução de CI para o SHA final.
 
 ## Segurança e escopo
 
