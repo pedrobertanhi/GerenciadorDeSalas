@@ -11,7 +11,7 @@ A CI extrai os contadores LINE e BRANCH de `target/site/jacoco/jacoco.xml`, escr
 
 ## Como registrar e avaliar
 
-1. Abrir a execução e consultar **Summary > Cobertura JaCoCo**; alternativamente, baixar `relatorios-maven-1` e abrir `site/jacoco/RESUMO_COBERTURA.md` ou `jacoco.xml`.
+1. Abrir a execução e consultar **Summary > Cobertura JaCoCo**; alternativamente, baixar o artefato `relatorios-maven-<tentativa>` correspondente ao número da tentativa exibido na execução (por exemplo, `relatorios-maven-2` após uma reexecução) e abrir `site/jacoco/RESUMO_COBERTURA.md` ou `jacoco.xml`.
 2. Registrar os contadores cobertos/perdidos, percentuais de linhas e branches, commit e URL do run.
 3. Comparar com as metas do projeto (linhas >= 80%, branches >= 70%).
 4. Se ambas forem atingidas, implementar `jacoco:check` com limites explícitos em PR separada e provar uma execução verde e uma falha controlada. Se não, abrir correções de testes sem reduzir metas silenciosamente.
