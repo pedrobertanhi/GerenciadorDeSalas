@@ -7,14 +7,14 @@
 - [Artefato Maven/JaCoCo](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43044216420/artifacts/13866487596)
 - CI, CodeQL, Dependency Review, Trivy e ZAP: sucesso para este commit.
 
-A CI extrai os contadores LINE e BRANCH de `target/site/jacoco/jacoco.xml`, escreve os percentuais no resumo da execução e gera `target/site/jacoco/RESUMO_COBERTURA.md`. **Os valores numéricos precisam ser transcritos do relatório efetivamente publicado**; nenhum valor é estimado neste documento.
+A CI extrai os contadores LINE e BRANCH de `target/site/jacoco/jacoco.xml`, escreve os percentuais no resumo da execução e gera `target/site/jacoco/RESUMO_COBERTURA.md`. Na [CI da PR #217, execução 43203143550](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43203143550), o log de `Maven Verify` registrou **93,90% LINE (2431/2589)** e **82,88% BRANCH (755/911)**. São resultados históricos do SHA `62d01d69a0b0c13485be0a0890139156da4c9291`; a candidata final precisa de nova execução.
 
 ## Como registrar e avaliar
 
 1. Abrir a execução e consultar **Summary > Cobertura JaCoCo**; alternativamente, baixar o artefato `relatorios-maven-<tentativa>` correspondente ao número da tentativa exibido na execução (por exemplo, `relatorios-maven-2` após uma reexecução) e abrir `site/jacoco/RESUMO_COBERTURA.md` ou `jacoco.xml`.
 2. Registrar os contadores cobertos/perdidos, percentuais de linhas e branches, commit e URL do run.
 3. Comparar com as metas do projeto (linhas >= 80%, branches >= 70%).
-4. Se ambas forem atingidas, implementar `jacoco:check` com limites explícitos em PR separada e provar uma execução verde e uma falha controlada. Se não, abrir correções de testes sem reduzir metas silenciosamente.
+4. O `jacoco:check` foi proposto com limites de 80% LINE e 70% BRANCH no `pom.xml` desta PR. Confirmar a execução verde no SHA da PR e produzir uma falha controlada seguida de recuperação verde em ambiente/branch de teste, sem enfraquecer os limites.
 
 ## Integrações ainda bloqueadas
 
