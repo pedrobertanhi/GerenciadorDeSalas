@@ -14,7 +14,7 @@ A CI extrai os contadores LINE e BRANCH de `target/site/jacoco/jacoco.xml`, escr
 1. Abrir a execução e consultar **Summary > Cobertura JaCoCo**; alternativamente, baixar o artefato `relatorios-maven-<tentativa>` correspondente ao número da tentativa exibido na execução (por exemplo, `relatorios-maven-2` após uma reexecução) e abrir `site/jacoco/RESUMO_COBERTURA.md` ou `jacoco.xml`.
 2. Registrar os contadores cobertos/perdidos, percentuais de linhas e branches, commit e URL do run.
 3. Comparar com as metas do projeto (linhas >= 80%, branches >= 70%).
-4. O `jacoco:check` foi proposto com limites de 80% LINE e 70% BRANCH no `pom.xml` desta PR. Confirmar a execução verde no SHA da PR e produzir uma falha controlada seguida de recuperação verde em ambiente/branch de teste, sem enfraquecer os limites.
+4. O `jacoco:check` está integrado à `main` pela [PR #218](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/218), com limites de 80% LINE e 70% BRANCH. A [falha controlada e recuperação verde](EVIDENCIA_CI_RED_GREEN_ENT04.md) foram comprovadas na PR #219: [run vermelho #43221134651](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43221134651) e [run verde #43223927880](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43223927880). Revalidar a candidata final no mesmo SHA/tag da release.
 
 ## Integrações ainda bloqueadas
 
