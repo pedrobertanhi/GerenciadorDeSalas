@@ -9,11 +9,11 @@ Este documento não substitui execuções reais nem autoriza fechar a issue ante
 | CI Maven, relatórios e JaCoCo | [PR #215](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/215) | Integrado |
 | Cálculo LINE/BRANCH e resumo rastreável | [PR #216](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/216) | Integrado |
 | Execução de CI com 5 workflows verdes | [Run CI #43044216420](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43044216420) e checks do SHA correspondente | Histórico; repetir na candidata final |
-| Cobertura percentual | [Resumo JaCoCo](EVIDENCIAS_COBERTURA_ENT04.md) | A medir e transcrever a partir do run final |
-| Gate de cobertura | Não há evidência de check percentual ativo | Pendente |
+| Cobertura percentual | [Resumo JaCoCo](EVIDENCIAS_COBERTURA_ENT04.md): 93,90% LINE e 82,88% BRANCH no run #43203143550 | Histórico verificado; repetir na candidata final |
+| Gate de cobertura | [PR #218](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/218), `jacoco:check` com LINE 80% e BRANCH 70% | Integrado; revalidar na candidata final |
 | SonarCloud | Sem análise e Quality Gate verificados | Pendente |
 | JMeter | Sem JTL e relatório HTML verificados | Pendente |
-| Falha controlada e recuperação CI | Sem par de runs vermelho/verde vinculado | Pendente |
+| Falha controlada e recuperação CI | [Evidência documentada](EVIDENCIA_CI_RED_GREEN_ENT04.md): [run vermelho #43221134651](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43221134651) e [run verde #43223927880](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43223927880) | Comprovado em branch isolada; CI final ainda deve passar |
 | Clone limpo, RTM e revisão cruzada final | Sem aceite vinculado ao SHA de release | Pendente |
 
 ## Protocolo de evidência por requisito
@@ -25,7 +25,7 @@ Para carga: documentar autorização do ambiente, configuração de usuários/ra
 ## Critérios de decisão
 
 - **Aprovado:** todos os requisitos obrigatórios têm evidência reproduzível no mesmo SHA/tag, gates exigidos passam, revisores aprovam e riscos residuais são aceitos nominalmente.
-- **Bloqueado:** faltam percentuais/gates, SonarCloud, JMeter, rastreabilidade, teste controlado vermelho/verde ou aprovação.
+- **Bloqueado:** faltam evidências obrigatórias como SonarCloud, JMeter, rastreabilidade ou aprovação final; percentuais, gates e teste controlado vermelho/verde já têm evidências históricas, sujeitas à validação da release.
 - **Reprovado:** teste/gate obrigatório falha ou evidência é inconsistente.
 
 **Decisão atual: BLOQUEADO para fechamento da #186.** A CI verde das PRs incrementais não comprova os demais requisitos. Atualizar esta decisão apenas após conferir os artefatos finais.
