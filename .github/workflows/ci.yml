@@ -36,6 +36,39 @@ jobs:
       - name: Executar verificação Maven
         run: ./mvnw --batch-mode --no-transfer-progress verify
 
+      # Preserva o XML do JaCoCo como evidencia automatizada de cobertura.
+      # Sem o XML, a etapa falha e nao informa percentuais inventados.
+      - name: Registrar cobertura JaCoCo
+        if: success()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          path = Path('target/site/jacoco/jacoco.xml')
+          if not path.is_file():
+              raise SystemExit('Relatorio jacoco.xml nao encontrado')
+          root = ET.parse(path).getroot()
+          lines = ['# Cobertura JaCoCo', '', '| Metrica | Cobertos | Perdidos | Percentual |', '|---|---:|---:|---:|']
+          for kind, label in [('LINE', 'Linhas'), ('BRANCH', 'Branches')]:
+              counters = [x for x in root.findall('counter') if x.get('type') == kind]
+              if len(counters) != 1:
+                  raise SystemExit(f'Contador {kind} ausente ou duplicado')
+              covered = int(counters[0].get('covered'))
+              missed = int(counters[0].get('missed'))
+              total = covered + missed
+              if total == 0:
+                  raise SystemExit(f'Contador {kind} sem elementos mensuraveis')
+              percent = 100 * covered / total
+              lines.append(f'| {label} | {covered} | {missed} | {percent:.2f}% |')
+              print(f'{label}: {percent:.2f}% ({covered}/{total})')
+          lines.extend(['', 'Commit: ${{ github.sha }}', 'Run: ${{ github.run_id }}', 'Tentativa: ${{ github.run_attempt }}'])
+          summary = '\n'.join(lines) + '\n'
+          with open(__import__('os').environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as out:
+              out.write(summary)
+          Path('target/site/jacoco/RESUMO_COBERTURA.md').write_text(summary, encoding='utf-8')
+          PY
+
       # Relatorios brutos gerados pelo Maven; disponiveis mesmo em falha de testes.
       - name: Publicar relatorios Surefire Failsafe e cobertura
         if: always()
