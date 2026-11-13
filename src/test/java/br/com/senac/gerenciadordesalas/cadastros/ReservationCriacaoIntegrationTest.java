@@ -10,6 +10,7 @@ import br.com.senac.gerenciadordesalas.usuario.Role;
 import br.com.senac.gerenciadordesalas.usuario.User;
 import br.com.senac.gerenciadordesalas.usuario.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -75,7 +76,12 @@ class ReservationCriacaoIntegrationTest extends IntegracaoPostgresBase {
     }
 
     @Test
-    void solicitante_criaReservaValida_recebe201ComLocationESaida() throws Exception {
+    @DisplayName("""
+            Dado um solicitante autenticado, uma sala disponível e materiais suficientes
+            Quando solicita uma reserva válida pela API
+            Então recebe HTTP 201, Location, identificador e a reserva é persistida
+            """)
+    void dadoSolicitanteAutenticadoESalaDisponivel_quandoSolicitaReservaValida_entaoRecebe201EPersiste() throws Exception {
         mockMvc.perform(post("/api/reservas")
                         .with(user(EMAIL).roles("SOLICITANTE"))
                         .with(csrf())
