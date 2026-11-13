@@ -8,13 +8,14 @@
 
 - Maven Verify, ZAP, Dependency Review, Trivy e CodeQL passaram no SHA atual.
 - Cobertura: 93,90% de linhas e 82,88% de branches.
-- SonarCloud registrou Quality Gate aprovado na PR #221.
-- JMeter executado em ambiente local autorizado, com dados sintéticos: baseline de 12.742 amostras, 0% de erros, p95 de 6 ms e 212,54 requisições/s. A disputa simultânea resultou em uma reserva aprovada e uma recusada por conflito.
+- O SonarCloud teve Quality Gate aprovado na candidata `98e59a55` desta PR. No workflow atual, a análise autenticada ocorre somente depois da integração na `main`, para não expor o token ao código de uma PR.
+- JMeter executado em ambiente local autorizado, com dados sintéticos: baseline de 12.742 amostras HTTP 200, 0% de erros, p95 de 6 ms e 212,54 requisições/s. O JTL anexado não contém a execução do cenário de disputa; esse resultado não é aceito como evidência até haver JTL próprio.
 
 ## Riscos residuais
 
 - TDD/BDD e cobertura API/E2E ainda estão consolidados parcialmente na RTM.
 - Reprodutibilidade de testes temporais por relógio/fuso não foi auditada integralmente.
+- O baseline JMeter é local e com um usuário; não permite inferir capacidade de produção.
 
 ## Decisão
 
