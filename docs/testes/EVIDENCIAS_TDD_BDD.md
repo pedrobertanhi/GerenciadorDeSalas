@@ -1,6 +1,6 @@
 # Evidências de TDD/BDD
 
-Status: pendente de comprovação histórica. Este documento registra o roteiro de coleta; não atesta execução nem adoção anterior de TDD.
+Status: BDD executável evidenciado; TDD histórico permanece sem comprovação e não é alegado.
 
 ## Execução de referência
 
@@ -35,7 +35,33 @@ Funcionalidade: Solicitação de reserva
     E nenhuma reserva será persistida
 ```
 
-Referência de implementação existente: [ReservationCriacaoIntegrationTest.java](../../src/test/java/br/com/senac/gerenciadordesalas/cadastros/ReservationCriacaoIntegrationTest.java). A descrição acima é uma especificação documental; não existe execução de Gherkin comprovada por este arquivo.
+## Evidência executável BDD
+
+A especificação BDD está automatizada em:
+
+`src/test/java/br/com/senac/gerenciadordesalas/cadastros/ReservationCriacaoIntegrationTest.java`
+
+Cenário automatizado:
+
+- Dado um solicitante autenticado, sala disponível e materiais suficientes;
+- Quando solicita uma reserva válida pela API;
+- Então recebe HTTP 201, cabeçalho `Location`, identificador e confirmação de persistência no PostgreSQL.
+
+Comando executado:
+
+```powershell
+.\mvnw.cmd --batch-mode --no-transfer-progress "-Dtest=ReservationCriacaoIntegrationTest" test
+```
+
+Resultado:
+
+- Data/hora: `2026-11-13 08:36:40 -03:00`.
+- SHA: `afbc7e070ce400deef00faaead1e16252e33e8cf`.
+- Ambiente: Windows; Java 21.0.12.1; Docker/Testcontainers; PostgreSQL 16.16.
+- Total de testes: 9; falhas: 0; erros: 0; ignorados: 0.
+- Conclusão: `BUILD SUCCESS`.
+
+O cenário executável usa `@DisplayName` em Given–When–Then; o `@BeforeEach` prepara solicitante, sala e material, e o método confirma tanto a resposta HTTP quanto a persistência no banco real do Testcontainers.
 
 ## Registro de um ciclo verificável
 
