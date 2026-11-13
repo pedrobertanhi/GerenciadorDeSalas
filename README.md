@@ -15,7 +15,9 @@ O projeto usa Java 21 e Spring Boot 4.1.2. A implementação funcional, seguran�
 - A candidata de segurança `1fde5bd` teve [837 testes aprovados](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/42920680085); execuções posteriores registradas na RTM alcançaram 898 testes. **Esses resultados não comprovam automaticamente o estado de novos commits.**
 - A [decisão de segurança da #184](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/184) aprovou uma candidata específica para o ambiente acadêmico controlado, com riscos residuais documentados.
 - A [entrega de qualidade #186](https://github.com/pedrobertanhi/GerenciadorDeSalas/issues/186) permanece aberta. Consulte o [relatório de testes](docs/testes/RELATORIO_DE_TESTES.md) para evidências e lacunas atuais.
-- A PR #215 adiciona publicação de relatórios Maven e geração de cobertura JaCoCo; a cobertura medida, SonarCloud, JMeter e decisão final exigem evidências próprias.
+- As PRs #215, #216 e #218 integraram publicação de relatórios Maven, resumo JaCoCo e gate de cobertura (80% LINE / 70% BRANCH). A [CI da PR #217](https://github.com/pedrobertanhi/GerenciadorDeSalas/actions/runs/43203143550) registrou 93,90% de linhas e 82,88% de branches; são valores históricos, não uma certificação automática da release final.
+- A [PR #219](https://github.com/pedrobertanhi/GerenciadorDeSalas/pull/219) comprovou falha controlada e recuperação verde da CI, com [evidência rastreável](docs/qualidade/EVIDENCIA_CI_RED_GREEN_ENT04.md).
+- SonarCloud, JMeter em ambiente autorizado, rastreabilidade integral e aceite da release ainda dependem de evidências reais. Consulte o [checklist ENT-04](docs/qualidade/CHECKLIST_ENT04.md).
 
 ## Produto
 
