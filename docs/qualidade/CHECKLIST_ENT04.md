@@ -13,12 +13,23 @@
 | Branch protection/check obrigatório | CONFIGURADO | Ruleset da main exige PR, 2 aprovações, conversas resolvidas, branch atualizada e checks CI/segurança. |
 | JMeter autorizado | EVIDENCIADO PARA BASELINE | [Resultado do teste de carga](../desempenho/RESULTADO_TESTE_CARGA.md), JTL, relatório HTML e plano JMX em `performance/`. Baseline: 12.742 amostras HTTP 200, 0% erros, p95 6 ms e 212,54 req/s. A disputa de reservas existe no plano, mas ainda requer JTL próprio. |
 | RTM, riscos, defeitos, diagramas e responsabilidades | PARCIAL | RTM existente; riscos residuais registrados na decisão final. |
-| Clone limpo e documentação | PENDENTE | Executar validação em ambiente novo antes do merge e registrar o resultado. |
+| Clone limpo e documentação | EVIDENCIADO | Validação em clone novo concluída com `BUILD SUCCESS`; detalhes abaixo. |
 | Revisão cruzada e decisão final | PENDENTE DE APROVAÇÃO | [Decisão de qualidade](DECISAO_QUALIDADE_ENT04.md) e [roteiro da apresentação](ROTEIRO_APRESENTACAO_ENT04.md) preparados; faltam clone limpo e 2 aprovações humanas. |
 
 ## Decisão atual
 
-A entrega está tecnicamente apta nos checks automatizados e tem evidência real de carga baseline. O merge permanece bloqueado até a validação de clone limpo, resolução das conversas e duas aprovações humanas requeridas pelo ruleset.
+A entrega está tecnicamente apta nos checks automatizados, tem evidência real de carga baseline e validação em clone limpo. O merge permanece bloqueado até a resolução das conversas e duas aprovações humanas requeridas pelo ruleset.
+
+## Validação em clone limpo
+
+- Data/hora: 13/11/2026 08:28:20 -03:00
+- Branch: `chore/sonarcloud-quality-gate`
+- SHA validado: `7339e2fce7d3b39e00d65bbb87902e655d104d62`
+- Ambiente: Windows, JDK 21, Docker/Testcontainers e PostgreSQL 16.
+- Procedimento: clone novo via Git, sem arquivos modificados; execução de `.\\mvnw.cmd --batch-mode --no-transfer-progress verify`.
+- Resultado: 898 testes executados, 0 falhas, 0 erros e 1 ignorado.
+- Cobertura: JaCoCo executado; todos os gates atendidos.
+- Conclusão: `BUILD SUCCESS`.
 
 ## Referências
 

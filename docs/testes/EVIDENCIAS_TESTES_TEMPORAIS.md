@@ -44,7 +44,7 @@ Para verificar a aplicação do relógio em integração, com Docker disponível
 | SHA completo e estado do checkout | `b17cd259c8753e6bf59ad561b620009a0fae63d5` — branch `chore/sonarcloud-quality-gate` |
 | Execução/log, data com fuso e ambiente | `2026-11-13 08:15:05 -03:00`; Windows; Java 21.0.12.1; PostgreSQL via Testcontainers/Docker |
 | Comando, código de saída e XML Surefire | `verify`; código de saída 0; `BUILD SUCCESS`; localização do XML Surefire não registrada |
-| Casos executados, falhos e ignorados | `ReservationTimePolicyTest`: 7 testes, 0 falhas; a execução completa teve 898 testes, 0 falhas, 0 erros e 0 ignorados |
+| Casos executados, falhos e ignorados | `ReservationTimePolicyTest`: 7 testes, 0 falhas; a execução completa teve 898 testes, 0 falhas, 0 erros e 1 ignorado |
 | Cobertura | JaCoCo gerado; todos os checks de cobertura aprovados |
 | Regra de negócio para início igual a agora | Pendente |
 | Requisitos de zona/offset e justificativa de casos não aplicáveis | Pendente |

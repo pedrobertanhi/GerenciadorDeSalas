@@ -39,7 +39,7 @@ Esse comando seleciona parte da suíte e não substitui o gate completo:
 | Requisito, cenário e persona | Pendente |
 | Data/hora com fuso, SO, JDK, Docker e Chrome | `2026-11-13 08:15:05 -03:00`; Windows; Java 21.0.12.1; PostgreSQL via Testcontainers/Docker; versão do Chrome não registrada |
 | Comando e código de saída | `verify`; código de saída 0; `BUILD SUCCESS` |
-| Total, sucessos, falhas, erros e ignorados | 898 testes; 898 sucessos; 0 falhas; 0 erros; 0 ignorados |
+| Total, sucessos, falhas, erros e ignorados | 898 testes executados; 0 falhas; 0 erros; 1 ignorado |
 | URL da execução CI e tentativa | Pendente |
 | Relatórios Surefire e capturas correspondentes | JaCoCo gerado e gate aprovado; localização/identificadores dos relatórios e das capturas não registrados |
 | Revisor e conclusão por cenário | Pendente |

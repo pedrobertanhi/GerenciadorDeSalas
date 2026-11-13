@@ -9,7 +9,7 @@ Status: pendente de comprovação histórica. Este documento registra o roteiro 
 | SHA completo e estado do checkout | `b17cd259c8753e6bf59ad561b620009a0fae63d5` — branch `chore/sonarcloud-quality-gate` |
 | Data/hora | `2026-11-13 08:15:05 -03:00` |
 | Ambiente | Windows; Java 21.0.12.1; PostgreSQL via Testcontainers/Docker |
-| Comando e resultado | `verify`; 898 testes, 0 falhas, 0 erros, 0 ignorados; `BUILD SUCCESS`; gate JaCoCo aprovado |
+| Comando e resultado | `verify`; 898 testes executados, 0 falhas, 0 erros, 1 ignorado; `BUILD SUCCESS`; gate JaCoCo aprovado |
 
 Esta execução comprova o estado atual da suíte no SHA registrado. Ela não fornece as etapas Red, Green e Refactor de uma funcionalidade e, portanto, não encerra o risco residual de TDD/BDD.
 
