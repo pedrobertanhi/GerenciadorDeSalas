@@ -15,7 +15,9 @@
 | CI | GitHub Actions em PR | A definir | A definir | A definir | Pendente |
 | Cobertura | JaCoCo | A definir | A definir | A definir | Pendente |
 | Análise | SonarCloud | A definir | A definir | A definir | Pendente |
-| TDD/BDD | Evidência red-green-refactor/cenários | A definir | A definir | A definir | Pendente |
+| TDD/BDD | Evidência red-green-refactor/cenários | A definir | [Registro](../testes/EVIDENCIAS_TDD_BDD.md) | A definir | Risco residual; comprovação histórica pendente |
+| API/E2E | Cenários, reprodução e relatórios | A definir | [Registro](../testes/EVIDENCIAS_API_E2E.md) | A definir | Risco residual; execuções pendentes de verificação |
+| Temporal | Relógio, fronteiras e fusos | A definir | [Registro](../testes/EVIDENCIAS_TESTES_TEMPORAIS.md) | A definir | Risco residual; execuções pendentes de verificação |
 | Desempenho | Plano JMeter | A definir | ../desempenho/PLANO_TESTE_CARGA.md | A definir | Pendente |
 | Desempenho | Resultado JMeter | A definir | ../desempenho/RESULTADO_TESTE_CARGA.md | A definir | Pendente |
 | Segurança | Modelo de ameaças | A definir | ../seguranca/MODELO_DE_AMEACAS.md | A definir | Pendente |
