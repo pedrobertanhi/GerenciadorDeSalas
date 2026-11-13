@@ -9,7 +9,7 @@
 - Rampa: 1 segundo
 - Duração: 60 segundos
 
-## Resultados
+## Resultados comprovados
 
 | Métrica | Resultado |
 |---|---:|
@@ -22,50 +22,13 @@
 | Máximo | 70 ms |
 | Throughput | 212,54 requisições/s |
 
-## Conclusão
+O arquivo `performance/resultados-baseline.jtl` contém as 12.742 amostras, todas com HTTP 200, do cenário de login e consulta autenticada. O relatório HTML foi gerado a partir do mesmo JTL.
 
-O baseline foi executado com sucesso, sem erros. A autenticação por sessão e CSRF funcionou, e a consulta autenticada de salas ativas respondeu dentro dos tempos registrados acima.
+## Cenário de disputa de reserva
 
-## Disputa de reserva
+O plano `performance/gerenciador-reservas.jmx` também contém um cenário de duas contas sintéticas tentando reservar a mesma sala e o mesmo horário, com sincronização entre as threads.
 
-Foram utilizadas duas contas sintéticas:
-
-- `solicitante.demo@exemplo.test`
-- `solicitante.carga2@exemplo.test`
-
-Sala utilizada:
-
-- Nome: Sala JMeter 01
-- ID: 1
-- Capacidade: 20
-- Localização: Ambiente de testes local
-
-Duas threads tentaram reservar a mesma sala no mesmo horário.
-
-| Item | Valor |
-|---|---|
-| Usuários concorrentes | 2 |
-| Sala | Sala JMeter 01 — ID 1 |
-| Período | 18/12/2026, 14:00–15:00 |
-| Horário enviado à API | `2026-12-18T17:00:00Z` até `2026-12-18T18:00:00Z` |
-
-### Resultado da disputa
-
-Uma thread criou a reserva com sucesso:
-
-- Reserva ID: 2
-- Status: APROVADA
-- Finalidade: Disputa de reserva JMeter
-
-A outra thread foi bloqueada pela regra de conflito:
-
-- Código HTTP: 409
-- Código interno: CONFLITO_DE_ESTADO
-- Mensagem: A operacao nao pode ser concluida devido a um conflito de estado atual do recurso.
-
-### Conclusão da disputa
-
-Foi validado que duas reservas não conseguem usar a mesma sala no mesmo período: uma foi aceita e a outra foi recusada por conflito.
+Contudo, o JTL versionado nesta entrega contém somente o baseline. Portanto, **não se declara resultado da disputa** até que seja anexado um JTL/relatório que inclua as duas requisições de reserva e seus códigos de resposta. Isso evita atribuir uma evidência inexistente ao JMeter.
 
 ## Evidências
 
@@ -74,8 +37,6 @@ Foi validado que duas reservas não conseguem usar a mesma sala no mesmo períod
 - `performance/resultados-baseline.jtl`
 - `performance/relatorio-baseline/index.html`
 
-## Conclusão geral
+## Limites e interpretação
 
-O teste de baseline foi concluído com sucesso, sem erros, com p95 de 6 ms, p99 de 7 ms e throughput de 212,54 requisições por segundo no ambiente local.
-
-Também foi validada a regra de concorrência de reservas: uma reserva foi aprovada e a outra tentativa para a mesma sala e horário retornou `409 CONFLITO_DE_ESTADO`.
+Este é um baseline local, com um único usuário e PostgreSQL local. Ele comprova funcionamento e desempenho naquele ambiente, mas não representa capacidade de produção nem substitui um ensaio com concorrência maior.
