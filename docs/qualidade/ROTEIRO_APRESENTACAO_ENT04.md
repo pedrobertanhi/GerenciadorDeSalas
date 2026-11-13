@@ -11,14 +11,15 @@ Consolidar a qualidade, a documentação e as evidências de entrega do projeto 
 - Cobertura JaCoCo:
   - Linhas: 93,90%
   - Branches: 82,88%
-- SonarCloud: Quality Gate aprovado na PR #221.
+- BDD executável: criação de reserva validada com PostgreSQL 16.16 via Testcontainers; 9 testes, sem falhas, erros ou ignorados.
+- SonarCloud: Quality Gate aprovado historicamente na candidata `98e59a55` da PR #221. O Quality Gate da `main` deve ser conferido após o merge.
 
 ## 3. Segurança do pipeline
 
 O workflow foi ajustado para não expor o `SONAR_TOKEN` durante a execução de pull requests.
 
 - Em pull requests, é executado apenas o Maven Verify.
-- A análise autenticada do SonarCloud ocorre somente após push na branch `main`.
+- A análise autenticada do SonarCloud ocorre somente após push na branch `main` ou disparo manual nessa branch.
 - O workflow usa `bash ./mvnw`, evitando falha por permissão de execução do Maven Wrapper.
 
 ## 4. Teste de carga
@@ -40,11 +41,9 @@ O JMeter foi executado em ambiente local autorizado, utilizando dados sintético
 
 ### Disputa de reserva
 
-Foram executadas duas requisições simultâneas para a mesma sala e horário.
+O plano JMeter contém o cenário de duas requisições simultâneas para a mesma sala e horário. Entretanto, o JTL versionado nesta entrega contém somente o baseline de um usuário.
 
-- Uma reserva foi aprovada.
-- A segunda requisição recebeu conflito de estado.
-- O resultado confirma que a aplicação impede dupla reserva para o mesmo recurso e período.
+Portanto, a disputa permanece **pendente de evidência** até que seja anexado um JTL/relatório com as duas requisições de reserva, seus códigos de resposta e o resultado esperado de uma reserva aceita e uma recusada por conflito.
 
 ## 5. Documentação entregue
 
@@ -52,23 +51,21 @@ Foram executadas duas requisições simultâneas para a mesma sala e horário.
 - Procedimento operacional do SonarCloud.
 - Evidências de cobertura JaCoCo.
 - Evidência de CI vermelho/verde.
-- Resultado real do JMeter.
+- Plano, JTL e relatório do baseline JMeter.
+- Evidência BDD de criação de reserva.
+- Validação em clone limpo.
 - Decisão de qualidade da ENT-04.
 - Roteiro de apresentação.
 
 ## 6. Riscos residuais
 
-- A rastreabilidade de TDD/BDD e API/E2E permanece parcial na RTM.
-- Testes envolvendo relógio e fuso horário ainda não foram auditados integralmente.
-- A validação de clone limpo deve ser registrada antes do merge final.
+- TDD histórico não é alegado; há evidência BDD executável.
+- A disputa concorrente de reserva no JMeter aguarda JTL específico.
+- Casos adicionais de relógio, offset e fuso permanecem como ampliação de cobertura, sem invalidar a execução atual com relógio fixo.
+- Após o merge, falta conferir a análise autenticada e o Quality Gate da `main`.
 
 ## 7. Decisão
 
-A entrega está tecnicamente apta:
+A entrega está tecnicamente apta para merge após os checks e as aprovações exigidas pelo ruleset.
 
-- Todos os checks automatizados atuais passaram.
-- A cobertura está acima dos limites definidos.
-- O Quality Gate do SonarCloud foi aprovado.
-- O teste de carga foi executado com sucesso e sem erros.
-
-O merge permanece condicionado apenas às exigências externas do ruleset da branch, como conversas resolvidas e aprovações humanas.
+A Issue #186 permanece aberta após o merge até que seja registrada a análise do SonarCloud na `main` e aceita formalmente a pendência da disputa de reserva no JMeter.
